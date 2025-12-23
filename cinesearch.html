@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineSearch | Movie Discovery App</title>
+    <title>CineSearch by h1m</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -35,6 +35,7 @@
             --rating-color: #ffc107;
             --favorite-color: #dc3545;
             --success-color: #28a745;
+            --watched-color: #4ade80;
             --shadow-sm: 0 1px 3px rgba(33, 37, 41, 0.08);
             --shadow-md: 0 4px 6px rgba(33, 37, 41, 0.1);
             --shadow-lg: 0 10px 25px rgba(33, 37, 41, 0.15);
@@ -63,6 +64,7 @@
             --rating-color: #ffc107;
             --favorite-color: #ff6b6b;
             --success-color: #4ade80;
+            --watched-color: #4ade80;
             --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
             --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
@@ -470,6 +472,60 @@
             outline-offset: 2px;
         }
 
+        /* Watched Badge */
+        .watched-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background-color: var(--watched-color);
+            backdrop-filter: blur(4px);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            pointer-events: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Favorites Actions */
+        .favorites-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            background-color: var(--bg-accent);
+            border-color: var(--border-hover);
+        }
+
+        .action-btn.active {
+            background-color: rgba(73, 80, 87, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
         /* Loading & States */
         .loading,
         .empty-state,
@@ -663,6 +719,9 @@
             margin-top: 32px;
             padding-top: 24px;
             border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .btn-favorite {
@@ -689,6 +748,32 @@
             background-color: rgba(220, 53, 69, 0.1);
             border-color: var(--favorite-color);
             color: var(--favorite-color);
+        }
+
+        .btn-watched {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-watched:hover {
+            background-color: var(--bg-accent);
+            border-color: var(--border-hover);
+        }
+
+        .btn-watched.active {
+            background-color: rgba(73, 80, 87, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
         }
 
         /* Toast */
@@ -840,6 +925,11 @@
                 align-items: flex-start;
                 gap: 16px;
             }
+            
+            .favorites-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
 
         @media (max-width: 480px) {
@@ -864,6 +954,10 @@
             
             .footer {
                 padding: 32px 0;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
             }
         }
 
@@ -958,6 +1052,19 @@
                         <i class="fas fa-arrow-left"></i> Back to Search
                     </button>
                 </div>
+                
+                <div class="favorites-actions" id="favoritesActions">
+                    <button class="action-btn" id="markWatchedBtn">
+                        <i class="fas fa-eye"></i> Mark as Watched
+                    </button>
+                    <button class="action-btn" id="markUnwatchedBtn">
+                        <i class="fas fa-eye-slash"></i> Mark as Unwatched
+                    </button>
+                    <button class="action-btn" id="clearWatchedBtn">
+                        <i class="fas fa-trash"></i> Clear All Watched
+                    </button>
+                </div>
+                
                 <div class="movies-grid" id="favoritesGrid">
                     <!-- Favorite movie cards will be inserted here -->
                 </div>
@@ -1017,12 +1124,15 @@
         const state = {
             searchResults: [],
             favorites: JSON.parse(localStorage.getItem('movieFavorites')) || [],
+            watchedMovies: JSON.parse(localStorage.getItem('watchedMovies')) || [],
+            favoriteMoviesData: JSON.parse(localStorage.getItem('favoriteMoviesData')) || {},
             currentView: 'search',
             isLoading: false,
             currentMovie: null,
             apiCache: new Map(),
             searchTimeout: null,
-            theme: localStorage.getItem('movieTheme') || 'light'
+            theme: localStorage.getItem('movieTheme') || 'light',
+            selectedFavorite: null // For marking watched/unwatched
         };
 
         // DOM Elements
@@ -1043,7 +1153,11 @@
             favoritesCount: document.getElementById('favoritesCount'),
             toast: document.getElementById('toast'),
             toastMessage: document.getElementById('toastMessage'),
-            mainContent: document.getElementById('mainContent')
+            mainContent: document.getElementById('mainContent'),
+            markWatchedBtn: document.getElementById('markWatchedBtn'),
+            markUnwatchedBtn: document.getElementById('markUnwatchedBtn'),
+            clearWatchedBtn: document.getElementById('clearWatchedBtn'),
+            favoritesActions: document.getElementById('favoritesActions')
         };
 
         // Initialize App
@@ -1052,7 +1166,7 @@
             loadPopularMovies();
             setupEventListeners();
             updateFavoritesCount();
-            renderFavorites();
+            updateFavoritesActions();
         }
 
         // Theme Management
@@ -1157,6 +1271,63 @@
             }
         }
 
+        // Save favorite movie data to localStorage
+        function saveFavoriteMovieData(movie) {
+            if (!movie || !movie.imdbID) return;
+            
+            state.favoriteMoviesData[movie.imdbID] = {
+                ...movie,
+                savedAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('favoriteMoviesData', JSON.stringify(state.favoriteMoviesData));
+        }
+
+        // Get favorite movie from storage
+        function getFavoriteMovie(imdbID) {
+            return state.favoriteMoviesData[imdbID] || null;
+        }
+
+        // Get all favorite movies with data
+        function getAllFavoriteMovies() {
+            return state.favorites
+                .map(imdbID => getFavoriteMovie(imdbID))
+                .filter(movie => movie !== null);
+        }
+
+        // Watched movies management
+        function toggleWatchedStatus(imdbID) {
+            const index = state.watchedMovies.indexOf(imdbID);
+            
+            if (index === -1) {
+                state.watchedMovies.push(imdbID);
+            } else {
+                state.watchedMovies.splice(index, 1);
+            }
+            
+            localStorage.setItem('watchedMovies', JSON.stringify(state.watchedMovies));
+            
+            // Update UI if in favorites view
+            if (state.currentView === 'favorites') {
+                renderFavorites();
+            }
+        }
+
+        function clearAllWatched() {
+            state.watchedMovies = [];
+            localStorage.setItem('watchedMovies', JSON.stringify(state.watchedMovies));
+            
+            if (state.currentView === 'favorites') {
+                renderFavorites();
+            }
+            
+            showToast('Cleared all watched statuses');
+        }
+
+        function isMovieWatched(imdbID) {
+            return state.watchedMovies.includes(imdbID);
+        }
+
         // Rendering Functions
         function renderMovies(movies) {
             if (movies.length === 0) {
@@ -1177,7 +1348,7 @@
                     <button class="favorite-btn ${state.favorites.includes(movie.imdbID) ? 'active' : ''}" 
                             data-id="${movie.imdbID}"
                             aria-label="${state.favorites.includes(movie.imdbID) ? 'Remove from favorites' : 'Add to favorites'}">
-                        <i class="fas ${state.favorites.includes(movie.imdbID) ? 'fa-heart' : 'fa-heart'}"></i>
+                        <i class="fas fa-heart"></i>
                     </button>
                     
                     ${movie.Poster && movie.Poster !== 'N/A' 
@@ -1214,14 +1385,7 @@
         }
 
         function renderFavorites() {
-            const favoriteMovies = state.searchResults.filter(movie => 
-                state.favorites.includes(movie.imdbID)
-            ).concat(
-                // Also include any favorites not in current search results
-                Array.from(state.apiCache.values())
-                    .filter(movie => state.favorites.includes(movie.imdbID))
-                    .filter(movie => !state.searchResults.some(m => m.imdbID === movie.imdbID))
-            );
+            const favoriteMovies = getAllFavoriteMovies();
 
             if (favoriteMovies.length === 0) {
                 elements.favoritesGrid.innerHTML = `
@@ -1233,6 +1397,7 @@
                         <p class="state-text">Click the heart icon on any movie to add it to your favorites</p>
                     </div>
                 `;
+                updateFavoritesActions();
                 return;
             }
 
@@ -1243,6 +1408,11 @@
                             aria-label="Remove from favorites">
                         <i class="fas fa-heart"></i>
                     </button>
+                    
+                    ${isMovieWatched(movie.imdbID) 
+                        ? `<div class="watched-badge">Watched</div>`
+                        : ''
+                    }
                     
                     ${movie.Poster && movie.Poster !== 'N/A' 
                         ? `<img class="movie-poster" src="${movie.Poster}" alt="${movie.Title} poster">`
@@ -1275,9 +1445,37 @@
                     </div>
                 </article>
             `).join('');
+            
+            updateFavoritesActions();
+        }
+
+        function updateFavoritesActions() {
+            const favoriteMovies = getAllFavoriteMovies();
+            const watchedCount = favoriteMovies.filter(movie => isMovieWatched(movie.imdbID)).length;
+            
+            if (favoriteMovies.length === 0) {
+                elements.favoritesActions.style.display = 'none';
+            } else {
+                elements.favoritesActions.style.display = 'flex';
+                
+                // Update button states
+                if (state.selectedFavorite) {
+                    const isWatched = isMovieWatched(state.selectedFavorite);
+                    elements.markWatchedBtn.classList.toggle('active', !isWatched);
+                    elements.markUnwatchedBtn.classList.toggle('active', isWatched);
+                } else {
+                    elements.markWatchedBtn.classList.remove('active');
+                    elements.markUnwatchedBtn.classList.remove('active');
+                }
+                
+                // Enable/disable clear watched button
+                elements.clearWatchedBtn.disabled = watchedCount === 0;
+            }
         }
 
         function renderMovieDetails(movie) {
+            const isWatched = isMovieWatched(movie.imdbID);
+            
             return `
                 ${movie.Poster && movie.Poster !== 'N/A' 
                     ? `<img class="modal-poster" src="${movie.Poster}" alt="${movie.Title} poster">`
@@ -1293,6 +1491,7 @@
                         <span>${movie.Year}</span>
                         ${movie.Runtime && movie.Runtime !== 'N/A' ? `<span><i class="fas fa-clock"></i> ${movie.Runtime}</span>` : ''}
                         ${movie.Rated && movie.Rated !== 'N/A' ? `<span><i class="fas fa-certificate"></i> ${movie.Rated}</span>` : ''}
+                        ${isWatched ? `<span style="color: var(--watched-color);"><i class="fas fa-eye"></i> Watched</span>` : ''}
                     </div>
                     
                     ${movie.imdbRating && movie.imdbRating !== 'N/A' 
@@ -1382,9 +1581,19 @@
                         <button class="btn-favorite ${state.favorites.includes(movie.imdbID) ? 'active' : ''}" 
                                 data-id="${movie.imdbID}"
                                 aria-label="${state.favorites.includes(movie.imdbID) ? 'Remove from favorites' : 'Add to favorites'}">
-                            <i class="fas ${state.favorites.includes(movie.imdbID) ? 'fa-heart' : 'fa-heart'}"></i>
+                            <i class="fas fa-heart"></i>
                             ${state.favorites.includes(movie.imdbID) ? ' Remove from Favorites' : ' Add to Favorites'}
                         </button>
+                        
+                        ${state.favorites.includes(movie.imdbID) 
+                            ? `<button class="btn-watched ${isWatched ? 'active' : ''}" 
+                                    data-id="${movie.imdbID}"
+                                    aria-label="${isWatched ? 'Mark as unwatched' : 'Mark as watched'}">
+                                <i class="fas ${isWatched ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                                ${isWatched ? ' Mark as Unwatched' : ' Mark as Watched'}
+                            </button>`
+                            : ''
+                        }
                     </div>
                 </div>
             `;
@@ -1449,6 +1658,15 @@
             
             if (index === -1) {
                 state.favorites.push(imdbID);
+                
+                // Save movie data to localStorage
+                const movie = state.searchResults.find(m => m.imdbID === imdbID) ||
+                             Array.from(state.apiCache.values()).find(m => m.imdbID === imdbID);
+                
+                if (movie) {
+                    saveFavoriteMovieData(movie);
+                }
+                
                 showToast('Movie added to favorites');
             } else {
                 state.favorites.splice(index, 1);
@@ -1498,6 +1716,7 @@
                 elements.favoritesView.classList.add('active');
                 elements.favoritesToggle.classList.add('active');
                 renderFavorites();
+                state.selectedFavorite = null;
             } else {
                 elements.favoritesView.classList.remove('active');
                 elements.searchView.classList.add('active');
@@ -1591,8 +1810,16 @@
                 const movieCard = e.target.closest('.movie-card');
                 if (movieCard) {
                     const imdbID = movieCard.dataset.id;
+                    
+                    // Store selected favorite for actions
+                    if (state.currentView === 'favorites') {
+                        state.selectedFavorite = imdbID;
+                        updateFavoritesActions();
+                    }
+                    
                     const movie = state.searchResults.find(m => m.imdbID === imdbID) ||
-                                 Array.from(state.apiCache.values()).find(m => m.imdbID === imdbID);
+                                 Array.from(state.apiCache.values()).find(m => m.imdbID === imdbID) ||
+                                 getFavoriteMovie(imdbID);
                     
                     if (movie) {
                         openMovieDetails(movie);
@@ -1616,13 +1843,60 @@
                 }
             });
 
-            // Modal favorite button (delegated)
+            // Modal buttons (delegated)
             elements.movieModal.addEventListener('click', (e) => {
                 const favoriteBtn = e.target.closest('.btn-favorite');
                 if (favoriteBtn) {
                     e.stopPropagation();
                     const imdbID = favoriteBtn.dataset.id;
                     toggleFavorite(imdbID);
+                    return;
+                }
+                
+                const watchedBtn = e.target.closest('.btn-watched');
+                if (watchedBtn) {
+                    e.stopPropagation();
+                    const imdbID = watchedBtn.dataset.id;
+                    toggleWatchedStatus(imdbID);
+                    showToast(isMovieWatched(imdbID) ? 'Marked as watched' : 'Marked as unwatched');
+                    
+                    // Update modal
+                    if (state.currentMovie) {
+                        openMovieDetails(state.currentMovie);
+                    }
+                }
+            });
+
+            // Favorites actions
+            elements.markWatchedBtn.addEventListener('click', () => {
+                if (state.selectedFavorite) {
+                    if (!isMovieWatched(state.selectedFavorite)) {
+                        toggleWatchedStatus(state.selectedFavorite);
+                        showToast('Marked as watched');
+                        renderFavorites();
+                    }
+                } else {
+                    showToast('Please select a movie first');
+                }
+            });
+
+            elements.markUnwatchedBtn.addEventListener('click', () => {
+                if (state.selectedFavorite) {
+                    if (isMovieWatched(state.selectedFavorite)) {
+                        toggleWatchedStatus(state.selectedFavorite);
+                        showToast('Marked as unwatched');
+                        renderFavorites();
+                    }
+                } else {
+                    showToast('Please select a movie first');
+                }
+            });
+
+            elements.clearWatchedBtn.addEventListener('click', () => {
+                if (state.watchedMovies.length > 0) {
+                    if (confirm('Clear watched status from all movies?')) {
+                        clearAllWatched();
+                    }
                 }
             });
 
