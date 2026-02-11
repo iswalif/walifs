@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>lofi</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    background: #0e0e0e;
+    color: #e5e5e5;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 24px;
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    text-transform: lowercase;
+    opacity: 0.75;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.start-text {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    opacity: 0.6;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.start-text:hover {
+    opacity: 1;
+}
+
+.controls {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+button {
+    background: transparent;
+    border: 1px solid #e5e5e5;
+    color: #e5e5e5;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: #e5e5e5;
+    color: #0e0e0e;
+}
+
+button.playing {
+    animation: pulse 2.4s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(229,229,229,0.12); }
+    70% { box-shadow: 0 0 0 22px rgba(229,229,229,0); }
+    100% { box-shadow: 0 0 0 0 rgba(229,229,229,0); }
+}
+
+.channel {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    opacity: 0.55;
+}
+
+.channel span {
+    opacity: 0.4;
+}
+
+.channel strong {
+    opacity: 1;
+}
+
+@media (max-width: 480px) {
+    button {
+        width: 75px;
+        height: 75px;
+        font-size: 9px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <div>lofi</div>
+    <div>by h1m</div>
+</nav>
+
+<main>
+
+<div class="start-text" id="startText">
+    press space or click anywhere to start
+</div>
+
+<div class="controls" id="controls">
+    <button id="muteBtn">mute</button>
+    <div class="channel">
+        channel <span>—</span> <strong id="channelName">chillhop</strong>
+    </div>
+</div>
+
+</main>
+
+<audio id="audio" preload="none" crossorigin="anonymous"></audio>
+
+<script>
+const streams = [
+    { name: "groovesalad", url: "https://ice1.somafm.com/groovesalad-128-mp3" },
+    { name: "dronezone", url: "https://ice1.somafm.com/dronezone-128-mp3" },
+    { name: "secretagent", url: "https://ice1.somafm.com/secretagent-128-mp3" },
+    { name: "defcon", url: "https://ice1.somafm.com/defcon-128-mp3" },
+    { name: "lush", url: "https://ice1.somafm.com/lush-128-mp3" }
+];
+
+const audio = document.getElementById("audio");
+const startText = document.getElementById("startText");
+const controls = document.getElementById("controls");
+const muteBtn = document.getElementById("muteBtn");
+const channelName = document.getElementById("channelName");
+
+let started = false;
+let muted = false;
+let channelIndex = 0;
+
+function fade(target, duration = 350) {
+    const step = 0.04;
+    const interval = duration / (1 / step);
+
+    const fader = setInterval(() => {
+        if (Math.abs(audio.volume - target) < step) {
+            audio.volume = target;
+            clearInterval(fader);
+        } else {
+            audio.volume += audio.volume < target ? step : -step;
+        }
+    }, interval);
+}
+
+function loadChannel(index) {
+    fade(0, 200);
+    setTimeout(() => {
+        audio.src = streams[index].url;
+        audio.play();
+        fade(1, 400);
+        channelName.textContent = streams[index].name;
+    }, 250);
+}
+
+function startPlayback() {
+    if (started) return;
+    started = true;
+
+    startText.style.display = "none";
+    controls.style.display = "flex";
+
+    audio.volume = 0;
+    loadChannel(channelIndex);
+
+    muteBtn.classList.add("playing");
+    muteBtn.textContent = "mute";
+}
+
+function toggleMute() {
+    muted = !muted;
+
+    if (muted) {
+        fade(0);
+        muteBtn.textContent = "unmute";
+        muteBtn.classList.remove("playing");
+    } else {
+        fade(1);
+        muteBtn.textContent = "mute";
+        muteBtn.classList.add("playing");
+    }
+}
+
+function nextChannel() {
+    channelIndex = (channelIndex + 1) % streams.length;
+    loadChannel(channelIndex);
+}
+
+document.addEventListener("click", startPlayback, { once: true });
+document.addEventListener("touchstart", startPlayback, { once: true });
+
+document.addEventListener("keydown", (e) => {
+    if (e.code === "Space") {
+        e.preventDefault();
+        startPlayback();
+    }
+    if (e.key === "ArrowRight" || e.key === "n") {
+        nextChannel();
+    }
+});
+
+muteBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMute();
+});
+
+document.addEventListener("dblclick", (e) => {
+    if (!started) return;
+    nextChannel();
+});
+
+// block iOS double-tap zoom
+let lastTouch = 0;
+document.addEventListener("touchend", e => {
+    const now = Date.now();
+    if (now - lastTouch <= 300) e.preventDefault();
+    lastTouch = now;
+}, { passive: false });
+</script>
+
+</body>
+</html>
