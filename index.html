@@ -2,348 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Walif's Portfolio Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Walif's Portolio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
-        /* Base Styles & Variables */
-        :root {
-            --dark-bg: #121212;
-            --card-bg: #1e1e1e;
-            --accent: #4a8eff;
-            --accent-light: #6ba2ff;
-            --text-primary: #ffffff;
-            --text-secondary: #b3b3b3;
-            --transition: all 0.5s ease;
-        }
-
+        /* —————————————————— lofi reset & base —————————————————— */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        html {
+        :root {
+            --bg: #0e0e0e;
+            --bg-card: #1a1a1a;
+            --text: #e5e5e5;
+            --text-muted: #a0a0a0;
+            --accent: #e5e5e5;
+            --spacer: 2rem;
+            --transition: all 0.2s ease;
+        }
+
+        html, body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            line-height: 1.6;
+            font-weight: 300;
             scroll-behavior: smooth;
+            min-height: 100%;
         }
 
         body {
-            background-color: var(--dark-bg);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Landing Page */
-        #landing {
-            height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
-            background: linear-gradient(to bottom, #0a0a0a, #1a1a1a);
         }
 
-        .logo {
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .tagline {
-            margin-bottom: 3rem;
-            max-width: 600px;
-            color: var(--text-secondary);
-        }
-
-        .explore-btn {
-            padding: 1rem 2.5rem;
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 4px 20px rgba(74, 142, 255, 0.3);
-        }
-
-        .explore-btn:hover {
-            background-color: var(--accent-light);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 25px rgba(74, 142, 255, 0.5);
-        }
-
-        /* Main Content Area */
-        #content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 4rem 2rem;
-        }
-
+        /* —————————————————— typography / helpers —————————————————— */
         .section-title {
-            font-size: 2rem;
+            font-size: 1.1rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 300;
             margin-bottom: 2rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--accent);
-            display: inline-block;
-        }
-
-        /* Projects Grid */
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 4rem;
-        }
-
-        .project-card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: var(--transition);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .project-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-img {
-            height: 200px;
-            background-color: #2a2a2a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent);
-            font-size: 3rem;
-        }
-
-        .card-content {
-            padding: 1.5rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card-title {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-desc {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            flex-grow: 1;
-        }
-
-        .card-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        .card-link i {
-            margin-left: 0.5rem;
-            transition: var(--transition);
-        }
-
-        .card-link:hover {
-            color: var(--accent-light);
-        }
-
-        .card-link:hover i {
-            transform: translateX(5px);
-        }
-
-        /* About Section */
-        #about {
-            margin-bottom: 4rem;
-        }
-
-        .about-content {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .about-text {
-            margin-bottom: 2rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
         }
 
         .highlight {
-            color: var(--accent);
-            font-weight: 600;
+            font-weight: 400;
+            color: var(--text);
+            border-bottom: 1px solid currentColor;
         }
 
-        /* Skills Section */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .skill-category {
-            background-color: #2a2a2a;
-            border-radius: 8px;
-            padding: 1.5rem;
-        }
-
-        .skill-title {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            color: var(--accent);
-        }
-
-        .skill-list {
-            list-style-type: none;
-        }
-
-        .skill-list li {
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .skill-list li:before {
-            content: "•";
-            color: var(--accent);
-            font-weight: bold;
-            margin-right: 0.5rem;
-        }
-
-        /* Contact Section */
-        #contact {
-            margin-bottom: 4rem;
-        }
-
-        .contact-content {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-
-        .contact-text {
-            margin-bottom: 2rem;
-            color: var(--text-secondary);
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-        }
-
-        .social-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            background-color: #2a2a2a;
-            border-radius: 50%;
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            transition: var(--transition);
-            text-decoration: none;
-        }
-
-        .social-link:hover {
-            background-color: var(--accent);
-            transform: translateY(-5px);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .logo {
-                font-size: 2rem;
-            }
-            
-            .projects-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 1.5rem;
-            }
-            
-            .skills-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #landing {
-                padding: 1rem;
-            }
-            
-            .logo {
-                font-size: 1.8rem;
-            }
-            
-            .tagline {
-                font-size: 0.9rem;
-            }
-            
-            .explore-btn {
-                padding: 0.8rem 2rem;
-                font-size: 1rem;
-            }
-            
-            .section-title {
-                font-size: 1.7rem;
-            }
-            
-            .projects-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .social-links {
-                flex-wrap: wrap;
-            }
-        }
-
-        /* Navigation */
+        /* —————————————————— navigation (hidden until scroll) —————————————————— */
         nav {
             position: fixed;
             top: 0;
+            left: 0;
             width: 100%;
-            background-color: rgba(18, 18, 18, 0);
-            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
-            backdrop-filter:blur(5px);
+            padding: 1.2rem 2rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            text-transform: lowercase;
+            z-index: 100;
+            background: transparent;
+            transform: translateY(-100%);                /* hidden initially */
+            transition: transform 0.3s ease, background 0.3s ease, backdrop-filter 0.3s ease;
         }
 
         nav.visible {
-            transform: translateY(0);
+            transform: translateY(0);                     /* slide in */
+            background: rgba(14, 14, 14, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .nav-logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--accent);
+            font-weight: 400;
+            color: var(--text);
         }
 
         .nav-links {
@@ -352,271 +92,471 @@
         }
 
         .nav-link {
-            color: var(--text-primary);
+            color: var(--text-muted);
             text-decoration: none;
             transition: var(--transition);
+            font-size: 0.85rem;
         }
 
         .nav-link:hover {
-            color: var(--accent);
+            color: var(--text);
         }
 
-        /* Footer */
+        /* —————————————————— landing —————————————————— */
+        #landing {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .tagline {
+            color: var(--text-muted);
+            max-width: 500px;
+            margin-bottom: 3rem;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+        }
+
+        .explore-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 0.25em;
+            text-transform: lowercase;
+            border-bottom: 1px solid transparent;
+            transition: var(--transition);
+            cursor: pointer;
+            padding-bottom: 4px;
+        }
+
+        .explore-link:hover {
+            color: var(--text);
+            border-bottom-color: currentColor;
+        }
+
+        /* —————————————————— main content —————————————————— */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem 5rem;
+            width: 100%;
+        }
+
+        section {
+            margin-bottom: 6rem;
+        }
+
+        /* —————————————————— project grid (borderless, subtle cards) —————————————————— */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            padding: 1.8rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            cursor: default;
+            border: none;
+            box-shadow: none;
+        }
+
+        .project-card:hover {
+            transform: translateY(-3px);
+            background: #202020;
+        }
+
+        .card-img {
+            font-size: 2rem;
+            margin-bottom: 1.2rem;
+            color: var(--text);
+            opacity: 0.8;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 350;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+
+        .card-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid transparent;
+            transition: var(--transition);
+            align-self: flex-start;
+            text-transform: lowercase;
+        }
+
+        .card-link i {
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+        }
+
+        .card-link:hover {
+            color: var(--text);
+            border-bottom-color: currentColor;
+        }
+
+        .card-link:hover i {
+            transform: translateX(4px);
+        }
+
+        /* —————————————————— about / skills / contact (all borderless) —————————————————— */
+        .about-content, .contact-content {
+            background: var(--bg-card);
+            padding: 2rem;
+        }
+
+        .about-text {
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+            font-size: 0.95rem;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .skill-category {
+            background: var(--bg-card);
+            padding: 1.8rem 1.5rem;
+        }
+
+        .skill-title {
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 350;
+            margin-bottom: 1.2rem;
+            color: var(--text);
+        }
+
+        .skill-list {
+            list-style: none;
+        }
+
+        .skill-list li {
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .skill-list li::before {
+            content: "—";
+            color: var(--text-muted);
+            margin-right: 0.7rem;
+            opacity: 0.5;
+        }
+
+        /* contact */
+        .contact-content {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .contact-text {
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.8rem;
+        }
+
+        .social-link {
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            transition: var(--transition);
+            line-height: 1;
+        }
+
+        .social-link:hover {
+            color: var(--text);
+            transform: translateY(-2px);
+        }
+
+        /* —————————————————— footer —————————————————— */
         footer {
             text-align: center;
             padding: 2rem;
-            background-color: #0a0a0a;
-            color: var(--text-secondary);
-            margin-top: 4rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+            border-top: none;
+            background: transparent;
+            margin-top: 2rem;
         }
 
-        /* Animation for content */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+        /* —————————————————— responsiveness —————————————————— */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 1.5rem;
+            }
+            .nav-links {
+                gap: 1.2rem;
+            }
+            .logo {
+                font-size: 2.8rem;
+            }
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+            .skill-category {
+                padding: 1.5rem;
+            }
         }
 
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
+        @media (max-width: 480px) {
+            nav {
+                padding: 0.9rem 1.2rem;
+            }
+            .nav-links {
+                gap: 1rem;
+            }
+            .nav-link, .nav-logo {
+                font-size: 0.75rem;
+            }
+            .logo {
+                font-size: 2.2rem;
+            }
+            .tagline {
+                font-size: 0.85rem;
+            }
+            .section-title {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .project-card {
+                padding: 1.5rem;
+            }
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+            .social-links {
+                gap: 1.2rem;
+            }
+            .social-link {
+                font-size: 1.4rem;
+            }
+        }
+
+        ::selection {
+            background: #e5e5e5;
+            color: #0e0e0e;
         }
     </style>
 </head>
 <body>
-    <!-- Landing Page -->
-    <section id="landing">
-        <div class="logo">Walif</div>
-        <p class="tagline">Content Creator & Editor | Bringing ideas to life through visual storytelling</p>
-        <button class="explore-btn" id="exploreBtn">Explore</button>
-    </section>
 
-    <!-- Navigation -->
+    <!-- nav: hidden until scroll (glass appears together) -->
     <nav id="nav">
-        <div class="nav-logo">Walif</div>
+        <div class="nav-logo">walif</div>
         <div class="nav-links">
-            <a href="#projects" class="nav-link">Projects</a>
-            <a href="#about" class="nav-link">About</a>
-            <a href="#contact" class="nav-link">Contact</a>
+            <a href="#projects" class="nav-link">projects</a>
+            <a href="#about" class="nav-link">about</a>
+            <a href="#contact" class="nav-link">contact</a>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main id="content">
-        <!-- Projects Section -->
+    <!-- landing section -->
+    <section id="landing">
+        <div class="logo">walif</div>
+        <p class="tagline">content creator & editor — bringing ideas to life through visual storytelling</p>
+        <a class="explore-link" id="exploreBtn">explore projects <i class="fa-regular fa-arrow-right" style="font-size: 0.7rem;"></i></a>
+    </section>
+
+    <!-- main content -->
+    <main>
+        <!-- projects section -->
         <section id="projects">
-            <h2 class="section-title fade-in">My Projects</h2>
+            <h2 class="section-title">projects</h2>
             <div class="projects-grid">
-                <!-- Project Card 1 -->
-                <div class="project-card fade-in">
-                    <div class="card-img">
-                        <i class="fas fa-dash"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Dash</h3>
-                        <p class="card-desc">A minimalist endless runner game.</p>
-                        <a href="dash.html" class="card-link" target="_blank">View Project <i class="fas fa-arrow-right"></i></a>
-                    </div>
+                <!-- project 1 -->
+                <div class="project-card">
+                    <div class="card-img"><i class="fas fa-dash"></i></div>
+                    <h3 class="card-title">Dash</h3>
+                    <p class="card-desc">a minimalist endless runner game.</p>
+                    <a href="dash.html" class="card-link" target="_blank">view <i class="fas fa-arrow-right"></i></a>
                 </div>
-
-                <!--project card 2-->
-					  <div class="project-card fade-in">
-                    <div class="card-img">
-                        <i class="fas fa-film"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Cine Search</h3>
-                        <p class="card-desc">Discover movies and tv shows and add them to your watchlist.</p>
-                        <a href="cinesearch.html" class="card-link" target="_blank">View Project <i class="fas fa-arrow-right"></i></a>
-                    </div>
+                <!-- project 2 -->
+                <div class="project-card">
+                    <div class="card-img"><i class="fas fa-film"></i></div>
+                    <h3 class="card-title">Cine Search</h3>
+                    <p class="card-desc">discover movies & tv, build your watchlist.</p>
+                    <a href="cinesearch.html" class="card-link" target="_blank">view <i class="fas fa-arrow-right"></i></a>
                 </div>
-
-
-                <!-- Project Card 3 -->
-                <div class="project-card fade-in">
-                    <div class="card-img">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Expense Tracker</h3>
-                        <p class="card-desc">A Simple Way to Track Your Expenses and Take Control of Your Money</p>
-                        <a href="expencetracker.html" class="card-link" target="_blank">View Project <i class="fas fa-arrow-right"></i></a>
-                    </div>
+                <!-- project 3 -->
+                <div class="project-card">
+                    <div class="card-img"><i class="fas fa-money-bill-wave"></i></div>
+                    <h3 class="card-title">Expense Tracker</h3>
+                    <p class="card-desc">simple way to track expenses, take control.</p>
+                    <a href="expencetracker.html" class="card-link" target="_blank">view <i class="fas fa-arrow-right"></i></a>
                 </div>
-
-                <!-- Project Card 4 -->
-                <div class="project-card fade-in">
-                    <div class="card-img">
-                        <i class="fas fa-weight-scale"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">BMI Calculator</h3>
-                        <p class="card-desc">Calculate BMI , Track Wellness.</p>
-                        <a href="bmicalc.html" class="card-link" target="_blank">View Project <i class="fas fa-arrow-right"></i></a>
-                    </div>
+                <!-- project 4 -->
+                <div class="project-card">
+                    <div class="card-img"><i class="fas fa-weight-scale"></i></div>
+                    <h3 class="card-title">BMI Calculator</h3>
+                    <p class="card-desc">calculate bmi, track wellness.</p>
+                    <a href="bmicalc.html" class="card-link" target="_blank">view <i class="fas fa-arrow-right"></i></a>
                 </div>
-
-
-				<!--project card 5 -->
-       <div class="project-card fade-in">
-                    <div class="card-img">
-                        <i class="fas fa-atom"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Particle Physics Sim</h3>
-                        <p class="card-desc">Simulate Physics in particles inside your viewport.</p>
-                        <a href="particlesim.html" class="card-link" target="_blank">View Project <i class="fas fa-arrow-right"></i></a>
-                    </div>
+                <!-- project 5 -->
+                <div class="project-card">
+                    <div class="card-img"><i class="fas fa-atom"></i></div>
+                    <h3 class="card-title">Particle Physics Sim</h3>
+                    <p class="card-desc">simulate particle physics in your viewport.</p>
+                    <a href="particlesim.html" class="card-link" target="_blank">view <i class="fas fa-arrow-right"></i></a>
                 </div>
-            
-					<!--project card 6 -->
-					  <div class="project-card fade-in">
-                    <div class="card-img">
-                        <i class="fas fa-terminal"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Terminal Portfolio</h3>
-                        <p class="card-desc">A portfolio inspired by a console</p>
-                        <a href="terminal.html" class="card-link" target="_blank">View Project <i class="fas fa-arrow-right"></i></a>
-                    </div>
+                <!-- project 6 -->
+                <div class="project-card">
+                    <div class="card-img"><i class="fas fa-terminal"></i></div>
+                    <h3 class="card-title">Terminal Portfolio</h3>
+                    <p class="card-desc">a portfolio inspired by a console.</p>
+                    <a href="terminal.html" class="card-link" target="_blank">view <i class="fas fa-arrow-right"></i></a>
                 </div>
-                
-                	<!--project card 7 -->
-					  <div class="project-card fade-in">
-                    <div class="card-img">
-                        <i class="fas fa-cloud"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Weather App</h3>
-                        <p class="card-desc">A minimal web based weather app.</p>
-                        <a href="weather.html" class="card-link" target="_blank">View Project <i class="fas fa-arrow-right"></i></a>
-                    </div>
+                <!-- project 7 -->
+                <div class="project-card">
+                    <div class="card-img"><i class="fas fa-cloud"></i></div>
+                    <h3 class="card-title">Weather App</h3>
+                    <p class="card-desc">minimal web-based weather.</p>
+                    <a href="weather.html" class="card-link" target="_blank">view <i class="fas fa-arrow-right"></i></a>
                 </div>
-                
-                	<!--project card 8 -->
-					  <div class="project-card fade-in">
-                    <div class="card-img">
-                        <i class="fas fa-radio"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Serein</h3>
-                        <p class="card-desc">Lofi radio stream . Screen Saver</p>
-                        <a href="lofi.html" class="card-link" target="_blank">View Project <i class="fas fa-arrow-right"></i></a>
-                    </div>
+                <!-- project 8 -->
+                <div class="project-card">
+                    <div class="card-img"><i class="fas fa-radio"></i></div>
+                    <h3 class="card-title">Serein</h3>
+                    <p class="card-desc">lofi radio stream + screensaver.</p>
+                    <a href="lofi.html" class="card-link" target="_blank">view <i class="fas fa-arrow-right"></i></a>
                 </div>
-
-
-</div>
-
+                <!-- to add a project: copy any .project-card block -->
+            </div>
         </section>
 
-        <!-- About Section -->
+        <!-- about section -->
         <section id="about">
-            <h2 class="section-title fade-in">About Me</h2>
-            <div class="about-content fade-in">
-                <p class="about-text">
-                    Hello everyone, thank you for allowing me to introduce myself. My name is <span class="highlight">Walif Mohian</span>. I am 18 years old and I'm from Sylhet,Bangladesh. I am a content creator and editor passionate about video editing and creating engaging digital experiences.
-                </p>
-                <p class="about-text">
-                    With a keen eye for detail and a creative mindset, I specialize in producing content that resonates with audiences and communicates messages effectively through various media formats.
-                </p>
+            <h2 class="section-title">about me</h2>
+            <div class="about-content">
+                <p class="about-text">hello everyone — my name is <span class="highlight">walif mohian</span>. 18, from sylhet, bangladesh. i create and edit content, always chasing visual stories that feel calm and intentional.</p>
+                <p class="about-text">with a quiet eye and a love for minimal tools, i work across video, photo, and tiny interactive projects. this space collects them.</p>
             </div>
         </section>
 
-        <!-- Skills Section -->
+        <!-- skills -->
         <section id="skills">
-            <h2 class="section-title fade-in">Skills</h2>
+            <h2 class="section-title">skills</h2>
             <div class="skills-grid">
-                <div class="skill-category fade-in">
-                    <h3 class="skill-title">Content Creation</h3>
+                <div class="skill-category">
+                    <h3 class="skill-title">content creation</h3>
                     <ul class="skill-list">
-                        <li>Video Production</li>
-                        <li>Photo Editing</li>
-                        <li>Storyboarding</li>
-                        <li>Content Strategy</li>
+                        <li>video production</li>
+                        <li>photo editing</li>
+                        <li>storyboarding</li>
+                        <li>content strategy</li>
                     </ul>
                 </div>
-
-                <div class="skill-category fade-in">
-                    <h3 class="skill-title">Video Editing</h3>
+                <div class="skill-category">
+                    <h3 class="skill-title">video editing</h3>
                     <ul class="skill-list">
-                        <li>Adobe Premiere Pro</li>
-                        <li>Final Cut Pro</li>
-                        <li>Color Grading</li>
-                        <li>Motion Graphics</li>
+                        <li>premiere pro</li>
+                        <li>final cut</li>
+                        <li>color grading</li>
+                        <li>motion graphics</li>
                     </ul>
                 </div>
-
-                <div class="skill-category fade-in">
-                    <h3 class="skill-title">Other Skills</h3>
+                <div class="skill-category">
+                    <h3 class="skill-title">other</h3>
                     <ul class="skill-list">
-                        <li>Photography</li>
-                        <li>Graphic Design</li>
-                        <li>Social Media Management</li>
-                        <li>Creative Direction</li>
+                        <li>photography</li>
+                        <li>graphic design</li>
+                        <li>social media</li>
+                        <li>creative direction</li>
                     </ul>
                 </div>
             </div>
         </section>
 
-        <!-- Contact Section -->
+        <!-- contact -->
         <section id="contact">
-            <h2 class="section-title fade-in">Contact Me</h2>
-            <div class="contact-content fade-in">
-                <p class="contact-text">Feel free to reach out for collaborations or just to say hello!</p>
+            <h2 class="section-title">contact</h2>
+            <div class="contact-content">
+                <p class="contact-text">reach out for collaborations or just to say hello.</p>
                 <div class="social-links">
                     <a href="https://github.com/iswalif" class="social-link" target="_blank"><i class="fab fa-github"></i></a>
                     <a href="https://fiverr.com/wcreatezz" class="social-link" target="_blank"><i class="fas fa-briefcase"></i></a>
                     <a href="mailto:walif.services@gmail.com" class="social-link" target="_blank"><i class="fas fa-envelope"></i></a>
-          
                 </div>
             </div>
         </section>
     </main>
 
     <footer>
-        <p>© 2025 WALIF MOHIAN All rights reserved.</p>
+        <p>© 2025 walif mohian — all rights reserved</p>
     </footer>
 
     <script>
-        // Explore button functionality
-        document.getElementById('exploreBtn').addEventListener('click', function() {
-            document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
-        });
+        (function() {
+            // explore button
+            document.getElementById('exploreBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+            });
 
-        // Navigation show/hide
-        const nav = document.getElementById('nav');
-        const landing = document.getElementById('landing');
-        
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > landing.offsetHeight / 2) {
-                nav.classList.add('visible');
-            } else {
-                nav.classList.remove('visible');
+            // nav: hidden until scrolled past half of landing
+            const nav = document.getElementById('nav');
+            const landing = document.getElementById('landing');
+
+            function updateNav() {
+                const threshold = landing.offsetHeight * 0.9;
+                if (window.scrollY > threshold) {
+                    nav.classList.add('visible');
+                } else {
+                    nav.classList.remove('visible');
+                }
             }
-            
-            // Check if elements are in viewport for animation
-            const fadeElements = document.querySelectorAll('.fade-in');
-            fadeElements.forEach(element => {
-                const elementTop = element.getBoundingClientRect().top;
-                const elementVisible = 150;
-                if (elementTop < window.innerHeight - elementVisible) {
-                    element.classList.add('visible');
-                }
-            });
-        });
 
-        // Initialize fade-in elements check on page load
-        window.addEventListener('load', function() {
-            const fadeElements = document.querySelectorAll('.fade-in');
-            fadeElements.forEach(element => {
-                const elementTop = element.getBoundingClientRect().top;
-                const elementVisible = 150;
-                if (elementTop < window.innerHeight - elementVisible) {
-                    element.classList.add('visible');
-                }
-            });
-        });
+            window.addEventListener('scroll', updateNav);
+            window.addEventListener('resize', updateNav); // in case landing height changes
+            updateNav(); // set initial state (hidden)
+        })();
     </script>
 </body>
 </html>
