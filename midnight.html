@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Midnight Reset</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root{
+            --bg:#0e0e0f;
+            --card:#161618;
+            --text:#f2f2f2;
+            --muted:#8a8a8f;
+            --accent:#4ade80;
+            --streak:#ff8c42;
+            --danger:#ff6b6b;
+            --done:#3a3a44;
+        }
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+        }
+        body{
+            background:var(--bg);
+            color:var(--text);
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+        }
+        .navbar{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:1rem 1.5rem;
+            background:var(--card);
+            margin-bottom: 0.5rem;
+        }
+        .nav-left {
+            display:flex;
+            align-items:center;
+            gap:1rem;
+        }
+        .rank-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+        }
+        .rank-badge svg {
+            width: 32px;
+            height: 32px;
+        }
+        .rank-bronze .badge-fill{ fill:#6b4f2a; }
+        .rank-silver .badge-fill{ fill:#aaa; }
+        .rank-gold .badge-fill{ fill:#c8a200; }
+        .rank-diamond .badge-fill{ fill:#5eead4; }
+        .rank-mythic .badge-fill{ fill:#a855f7; }
+
+        .player-name-section {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+        }
+        .name-input{
+            background:none;
+            border:none;
+            color:var(--text);
+            font-size:1.3rem;
+            font-weight:600;
+            outline:none;
+            width:auto;
+            max-width:200px;
+        }
+        .total-xp{
+            font-size:1rem;
+            color:var(--accent);
+            font-weight: 500;
+        }
+        .reset-icon {
+            cursor: pointer;
+            color: var(--muted);
+            transition: color 0.2s;
+            font-size: 1.2rem;
+        }
+        .reset-icon:hover {
+            color: var(--danger);
+        }
+        .countdown-panel {
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+        #countdownDisplay {
+            font-size: 2.5rem;
+            font-weight: 600;
+            font-family: monospace;
+            letter-spacing: 4px;
+            color: var(--text);
+            text-shadow: 0 0 10px rgba(74,222,128,0.3);
+            line-height: 1;
+        }
+        .countdown-label {
+            color: var(--muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .main{
+            padding:1.5rem;
+            display:grid;
+            gap:2rem;
+            flex:1;
+            grid-template-columns: 1fr 1fr;
+        }
+        .tasks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            margin-top: 1rem;
+        }
+        .tasks-header h3 {
+            font-size:.85rem;
+            color:var(--muted);
+        }
+        .tasks{
+            display:flex;
+            flex-direction:column;
+            gap:.75rem;
+        }
+        .task-item{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:.8rem 1rem;
+            background:var(--card);
+            border-radius:12px;
+            font-size:.85rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .task-left{
+            display:flex;
+            gap:.6rem;
+            align-items:center;
+            flex: 2 1 200px;
+        }
+        .task-item.completed {
+            opacity: 0.6;
+        }
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: var(--muted);
+        }
+        .task-category{
+            background: #2a2a30;
+            padding:0.2rem 0.8rem;
+            border-radius:40px;
+            font-size:0.7rem;
+        }
+        .difficulty-stars{
+            color: var(--muted);
+            letter-spacing: 2px;
+            font-size:0.9rem;
+        }
+        .streak-badge{
+            background: var(--streak);
+            color: black;
+            padding:0.2rem 0.6rem;
+            border-radius:30px;
+            font-size:0.7rem;
+            font-weight:bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .task-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+        .task-actions button{
+            background:transparent;
+            border:1px solid var(--accent);
+            color:var(--accent);
+            border-radius:30px;
+            padding:0.3rem 1rem;
+            font-weight:bold;
+            cursor:pointer;
+            font-size:0.8rem;
+        }
+        .task-actions button:disabled{
+            opacity:0.3;
+            border-color:var(--done);
+            color:var(--muted);
+            cursor: default;
+        }
+        .delete-task-btn {
+            background: transparent !important;
+            border: 1px solid #555 !important;
+            color: #aaa !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        .delete-task-btn:hover {
+            border-color: var(--danger) !important;
+            color: var(--danger) !important;
+        }
+        .failure-badge {
+            background: var(--danger);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+        .stats{
+            display:grid;
+            gap:1rem;
+        }
+        .stat-row{
+            padding:.8rem 1rem;
+            background:var(--card);
+            border-radius:12px;
+            display:flex;
+            flex-direction:column;
+            gap:.4rem;
+        }
+        .stat-top{
+            display:flex;
+            justify-content:space-between;
+            font-size:.85rem;
+            align-items: center;
+        }
+        .stat-name {
+            font-weight: 600;
+            display: flex;
+            gap: 0.3rem;
+            align-items: center;
+        }
+        .stat-level {
+            background: var(--muted);
+            color: black;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .progress{
+            height:6px;
+            background:#222;
+            border-radius:4px;
+            overflow:hidden;
+        }
+        .progress-fill{
+            height:100%;
+            background:linear-gradient(to right,#fff,var(--accent));
+        }
+        .stat-xp-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+        .disable-btn {
+            background: none;
+            border: 1px solid #555;
+            color: #ccc;
+            border-radius: 20px;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        .disable-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+        .fab{
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            width:54px;
+            height:54px;
+            border-radius:50%;
+            background:#fff;
+            color:#000;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:1.3rem;
+            cursor:pointer;
+            box-shadow:0 6px 20px rgba(0,0,0,.5);
+            z-index:10;
+        }
+        .modal{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.7);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            padding:1rem;
+            z-index:20;
+        }
+        .modal-content{
+            background:#111;
+            padding:1.5rem;
+            border-radius:12px;
+            width:100%;
+            max-width:400px;
+            display:flex;
+            flex-direction:column;
+            gap:1rem;
+        }
+        .modal input,
+        .modal select,
+        .modal textarea{
+            padding:.7rem;
+            background:#1c1c1e;
+            border:1px solid #333;
+            color:white;
+            border-radius:6px;
+            font-family: inherit;
+        }
+        .modal button{
+            padding:.7rem;
+            border:none;
+            background:white;
+            color:black;
+            font-weight:600;
+            cursor:pointer;
+            border-radius:6px;
+        }
+        .secondary-btn {
+            background: #2a2a30;
+            border: none;
+            color: var(--text);
+            border-radius: 30px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .xp-floating {
+            position: fixed;
+            color: var(--accent);
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 999;
+            animation: floatUp 1s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+        .level-up-glow {
+            animation: glowPulse 0.5s 2;
+        }
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 5px var(--accent); }
+            50% { box-shadow: 0 0 20px var(--accent); }
+        }
+        footer{
+            text-align:center;
+            font-size:.7rem;
+            padding:1rem;
+            color:var(--muted);
+        }
+        @media(max-width:768px){
+            .main{
+                grid-template-columns:1fr;
+            }
+            .countdown-panel {
+                padding: 0.8rem 1rem;
+            }
+            #countdownDisplay {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-left">
+        <div class="rank-badge" id="rankDisplay">
+            <svg viewBox="0 0 24 24">
+                <path class="badge-fill" d="M12 2L4 7v6c0 5 3.5 7 8 9 4.5-2 8-4 8-9V7l-8-5z"/>
+            </svg>
+            <span id="rankText">Bronze</span>
+        </div>
+        <div class="player-name-section">
+            <input type="text" id="playerNameInput" class="name-input" value="Adventurer">
+            <span class="total-xp" id="totalXPDisplay">0 XP</span>
+        </div>
+    </div>
+    <i class="fa-solid fa-trash reset-icon" id="resetDataBtn" title="Reset all progress"></i>
+</div>
+
+<div class="main">
+    <div>
+        <div class="countdown-panel">
+            <span id="countdownDisplay">00:00:00</span>
+            <span class="countdown-label">until midnight reset</span>
+        </div>
+
+        <div class="tasks-header">
+         
+        </div>
+        <div class="tasks" id="taskList"></div>
+    </div>
+
+    <div>
+        
+        <div class="stats" id="categoriesContainer"></div>
+        <button class="secondary-btn" id="addCustomCategoryBtn" style="width:100%;">
+            <i class="fa-solid fa-plus"></i> Add custom category
+        </button>
+    </div>
+</div>
+
+<div class="fab" onclick="openModal()">
+    <i class="fa-solid fa-plus"></i>
+</div>
+
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <h4 style="color:white;">New Daily Quest</h4>
+        <input type="text" id="newTaskTitle" placeholder="Quest name">
+        <select id="newTaskCategory"></select>
+        <select id="newTaskDifficulty">
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+        </select>
+        <button id="addTaskBtn">Create Quest</button>
+    </div>
+</div>
+
+<div class="modal" id="resetConfirmModal">
+    <div class="modal-content">
+        <p style="color:white;">Delete all saved data? This cannot be undone.</p>
+        <div style="display:flex; justify-content:center;gap:1rem;">
+            <button id="confirmResetYes">Yes, reset</button>
+            <button id="confirmResetNo">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    walif · midnight reset
+</footer>
+
+<script>
+(function() {
+    const STORAGE_KEY = 'LIFE_RPG_DATA';
+    const DEFAULT_CATS = [
+        "Intellect", "Physique", "Social", "Ambition", "Finance"
+    ];
+
+    const today = () => new Date().toISOString().split('T')[0];
+    const yesterday = () => {
+        const d = new Date();
+        d.setDate(d.getDate()-1);
+        return d.toISOString().split('T')[0];
+    };
+
+    function uid() { return Date.now() + '-' + Math.random().toString(36).substr(2, 9); }
+
+    function calcLevelFromXP(xp) {
+        if (xp < 0) xp = 0;
+        let level = 1;
+        let cumulative = 0;
+        while (true) {
+            let need = 100 * Math.pow(level, 1.5);
+            if (xp < cumulative + need) break;
+            cumulative += need;
+            level++;
+        }
+        let current = xp - cumulative;
+        let next = 100 * Math.pow(level, 1.5);
+        return { level, current, next, progress: (current / next) * 100 };
+    }
+
+    function getRank(totalXP) {
+        if (totalXP < 1000) return 'Bronze';
+        if (totalXP < 3000) return 'Silver';
+        if (totalXP < 7000) return 'Gold';
+        if (totalXP < 15000) return 'Diamond';
+        return 'Mythic';
+    }
+
+    function getInitialState() {
+        let categories = DEFAULT_CATS.map(name => ({
+            id: uid(), name, xp: 0, enabled: true,
+            lastActiveDate: null, custom: false
+        }));
+        let tasks = [
+            { id: uid(), title: 'Read 30m', category: categories[0].id, difficulty: 3, recurring: true, streakCount: 0, lastCompletedDate: null, completed: false, createdDate: today(), failures: 0 },
+            { id: uid(), title: 'Workout', category: categories[1].id, difficulty: 4, recurring: true, streakCount: 0, lastCompletedDate: null, completed: false, createdDate: today(), failures: 0 },
+            { id: uid(), title: 'Call a friend', category: categories[2].id, difficulty: 2, recurring: true, streakCount: 0, lastCompletedDate: null, completed: false, createdDate: today(), failures: 0 },
+            { id: uid(), title: 'Weekly planning', category: categories[3].id, difficulty: 2, recurring: true, streakCount: 0, lastCompletedDate: null, completed: false, createdDate: today(), failures: 0 },
+        ];
+        return { categories, tasks, lastReset: today(), playerName: 'Adventurer' };
+    }
+
+    function loadState() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try { return JSON.parse(stored); } catch (e) { console.warn('invalid storage'); }
+        }
+        return getInitialState();
+    }
+
+    let state = loadState();
+
+    function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function performDailyReset() {
+        const now = today();
+        if (state.lastReset === now) return false;
+
+        state.tasks.forEach(t => {
+            if (!t.completed) {
+                t.failures = (t.failures || 0) + 1;
+            }
+        });
+
+        state.tasks.forEach(t => t.completed = false);
+
+        const yest = yesterday();
+        state.tasks.forEach(t => {
+            if (t.recurring) {
+                if (t.lastCompletedDate !== yest) {
+                    t.streakCount = 0;
+                    t.lastCompletedDate = null;
+                }
+            }
+        });
+
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        const threeDaysStr = threeDaysAgo.toISOString().split('T')[0];
+
+        state.categories.forEach(cat => {
+            if (!cat.enabled) return;
+            const lastActive = cat.lastActiveDate;
+            if (lastActive && lastActive < threeDaysStr) {
+                let oldXP = cat.xp;
+                let newXP = Math.floor(oldXP * 0.95);
+                const { level: oldLevel } = calcLevelFromXP(oldXP);
+                const { level: newLevel } = calcLevelFromXP(newXP);
+                if (newLevel < oldLevel) {
+                    let cum = 0;
+                    for (let l = 1; l < oldLevel; l++) cum += 100 * Math.pow(l, 1.5);
+                    newXP = Math.max(newXP, cum);
+                }
+                cat.xp = Math.max(0, newXP);
+            }
+        });
+
+        state.lastReset = now;
+        saveState();
+        return true;
+    }
+
+    function checkResetAndApply() {
+        if (performDailyReset()) renderAll();
+    }
+
+    function renderPlayerInfo() {
+        document.getElementById('playerNameInput').value = state.playerName || 'Adventurer';
+        const totalXP = state.categories.reduce((acc, c) => acc + (c.enabled ? c.xp : 0), 0);
+        document.getElementById('totalXPDisplay').innerText = totalXP + ' XP';
+        const rank = getRank(totalXP);
+        document.getElementById('rankText').innerText = rank;
+        const badge = document.querySelector('.rank-badge');
+        badge.className = 'rank-badge rank-' + rank.toLowerCase();
+    }
+
+    function renderCategories() {
+        const container = document.getElementById('categoriesContainer');
+        container.innerHTML = '';
+        state.categories.filter(c => c.enabled).forEach(cat => {
+            const { level, current, next, progress } = calcLevelFromXP(cat.xp);
+            const row = document.createElement('div');
+            row.className = 'stat-row';
+            row.dataset.id = cat.id;
+            row.innerHTML = `
+                <div class="stat-top">
+                    <span class="stat-name">${cat.name} <span class="stat-level">LV.${level}</span></span>
+                    <button class="disable-btn" data-id="${cat.id}"><i class="fa-solid fa-ban"></i></button>
+                </div>
+                <div class="progress"><div class="progress-fill" style="width:${Math.min(progress,100)}%"></div></div>
+                <div class="stat-xp-text">
+                    <span>${Math.floor(current)} / ${Math.floor(next)} XP</span>
+                    <span>${Math.floor(progress)}%</span>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+        document.querySelectorAll('.disable-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = e.currentTarget.dataset.id;
+                const cat = state.categories.find(c => c.id === id);
+                if (cat) cat.enabled = false;
+                saveState(); renderAll();
+            });
+        });
+    }
+
+    function renderTasks() {
+        const taskListDiv = document.getElementById('taskList');
+        const catSelect = document.getElementById('newTaskCategory');
+        if (catSelect) {
+            catSelect.innerHTML = '';
+            state.categories.filter(c => c.enabled).forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.textContent = cat.name;
+                catSelect.appendChild(opt);
+            });
+        }
+
+        taskListDiv.innerHTML = '';
+        const incomplete = state.tasks.filter(t => !t.completed);
+        const completed = state.tasks.filter(t => t.completed);
+        [...incomplete, ...completed].forEach(task => {
+            const cat = state.categories.find(c => c.id === task.category);
+            if (!cat || !cat.enabled) return;
+            const difficultyStars = '★'.repeat(task.difficulty);
+            const streakText = task.streakCount > 0 ? `<span class="streak-badge"><i class="fa-solid fa-fire"></i> ${task.streakCount}</span>` : '';
+            const failureBadge = task.failures > 0 ? `<span class="failure-badge"><i class="fa-regular fa-clock"></i> ${task.failures}</span>` : '';
+            const item = document.createElement('div');
+            item.className = `task-item ${task.completed ? 'completed' : ''}`;
+            const completeBtn = task.completed 
+                ? `<button disabled class="complete-btn"><i class="fa-regular fa-circle-check"></i> Done</button>`
+                : `<button data-task-id="${task.id}" class="complete-btn"><i class="fa-regular fa-circle-check"></i> Complete</button>`;
+            item.innerHTML = `
+                <div class="task-left">
+                    <span class="task-title">${task.title}</span>
+                    <span class="task-category">${cat.name}</span>
+                    <span class="difficulty-stars">${difficultyStars}</span>
+                    ${streakText}
+                    ${failureBadge}
+                </div>
+                <div class="task-actions">
+                    ${completeBtn}
+                    <button data-task-id="${task.id}" class="delete-task-btn"><i class="fa-regular fa-trash-can"></i></button>
+                </div>
+            `;
+            taskListDiv.appendChild(item);
+        });
+
+        document.querySelectorAll('.complete-btn:not(:disabled)').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const taskId = e.currentTarget.dataset.taskId;
+                completeTask(taskId);
+            });
+        });
+        document.querySelectorAll('.delete-task-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const taskId = e.currentTarget.dataset.taskId;
+                deleteTask(taskId);
+            });
+        });
+    }
+
+    function deleteTask(taskId) {
+        state.tasks = state.tasks.filter(t => t.id !== taskId);
+        saveState();
+        renderAll();
+    }
+
+    function completeTask(taskId) {
+        const task = state.tasks.find(t => t.id === taskId);
+        if (!task || task.completed) return;
+        const category = state.categories.find(c => c.id === task.category);
+        if (!category || !category.enabled) return;
+        let baseXP = task.difficulty * 10;
+        let multiplier = 1.0;
+        if (task.recurring) {
+            const streak = task.streakCount || 0;
+            if (streak >= 30) multiplier = 2.0;
+            else if (streak >= 7) multiplier = 1.5;
+            else if (streak >= 3) multiplier = 1.2;
+        }
+        const gainedXP = Math.floor(baseXP * multiplier);
+        category.xp += gainedXP;
+        category.lastActiveDate = today();
+        task.completed = true;
+        task.completedDate = today();
+        if (task.recurring) {
+            if (task.lastCompletedDate === yesterday()) {
+                task.streakCount = (task.streakCount || 0) + 1;
+            } else {
+                task.streakCount = 1;
+            }
+            task.lastCompletedDate = today();
+        }
+        showFloatingXP(gainedXP, category.name);
+        const { level: oldLevel } = calcLevelFromXP(category.xp - gainedXP);
+        const { level: newLevel } = calcLevelFromXP(category.xp);
+        if (newLevel > oldLevel) triggerLevelUp(category.id);
+        saveState();
+        renderAll();
+    }
+
+    function showFloatingXP(xp, catName) {
+        const msg = document.createElement('div');
+        msg.className = 'xp-floating';
+        msg.innerText = `+${xp} XP (${catName})`;
+        msg.style.left = '50%';
+        msg.style.top = '50%';
+        document.body.appendChild(msg);
+        setTimeout(() => msg.remove(), 1000);
+    }
+
+    function triggerLevelUp(catId) {
+        const row = document.querySelector(`.stat-row[data-id="${catId}"]`);
+        if (row) {
+            row.classList.add('level-up-glow');
+            setTimeout(() => row.classList.remove('level-up-glow'), 1000);
+        }
+    }
+
+    function renderAll() {
+        checkResetAndApply();
+        renderPlayerInfo();
+        renderCategories();
+        renderTasks();
+    }
+
+    function openModal() {
+        document.getElementById('modal').style.display = 'flex';
+        renderTasks();
+    }
+
+    document.getElementById('addTaskBtn').addEventListener('click', () => {
+        const title = document.getElementById('newTaskTitle').value.trim();
+        if (!title) return;
+        const catId = document.getElementById('newTaskCategory').value;
+        const difficulty = parseInt(document.getElementById('newTaskDifficulty').value);
+        const recurring = true;
+        const newTask = {
+            id: uid(),
+            title,
+            category: catId,
+            difficulty,
+            recurring,
+            streakCount: 0,
+            lastCompletedDate: null,
+            completed: false,
+            createdDate: today(),
+            failures: 0
+        };
+        state.tasks.push(newTask);
+        saveState();
+        renderAll();
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('newTaskTitle').value = '';
+    });
+
+    const resetModal = document.getElementById('resetConfirmModal');
+    document.getElementById('resetDataBtn').addEventListener('click', () => {
+        resetModal.style.display = 'flex';
+    });
+    document.getElementById('confirmResetYes').addEventListener('click', () => {
+        localStorage.removeItem(STORAGE_KEY);
+        state = getInitialState();
+        saveState();
+        renderAll();
+        resetModal.style.display = 'none';
+    });
+    document.getElementById('confirmResetNo').addEventListener('click', () => {
+        resetModal.style.display = 'none';
+    });
+
+    document.getElementById('modal').addEventListener('click', e => {
+        if (e.target.id === 'modal') e.target.style.display = 'none';
+    });
+    resetModal.addEventListener('click', e => {
+        if (e.target.id === 'resetConfirmModal') resetModal.style.display = 'none';
+    });
+
+    document.getElementById('addCustomCategoryBtn').addEventListener('click', () => {
+        const name = prompt('New category name:');
+        if (!name) return;
+        const newCat = {
+            id: uid(),
+            name,
+            xp: 0,
+            enabled: true,
+            lastActiveDate: null,
+            custom: true
+        };
+        state.categories.push(newCat);
+        saveState();
+        renderAll();
+    });
+
+    document.getElementById('playerNameInput').addEventListener('input', (e) => {
+        state.playerName = e.target.value;
+        saveState();
+    });
+
+    function updateCountdown() {
+        const now = new Date();
+        const midnight = new Date(now);
+        midnight.setHours(24, 0, 0, 0);
+        const diffMs = midnight - now;
+        if (diffMs <= 0) {
+            performDailyReset();
+            renderAll();
+            return;
+        }
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+        const display = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        document.getElementById('countdownDisplay').innerText = display;
+    }
+
+    setInterval(() => {
+        updateCountdown();
+    }, 1000);
+
+    setInterval(() => { checkResetAndApply(); }, 60000);
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderAll();
+        updateCountdown();
+    });
+
+    window.openModal = openModal;
+})();
+</script>
+</body>
+</html>
