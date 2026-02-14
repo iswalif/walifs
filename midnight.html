@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,335 +56,334 @@
         .rank-gold .badge-fill{ fill:#c8a200; }
         .rank-diamond .badge-fill{ fill:#5eead4; }
         .rank-mythic .badge-fill{ fill:#a855f7; }
-
-        .player-name-section {
-            display: flex;
-            align-items: baseline;
-            gap: 1rem;
-        }
-        .name-input{
-            background:none;
-            border:none;
-            color:var(--text);
-            font-size:1.3rem;
-            font-weight:600;
-            outline:none;
-            width:auto;
-            max-width:200px;
-        }
-        .total-xp{
-            font-size:1rem;
-            color:var(--accent);
-            font-weight: 500;
-        }
-        .reset-icon {
-            cursor: pointer;
-            color: var(--muted);
-            transition: color 0.2s;
-            font-size: 1.2rem;
-        }
-        .reset-icon:hover {
-            color: var(--danger);
+    .player-name-section {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+    }
+    .name-input{
+        background:none;
+        border:none;
+        color:var(--text);
+        font-size:1.3rem;
+        font-weight:600;
+        outline:none;
+        width:auto;
+        max-width:200px;
+    }
+    .total-xp{
+        font-size:1rem;
+        color:var(--accent);
+        font-weight: 500;
+    }
+    .reset-icon {
+        cursor: pointer;
+        color: var(--muted);
+        transition: color 0.2s;
+        font-size: 1.2rem;
+    }
+    .reset-icon:hover {
+        color: var(--danger);
+    }
+    .countdown-panel {
+        border-radius: 16px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+    }
+    #countdownDisplay {
+        font-size: 2.5rem;
+        font-weight: 600;
+        font-family: monospace;
+        letter-spacing: 4px;
+        color: var(--text);
+        text-shadow: 0 0 10px rgba(74,222,128,0.3);
+        line-height: 1;
+    }
+    .countdown-label {
+        color: var(--muted);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .main{
+        padding:1.5rem;
+        display:grid;
+        gap:2rem;
+        flex:1;
+        grid-template-columns: 1fr 1fr;
+    }
+    .tasks-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+    }
+    .tasks-header h3 {
+        font-size:.85rem;
+        color:var(--muted);
+    }
+    .tasks{
+        display:flex;
+        flex-direction:column;
+        gap:.75rem;
+    }
+    .task-item{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        padding:.8rem 1rem;
+        background:var(--card);
+        border-radius:12px;
+        font-size:.85rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .task-left{
+        display:flex;
+        gap:.6rem;
+        align-items:center;
+        flex: 2 1 200px;
+    }
+    .task-item.completed {
+        opacity: 0.6;
+    }
+    .task-item.completed .task-title {
+        text-decoration: line-through;
+        color: var(--muted);
+    }
+    .task-category{
+        background: #2a2a30;
+        padding:0.2rem 0.8rem;
+        border-radius:40px;
+        font-size:0.7rem;
+    }
+    .difficulty-stars{
+        color: var(--muted);
+        letter-spacing: 2px;
+        font-size:0.9rem;
+    }
+    .streak-badge{
+        background: var(--streak);
+        color: black;
+        padding:0.2rem 0.6rem;
+        border-radius:30px;
+        font-size:0.7rem;
+        font-weight:bold;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+    }
+    .task-actions {
+        display: flex;
+        gap: 0.3rem;
+    }
+    .task-actions button{
+        background:transparent;
+        border:1px solid var(--accent);
+        color:var(--accent);
+        border-radius:30px;
+        padding:0.3rem 1rem;
+        font-weight:bold;
+        cursor:pointer;
+        font-size:0.8rem;
+    }
+    .task-actions button:disabled{
+        opacity:0.3;
+        border-color:var(--done);
+        color:var(--muted);
+        cursor: default;
+    }
+    .delete-task-btn {
+        background: transparent !important;
+        border: 1px solid #555 !important;
+        color: #aaa !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+    .delete-task-btn:hover {
+        border-color: var(--danger) !important;
+        color: var(--danger) !important;
+    }
+    .failure-badge {
+        background: var(--danger);
+        color: white;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        margin-left: 0.5rem;
+    }
+    .stats{
+        display:grid;
+        gap:1rem;
+    }
+    .stat-row{
+        padding:.8rem 1rem;
+        background:var(--card);
+        border-radius:12px;
+        display:flex;
+        flex-direction:column;
+        gap:.4rem;
+    }
+    .stat-top{
+        display:flex;
+        justify-content:space-between;
+        font-size:.85rem;
+        align-items: center;
+    }
+    .stat-name {
+        font-weight: 600;
+        display: flex;
+        gap: 0.3rem;
+        align-items: center;
+    }
+    .stat-level {
+        background: var(--muted);
+        color: black;
+        padding: 0.1rem 0.5rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    .progress{
+        height:6px;
+        background:#222;
+        border-radius:4px;
+        overflow:hidden;
+    }
+    .progress-fill{
+        height:100%;
+        background:linear-gradient(to right,#fff,var(--accent));
+    }
+    .stat-xp-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        color: var(--muted);
+    }
+    .disable-btn {
+        background: none;
+        border: 1px solid #555;
+        color: #ccc;
+        border-radius: 20px;
+        padding: 0.1rem 0.5rem;
+        font-size: 0.7rem;
+        cursor: pointer;
+        margin-left: auto;
+    }
+    .disable-btn:hover {
+        background: var(--danger);
+        color: white;
+    }
+    .fab{
+        position:fixed;
+        bottom:20px;
+        right:20px;
+        width:54px;
+        height:54px;
+        border-radius:50%;
+        background:#fff;
+        color:#000;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:1.3rem;
+        cursor:pointer;
+        box-shadow:0 6px 20px rgba(0,0,0,.5);
+        z-index:10;
+    }
+    .modal{
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.7);
+        display:none;
+        align-items:center;
+        justify-content:center;
+        padding:1rem;
+        z-index:20;
+    }
+    .modal-content{
+        background:#111;
+        padding:1.5rem;
+        border-radius:12px;
+        width:100%;
+        max-width:400px;
+        display:flex;
+        flex-direction:column;
+        gap:1rem;
+    }
+    .modal input,
+    .modal select,
+    .modal textarea{
+        padding:.7rem;
+        background:#1c1c1e;
+        border:1px solid #333;
+        color:white;
+        border-radius:6px;
+        font-family: inherit;
+    }
+    .modal button{
+        padding:.7rem;
+        border:none;
+        background:white;
+        color:black;
+        font-weight:600;
+        cursor:pointer;
+        border-radius:6px;
+    }
+    .secondary-btn {
+        background: #2a2a30;
+        border: none;
+        color: var(--text);
+        border-radius: 30px;
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+        margin-top: 0.5rem;
+    }
+    .xp-floating {
+        position: fixed;
+        color: var(--accent);
+        font-weight: bold;
+        pointer-events: none;
+        z-index: 999;
+        animation: floatUp 1s ease-out forwards;
+    }
+    @keyframes floatUp {
+        0% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-50px); }
+    }
+    .level-up-glow {
+        animation: glowPulse 0.5s 2;
+    }
+    @keyframes glowPulse {
+        0% { box-shadow: 0 0 5px var(--accent); }
+        50% { box-shadow: 0 0 20px var(--accent); }
+    }
+    footer{
+        text-align:center;
+        font-size:.7rem;
+        padding:1rem;
+        color:var(--muted);
+    }
+    @media(max-width:768px){
+        .main{
+            grid-template-columns:1fr;
         }
         .countdown-panel {
-            border-radius: 16px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
+            padding: 0.8rem 1rem;
         }
         #countdownDisplay {
-            font-size: 2.5rem;
-            font-weight: 600;
-            font-family: monospace;
-            letter-spacing: 4px;
-            color: var(--text);
-            text-shadow: 0 0 10px rgba(74,222,128,0.3);
-            line-height: 1;
+            font-size: 2rem;
         }
-        .countdown-label {
-            color: var(--muted);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .main{
-            padding:1.5rem;
-            display:grid;
-            gap:2rem;
-            flex:1;
-            grid-template-columns: 1fr 1fr;
-        }
-        .tasks-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            margin-top: 1rem;
-        }
-        .tasks-header h3 {
-            font-size:.85rem;
-            color:var(--muted);
-        }
-        .tasks{
-            display:flex;
-            flex-direction:column;
-            gap:.75rem;
-        }
-        .task-item{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            padding:.8rem 1rem;
-            background:var(--card);
-            border-radius:12px;
-            font-size:.85rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        .task-left{
-            display:flex;
-            gap:.6rem;
-            align-items:center;
-            flex: 2 1 200px;
-        }
-        .task-item.completed {
-            opacity: 0.6;
-        }
-        .task-item.completed .task-title {
-            text-decoration: line-through;
-            color: var(--muted);
-        }
-        .task-category{
-            background: #2a2a30;
-            padding:0.2rem 0.8rem;
-            border-radius:40px;
-            font-size:0.7rem;
-        }
-        .difficulty-stars{
-            color: var(--muted);
-            letter-spacing: 2px;
-            font-size:0.9rem;
-        }
-        .streak-badge{
-            background: var(--streak);
-            color: black;
-            padding:0.2rem 0.6rem;
-            border-radius:30px;
-            font-size:0.7rem;
-            font-weight:bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-        }
-        .task-actions {
-            display: flex;
-            gap: 0.3rem;
-        }
-        .task-actions button{
-            background:transparent;
-            border:1px solid var(--accent);
-            color:var(--accent);
-            border-radius:30px;
-            padding:0.3rem 1rem;
-            font-weight:bold;
-            cursor:pointer;
-            font-size:0.8rem;
-        }
-        .task-actions button:disabled{
-            opacity:0.3;
-            border-color:var(--done);
-            color:var(--muted);
-            cursor: default;
-        }
-        .delete-task-btn {
-            background: transparent !important;
-            border: 1px solid #555 !important;
-            color: #aaa !important;
-            padding: 0.3rem 0.6rem !important;
-        }
-        .delete-task-btn:hover {
-            border-color: var(--danger) !important;
-            color: var(--danger) !important;
-        }
-        .failure-badge {
-            background: var(--danger);
-            color: white;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            margin-left: 0.5rem;
-        }
-        .stats{
-            display:grid;
-            gap:1rem;
-        }
-        .stat-row{
-            padding:.8rem 1rem;
-            background:var(--card);
-            border-radius:12px;
-            display:flex;
-            flex-direction:column;
-            gap:.4rem;
-        }
-        .stat-top{
-            display:flex;
-            justify-content:space-between;
-            font-size:.85rem;
-            align-items: center;
-        }
-        .stat-name {
-            font-weight: 600;
-            display: flex;
-            gap: 0.3rem;
-            align-items: center;
-        }
-        .stat-level {
-            background: var(--muted);
-            color: black;
-            padding: 0.1rem 0.5rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .progress{
-            height:6px;
-            background:#222;
-            border-radius:4px;
-            overflow:hidden;
-        }
-        .progress-fill{
-            height:100%;
-            background:linear-gradient(to right,#fff,var(--accent));
-        }
-        .stat-xp-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
-            color: var(--muted);
-        }
-        .disable-btn {
-            background: none;
-            border: 1px solid #555;
-            color: #ccc;
-            border-radius: 20px;
-            padding: 0.1rem 0.5rem;
-            font-size: 0.7rem;
-            cursor: pointer;
-            margin-left: auto;
-        }
-        .disable-btn:hover {
-            background: var(--danger);
-            color: white;
-        }
-        .fab{
-            position:fixed;
-            bottom:20px;
-            right:20px;
-            width:54px;
-            height:54px;
-            border-radius:50%;
-            background:#fff;
-            color:#000;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:1.3rem;
-            cursor:pointer;
-            box-shadow:0 6px 20px rgba(0,0,0,.5);
-            z-index:10;
-        }
-        .modal{
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,.7);
-            display:none;
-            align-items:center;
-            justify-content:center;
-            padding:1rem;
-            z-index:20;
-        }
-        .modal-content{
-            background:#111;
-            padding:1.5rem;
-            border-radius:12px;
-            width:100%;
-            max-width:400px;
-            display:flex;
-            flex-direction:column;
-            gap:1rem;
-        }
-        .modal input,
-        .modal select,
-        .modal textarea{
-            padding:.7rem;
-            background:#1c1c1e;
-            border:1px solid #333;
-            color:white;
-            border-radius:6px;
-            font-family: inherit;
-        }
-        .modal button{
-            padding:.7rem;
-            border:none;
-            background:white;
-            color:black;
-            font-weight:600;
-            cursor:pointer;
-            border-radius:6px;
-        }
-        .secondary-btn {
-            background: #2a2a30;
-            border: none;
-            color: var(--text);
-            border-radius: 30px;
-            padding: 0.4rem 1rem;
-            font-size: 0.8rem;
-            cursor: pointer;
-            margin-top: 0.5rem;
-        }
-        .xp-floating {
-            position: fixed;
-            color: var(--accent);
-            font-weight: bold;
-            pointer-events: none;
-            z-index: 999;
-            animation: floatUp 1s ease-out forwards;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-50px); }
-        }
-        .level-up-glow {
-            animation: glowPulse 0.5s 2;
-        }
-        @keyframes glowPulse {
-            0% { box-shadow: 0 0 5px var(--accent); }
-            50% { box-shadow: 0 0 20px var(--accent); }
-        }
-        footer{
-            text-align:center;
-            font-size:.7rem;
-            padding:1rem;
-            color:var(--muted);
-        }
-        @media(max-width:768px){
-            .main{
-                grid-template-columns:1fr;
-            }
-            .countdown-panel {
-                padding: 0.8rem 1rem;
-            }
-            #countdownDisplay {
-                font-size: 2rem;
-            }
-        }
-    </style>
-</head>
-<body>
+    }
+</style>
 
-<div class="navbar">
+
+</head>
+<body><div class="navbar">
     <div class="nav-left">
         <div class="rank-badge" id="rankDisplay">
             <svg viewBox="0 0 24 24">
@@ -399,35 +397,30 @@
         </div>
     </div>
     <i class="fa-solid fa-trash reset-icon" id="resetDataBtn" title="Reset all progress"></i>
-</div>
-
-<div class="main">
+</div><div class="main">
     <div>
         <div class="countdown-panel">
             <span id="countdownDisplay">00:00:00</span>
             <span class="countdown-label">until midnight reset</span>
         </div>
-
-        <div class="tasks-header">
-         
-        </div>
-        <div class="tasks" id="taskList"></div>
+    <div class="tasks-header">
+     
     </div>
-
-    <div>
-        
-        <div class="stats" id="categoriesContainer"></div>
-        <button class="secondary-btn" id="addCustomCategoryBtn" style="width:100%;">
-            <i class="fa-solid fa-plus"></i> Add custom category
-        </button>
-    </div>
+    <div class="tasks" id="taskList"></div>
 </div>
 
-<div class="fab" onclick="openModal()">
+<div>
+    
+    <div class="stats" id="categoriesContainer"></div>
+    <button class="secondary-btn" id="addCustomCategoryBtn" style="width:100%;">
+        <i class="fa-solid fa-plus"></i> Add custom category
+    </button>
+</div>
+
+
+</div><div class="fab" onclick="openModal()">
     <i class="fa-solid fa-plus"></i>
-</div>
-
-<div class="modal" id="modal">
+</div><div class="modal" id="modal">
     <div class="modal-content">
         <h4 style="color:white;">New Daily Quest</h4>
         <input type="text" id="newTaskTitle" placeholder="Quest name">
@@ -441,9 +434,7 @@
         </select>
         <button id="addTaskBtn">Create Quest</button>
     </div>
-</div>
-
-<div class="modal" id="resetConfirmModal">
+</div><div class="modal" id="resetConfirmModal">
     <div class="modal-content">
         <p style="color:white;">Delete all saved data? This cannot be undone.</p>
         <div style="display:flex; justify-content:center;gap:1rem;">
@@ -451,13 +442,9 @@
             <button id="confirmResetNo">Cancel</button>
         </div>
     </div>
-</div>
-
-<footer>
+</div><footer>
     walif · midnight reset
-</footer>
-
-<script>
+</footer><script>
 (function() {
     const STORAGE_KEY = 'LIFE_RPG_DATA';
     const DEFAULT_CATS = [
@@ -501,12 +488,7 @@
             id: uid(), name, xp: 0, enabled: true,
             lastActiveDate: null, custom: false
         }));
-        let tasks = [
-            { id: uid(), title: 'Read 30m', category: categories[0].id, difficulty: 3, recurring: true, streakCount: 0, lastCompletedDate: null, completed: false, createdDate: today(), failures: 0 },
-            { id: uid(), title: 'Workout', category: categories[1].id, difficulty: 4, recurring: true, streakCount: 0, lastCompletedDate: null, completed: false, createdDate: today(), failures: 0 },
-            { id: uid(), title: 'Call a friend', category: categories[2].id, difficulty: 2, recurring: true, streakCount: 0, lastCompletedDate: null, completed: false, createdDate: today(), failures: 0 },
-            { id: uid(), title: 'Weekly planning', category: categories[3].id, difficulty: 2, recurring: true, streakCount: 0, lastCompletedDate: null, completed: false, createdDate: today(), failures: 0 },
-        ];
+        let tasks = [];
         return { categories, tasks, lastReset: today(), playerName: 'Adventurer' };
     }
 
@@ -632,6 +614,16 @@
         }
 
         taskListDiv.innerHTML = '';
+        if (state.tasks.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.style.textAlign = 'center';
+            emptyMsg.style.color = 'var(--muted)';
+            emptyMsg.style.padding = '2rem';
+            emptyMsg.innerText = 'click the + button on the bottom right to get started';
+            taskListDiv.appendChild(emptyMsg);
+            return;
+        }
+
         const incomplete = state.tasks.filter(t => !t.completed);
         const completed = state.tasks.filter(t => t.completed);
         [...incomplete, ...completed].forEach(task => {
@@ -844,6 +836,5 @@
 
     window.openModal = openModal;
 })();
-</script>
-</body>
+</script></body>
 </html>
