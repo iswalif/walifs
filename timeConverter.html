@@ -2,70 +2,689 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send WhatsApp Message</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>GXB — lounge booking system</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* ----- RESET & VARIABLES (unchanged, keeping original design) ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: rgb(8, 8, 8);
+            --bg-secondary: rgb(12, 12, 12);
+            --bg-card: rgba(255, 255, 255, 0.015);
+            --bg-card-hover: rgba(255, 255, 255, 0.03);
+            --bg-glass: rgba(11, 11, 12, 0.6);
+            --bg-glass-strong: rgba(11, 11, 12, 0.85);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.5);
+            --text-muted: rgba(255, 255, 255, 0.3);
+            --accent: rgba(255, 255, 255, 0.85);
+            --accent-glow: rgba(255, 255, 255, 0.05);
+            --accent-bright: #ffffff;
+            --accent-dark: rgba(255, 255, 255, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.15);
+            --border-accent: rgba(255, 255, 255, 0.2);
+            --section-py: clamp(5rem, 10vw, 8rem);
+            --container-px: clamp(1.25rem, 4vw, 3rem);
+            --container-max: 900px;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-heading: 'Inter', monospace;
+            --radius-sm: 0px;
+            --radius-md: 0px;
+            --radius-lg: 0px;
+            --radius-xl: 0px;
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 30px rgba(255, 255, 255, 0.04);
+            --transition: 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            --transition-slow: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* ----- BASE (unchanged) ----- */
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--bg-primary);
+        }
         body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f5f5f5;
-            text-align: center;
+            font-family: var(--font-body);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
-        textarea {
-            width: 100%;
-            height: 150px;
-            padding: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            resize: vertical;
+        .section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
-        button {
-            padding: 12px 30px;
-            font-size: 18px;
-            background-color: #25D366;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .container {
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: 0 var(--container-px);
+        }
+        h1, h2, h3 {
+            font-weight: 400;
+            letter-spacing: -0.02em;
+        }
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+        h2 {
+            font-size: clamp(2rem, 6vw, 2.8rem);
+            margin-bottom: 2.5rem;
+            font-weight: 450;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+        }
+        h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 450;
+        }
+        .text-secondary {
+            color: var(--text-secondary);
+        }
+        .btn {
+            display: inline-block;
+            background: transparent;
+            border: 1px solid var(--border-accent);
+            color: var(--accent-bright);
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 450;
+            text-decoration: none;
             cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: 0.5px;
+            text-align: center;
+            background-color: var(--bg-glass);
         }
-        button:hover {
-            background-color: #128C7E;
+        .btn:hover {
+            border-color: var(--accent-bright);
+            background-color: rgba(255, 255, 255, 0.02);
+            box-shadow: var(--shadow-glow);
         }
-        .note {
-            margin-top: 20px;
-            color: #555;
-            font-size: 14px;
+        .btn-block {
+            width: 100%;
+        }
+        .btn-outline {
+            border-color: var(--border);
+            background: transparent;
+        }
+        .btn-outline:hover {
+            border-color: var(--accent-bright);
+        }
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            transition: var(--transition);
+            box-shadow: var(--shadow-card);
+        }
+        .card:hover {
+            background-color: var(--bg-card-hover);
+            border-color: var(--border-hover);
+        }
+        .glass-panel {
+            background: var(--bg-glass-strong);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--border);
+            padding: 2rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2px;
+            background-color: var(--border);
+            border: 1px solid var(--border);
+        }
+        .feature-card {
+            background-color: var(--bg-primary);
+            padding: 2rem 1.5rem;
+            transition: var(--transition);
+            height: 100%;
+        }
+        .feature-card i {
+            font-size: 2rem;
+            margin-bottom: 1.2rem;
+            color: var(--accent);
+        }
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .addons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0 1rem;
+        }
+        .addon-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .addon-card.selected {
+            border-color: var(--accent-bright);
+            background-color: var(--bg-card-hover);
+        }
+        .addon-card input[type="checkbox"] {
+            width: 1.3rem;
+            height: 1.3rem;
+            accent-color: white;
+            background: transparent;
+            border: 1px solid var(--border-accent);
+        }
+        .addon-info {
+            flex: 1;
+        }
+        .addon-price {
+            color: var(--accent-bright);
+            font-weight: 500;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .form-field.full-width {
+            grid-column: span 2;
+        }
+        label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+        }
+        input, textarea, select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 0.9rem 1rem;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            transition: var(--transition);
+            border-radius: 0;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-bright);
+            background: var(--bg-card);
+        }
+        .summary-box {
+            background: var(--bg-glass-strong);
+            border: 1px solid var(--border-accent);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .summary-line.total {
+            border-bottom: none;
+            margin-top: 0.5rem;
+            font-size: 1.3rem;
+            font-weight: 450;
+            color: var(--accent-bright);
+        }
+        .info-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+        .info-box p {
+            margin: 0.8rem 0;
+            display: flex;
+            gap: 1rem;
+        }
+        .info-box i {
+            width: 1.5rem;
+            color: var(--accent);
+        }
+        .scroll-indicator {
+            margin-top: 3rem;
+            animation: float 2s infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); opacity: 0.3; }
+            50% { transform: translateY(10px); opacity: 1; }
+            100% { transform: translateY(0); opacity: 0.3; }
+        }
+        /* fallback panel */
+        .fallback-panel {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-accent);
+            display: none;
+        }
+        .fallback-panel.visible {
+            display: block;
+        }
+        .copy-btn {
+            margin-top: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-field.full-width {
+                grid-column: span 1;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h2>Send WhatsApp Message</h2>
-    <p>Enter your message below:</p>
-    <textarea id="message" placeholder="Type your message here..."></textarea>
-    <br>
-    <button onclick="sendMessage()">Send via WhatsApp</button>
-    <p class="note">The message will be sent to <strong>+8801761149535</strong> (01761149535).<br>WhatsApp will open with the pre‑filled text – just tap send.</p>
 
+    <!-- HERO SECTION (unchanged) -->
+    <section class="section" id="hero">
+        <div class="container" style="padding-top: 6rem; padding-bottom: 4rem; text-align: center;">
+            <h1>Turn Your Gaming Lounge<br>Into a Smart Booking System</h1>
+            <p class="text-secondary" style="font-size: 1.3rem; max-width: 700px; margin: 0 auto 2rem;">
+                The demo you just experienced is a real, customizable website. <br>Own it for your lounge — complete with online bookings, admin tools, and SMS.
+            </p>
+            <a href="#order" class="btn" style="min-width: 240px;">Get This Website</a>
+            <div class="scroll-indicator">
+                <i class="fa-solid fa-chevron-down" style="color: var(--text-muted); font-size: 1.5rem;"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: FEATURES (unchanged) -->
+    <section class="section" id="features">
+        <div class="container" style="padding: var(--section-py) 0;">
+            <h2>What you get</h2>
+            <div class="features-grid">
+                <div class="feature-card"><i class="fa-regular fa-calendar-check"></i><h3>Online station booking</h3><p>24/7 automated reservations, no manual entry.</p></div>
+                <div class="feature-card"><i class="fa-regular fa-clock"></i><h3>Real-time availability</h3><p>Live station status, updated instantly.</p></div>
+                <div class="feature-card"><i class="fa-regular fa-chart-bar"></i><h3>Admin dashboard</h3><p>Full control: bookings, stations, earnings.</p></div>
+                <div class="feature-card"><i class="fa-regular fa-eye"></i><h3>Analytics (optional)</h3><p>Track peak hours, revenue, and more.</p></div>
+                <div class="feature-card"><i class="fa-regular fa-mobile-notch"></i><h3>Mobile friendly</h3><p>Flawless on phones, tablets, desktops.</p></div>
+                <div class="feature-card"><i class="fa-regular fa-message"></i><h3>SMS notifications</h3><p>Confirm bookings & reminders via SMS.</p></div>
+                <div class="feature-card"><i class="fa-regular fa-check-circle"></i><h3>Booking approval</h3><p>Approve or decline requests manually.</p></div>
+                <div class="feature-card"><i class="fa-regular fa-gear"></i><h3>Station management</h3><p>Add/remove PCs, consoles, set pricing.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: BASE PRICE (unchanged) -->
+    <section class="section" id="base-price">
+        <div class="container" style="padding: var(--section-py) 0;">
+            <h2>Base website</h2>
+            <div class="card" style="max-width: 600px; margin: 0 auto;">
+                <h3 style="font-size: 1.8rem;">Gaming Lounge Booking System</h3>
+                <div style="font-size: 3.5rem; margin: 1rem 0 0.5rem; color: var(--accent-bright);">$240</div>
+                <p class="text-secondary" style="font-size: 1.1rem;">A fully functional gaming lounge booking platform with admin control, station management, and SMS booking confirmation system.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: ADD-ONS (unchanged) -->
+    <section class="section" id="addons">
+        <div class="container" style="padding: var(--section-py) 0;">
+            <h2>Optional upgrades</h2>
+            <div class="addons-grid" id="addons-grid">
+                <div class="addon-card" data-addon-id="analytics">
+                    <input type="checkbox" id="addon-analytics" class="addon-checkbox" value="30">
+                    <div class="addon-info">
+                        <label for="addon-analytics" style="cursor: pointer; color: var(--text-primary);"><strong>Admin Analytics Dashboard</strong></label>
+                        <div class="text-secondary">Detailed reports, graphs & metrics</div>
+                    </div>
+                    <span class="addon-price">$30</span>
+                </div>
+                <div class="addon-card" data-addon-id="maps">
+                    <input type="checkbox" id="addon-maps" class="addon-checkbox" value="15">
+                    <div class="addon-info">
+                        <label for="addon-maps" style="cursor: pointer; color: var(--text-primary);"><strong>Google Maps Integration</strong></label>
+                        <div class="text-secondary">Show lounge location & directions</div>
+                    </div>
+                    <span class="addon-price">$15</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: RUNNING COST NOTICE (unchanged) -->
+    <section class="section" id="running-costs">
+        <div class="container" style="padding: var(--section-py) 0;">
+            <h2>Operational costs (industry standard)</h2>
+            <div class="info-box">
+                <p><i class="fa-regular fa-globe"></i> <strong>Domain:</strong> $10–15 per year</p>
+                <p><i class="fa-regular fa-server"></i> <strong>Hosting:</strong> $5–10 per month</p>
+                <p><i class="fa-regular fa-message"></i> <strong>SMS Provider (SSL Wireless):</strong> ~0.30 BDT per SMS</p>
+                <p style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 0.5rem;"><i class="fa-regular fa-circle-info"></i> These are direct costs you pay to domain/ SMS providers. No hidden fees.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 6+7: ORDER FORM & BUTTON with FALLBACKS -->
+    <section class="section" id="order">
+        <div class="container" style="padding: var(--section-py) 0;">
+            <h2>Start your lounge website</h2>
+            <div class="form-grid">
+                <div class="form-field"><label>Gaming Lounge Name *</label><input type="text" id="loungeName" placeholder="e.g. NetPlay Arena" required></div>
+                <div class="form-field"><label>Owner Name *</label><input type="text" id="ownerName" placeholder="Alex Chen" required></div>
+                <div class="form-field"><label>WhatsApp Number *</label><input type="tel" id="whatsapp" placeholder="+8801xxxxxxxx" pattern="[+][0-9]{1,4}[0-9]{6,12}" title="Please enter a valid international number starting with +" required></div>
+                <div class="form-field"><label>Email *</label><input type="email" id="email" placeholder="owner@lounge.com" required></div>
+                <div class="form-field"><label>City / Location *</label><input type="text" id="city" placeholder="Dhaka" required></div>
+                <div class="form-field"><label>Number of Stations *</label><input type="number" id="stations" value="10" min="1" required></div>
+                <div class="form-field full-width"><label>Custom Requests (optional)</label><textarea id="customRequests" rows="3" placeholder="Tell us about specific needs..."></textarea></div>
+            </div>
+
+            <!-- ORDER SUMMARY (LIVE) -->
+            <div class="summary-box" id="summaryBox">
+                <h3 style="margin-bottom: 1.5rem;">Order summary</h3>
+                <div class="summary-line"><span>Base Website</span> <span>$240</span></div>
+                <div class="summary-line" id="addonsSummaryLine"><span>Add-ons</span> <span id="addonTotal">$0</span></div>
+                <div class="summary-line total"><span>Final price</span> <span id="finalTotal">$240</span></div>
+                <div style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;" id="selectedAddonsList"></div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2.5rem;">
+                <button class="btn btn-block" id="placeOrderBtn" style="flex: 2;">Send Order on WhatsApp</button>
+                <button class="btn btn-outline" id="copySummaryBtn" style="flex: 1;"><i class="fa-regular fa-clipboard"></i> Copy Summary</button>
+            </div>
+            <p class="text-muted" style="margin-top: 0.5rem; text-align: center; font-size: 0.85rem;">
+                You'll be redirected to WhatsApp. Both +8801761149535 & +8801932-411622 will be notified.<br>
+                If the chat doesn't open automatically, copy the summary and send it manually.
+            </p>
+
+            <!-- FALLBACK PANEL (hidden by default) -->
+            <div class="fallback-panel" id="fallbackPanel">
+                <h4 style="margin-bottom: 1rem;">📋 Manual order message</h4>
+                <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">If WhatsApp didn't open, copy the text below and send it to <strong>+8801761149535</strong> or <strong>+8801932-411622</strong>:</p>
+                <textarea id="fallbackMessage" rows="8" readonly style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); padding: 1rem; border: 1px solid var(--border); font-family: monospace;"></textarea>
+                <button class="btn copy-btn" id="copyFallbackBtn"><i class="fa-regular fa-copy"></i> Copy message</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>walif.services@email.com | +8801761149535 / +8801932-411622</p>
+            <p style="margin-top: 1rem;">© gaming lounge system — demo to real in one click</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript with robust fallbacks -->
     <script>
-        function sendMessage() {
-            const message = document.getElementById('message').value.trim();
-            if (!message) {
-                alert('Please enter a message.');
-                return;
+        (function() {
+            // ----- SELECTABLE ADDONS & LIVE TOTAL (unchanged) -----
+            const addonCheckboxes = document.querySelectorAll('.addon-checkbox');
+            const addonCards = document.querySelectorAll('.addon-card');
+            const addonTotalSpan = document.getElementById('addonTotal');
+            const finalTotalSpan = document.getElementById('finalTotal');
+            const selectedAddonsListDiv = document.getElementById('selectedAddonsList');
+
+            function updateSummaryAndTotal() {
+                let totalAddons = 0;
+                const selectedNames = [];
+
+                addonCheckboxes.forEach(cb => {
+                    if (cb.checked) {
+                        totalAddons += parseInt(cb.value, 10);
+                        const parentCard = cb.closest('.addon-card');
+                        const strongLabel = parentCard ? parentCard.querySelector('strong') : null;
+                        if (strongLabel) selectedNames.push(strongLabel.innerText.trim());
+                    }
+                });
+
+                addonCards.forEach(card => {
+                    const chk = card.querySelector('.addon-checkbox');
+                    if (chk && chk.checked) {
+                        card.classList.add('selected');
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                });
+
+                addonTotalSpan.textContent = '$' + totalAddons;
+                const base = 240;
+                const final = base + totalAddons;
+                finalTotalSpan.textContent = '$' + final;
+
+                if (selectedNames.length > 0) {
+                    selectedAddonsListDiv.innerHTML = 'Selected: ' + selectedNames.join(' · ');
+                } else {
+                    selectedAddonsListDiv.innerHTML = 'No add-ons selected';
+                }
+            }
+            updateSummaryAndTotal();
+
+            addonCheckboxes.forEach(cb => {
+                cb.addEventListener('change', updateSummaryAndTotal);
+            });
+
+            addonCards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') return;
+                    const chk = card.querySelector('.addon-checkbox');
+                    if (chk) {
+                        chk.checked = !chk.checked;
+                        updateSummaryAndTotal();
+                    }
+                });
+            });
+
+            // ----- FORM DATA & MESSAGE GENERATION -----
+            function getFormData() {
+                return {
+                    loungeName: document.getElementById('loungeName').value.trim(),
+                    ownerName: document.getElementById('ownerName').value.trim(),
+                    whatsapp: document.getElementById('whatsapp').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    city: document.getElementById('city').value.trim(),
+                    stations: document.getElementById('stations').value.trim(),
+                    custom: document.getElementById('customRequests').value.trim()
+                };
             }
 
-            // Target number: +8801761149535 → without '+' for the link
-            const phoneNumber = '8801761149535';
-            const encodedMessage = encodeURIComponent(message);
-            const url = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            function getSelectedAddonsText() {
+                let names = [];
+                addonCheckboxes.forEach(cb => {
+                    if (cb.checked) {
+                        const parent = cb.closest('.addon-card');
+                        const strong = parent ? parent.querySelector('strong') : null;
+                        if (strong) names.push(strong.innerText.trim());
+                    }
+                });
+                return names.length ? names.join(', ') : 'None';
+            }
 
-            // Open WhatsApp
-            window.open(url, '_blank');
-        }
+            function getAddonsTotal() {
+                let total = 0;
+                addonCheckboxes.forEach(cb => { if (cb.checked) total += parseInt(cb.value, 10); });
+                return total;
+            }
+
+            function buildOrderMessage() {
+                const data = getFormData();
+                const selectedAddonsStr = getSelectedAddonsText();
+                const addonsTotal = getAddonsTotal();
+                const finalPrice = 240 + addonsTotal;
+
+                let message = `NEW WEBSITE ORDER REQUEST\n\n`;
+                message += `Lounge Name: ${data.loungeName || '(not provided)'}\n`;
+                message += `Owner Name: ${data.ownerName || '(not provided)'}\n`;
+                message += `WhatsApp Number: ${data.whatsapp || '(not provided)'}\n`;
+                message += `Email: ${data.email || '(not provided)'}\n`;
+                message += `City: ${data.city || '(not provided)'}\n`;
+                message += `Number of Stations: ${data.stations || '(not provided)'}\n\n`;
+                message += `Selected Features:\n${selectedAddonsStr}\n\n`;
+                message += `Base Price: $240\n`;
+                message += `Add-ons Total: $${addonsTotal}\n`;
+                message += `Final Price: $${finalPrice}\n\n`;
+                message += `Custom Requests:\n${data.custom || '(none)'}\n\n`;
+                message += `---\nAlso notify: +8801932-411622\nDeveloper Email: walif.services@email.com`;
+                return message;
+            }
+
+            // ----- VALIDATION (improved) -----
+            function validateForm() {
+                const data = getFormData();
+                if (!data.loungeName) return 'Gaming Lounge Name is required.';
+                if (!data.ownerName) return 'Owner Name is required.';
+                if (!data.whatsapp) return 'WhatsApp Number is required.';
+                // Simple international phone pattern check
+                const phonePattern = /^\+[0-9]{1,4}[0-9]{6,12}$/;
+                if (!phonePattern.test(data.whatsapp)) {
+                    return 'Please enter a valid WhatsApp number with country code, starting with + (e.g., +8801761149535).';
+                }
+                if (!data.email) return 'Email is required.';
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(data.email)) return 'Please enter a valid email address.';
+                if (!data.city) return 'City is required.';
+                if (!data.stations || parseInt(data.stations) < 1) return 'Number of Stations must be at least 1.';
+                return null;
+            }
+
+            // ----- WHATSAPP LINK (with fallback panel) -----
+            const placeOrderBtn = document.getElementById('placeOrderBtn');
+            const fallbackPanel = document.getElementById('fallbackPanel');
+            const fallbackMessage = document.getElementById('fallbackMessage');
+            const copyFallbackBtn = document.getElementById('copyFallbackBtn');
+            const copySummaryBtn = document.getElementById('copySummaryBtn');
+
+            function updateFallbackMessage() {
+                fallbackMessage.value = buildOrderMessage();
+            }
+
+            // Show fallback panel with latest message
+            function showFallback() {
+                updateFallbackMessage();
+                fallbackPanel.classList.add('visible');
+            }
+
+            placeOrderBtn.addEventListener('click', () => {
+                const validationError = validateForm();
+                if (validationError) {
+                    alert(validationError);
+                    return;
+                }
+
+                const message = buildOrderMessage();
+                const encoded = encodeURIComponent(message);
+                const whatsappLink = `https://wa.me/8801761149535?text=${encoded}`;
+
+                // Try to open WhatsApp
+                const newWindow = window.open(whatsappLink, '_blank');
+
+                // Fallback if popup blocked or window didn't open
+                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                    showFallback();
+                } else {
+                    // Still show fallback after a delay in case it doesn't actually open (e.g., no app)
+                    setTimeout(() => {
+                        try {
+                            if (newWindow.closed) {
+                                showFallback();
+                            }
+                        } catch (e) {
+                            // Cross-origin? just show fallback anyway
+                            showFallback();
+                        }
+                    }, 1000);
+                }
+
+                // Always update fallback message (in case user needs it)
+                updateFallbackMessage();
+            });
+
+            // Copy summary button (copies the message to clipboard)
+            copySummaryBtn.addEventListener('click', async () => {
+                const message = buildOrderMessage();
+                try {
+                    await navigator.clipboard.writeText(message);
+                    alert('Order summary copied to clipboard! You can now paste it into WhatsApp.');
+                } catch (err) {
+                    // Fallback for older browsers
+                    const textarea = document.createElement('textarea');
+                    textarea.value = message;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('Order summary copied (fallback method).');
+                }
+            });
+
+            // Copy from fallback textarea
+            copyFallbackBtn.addEventListener('click', () => {
+                fallbackMessage.select();
+                document.execCommand('copy');
+                alert('Message copied to clipboard. Now paste it into WhatsApp.');
+            });
+
+            // Also update fallback message whenever form changes (optional)
+            const formInputs = document.querySelectorAll('#order input, #order textarea');
+            formInputs.forEach(input => {
+                input.addEventListener('input', updateFallbackMessage);
+            });
+            addonCheckboxes.forEach(cb => {
+                cb.addEventListener('change', updateFallbackMessage);
+            });
+
+            // Initial update
+            updateFallbackMessage();
+
+            // ----- SCROLL REVEAL (unchanged) -----
+            const sections = document.querySelectorAll('.section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
+            sections.forEach(section => observer.observe(section));
+            setTimeout(() => {
+                document.getElementById('hero')?.classList.add('visible');
+            }, 100);
+        })();
     </script>
 </body>
 </html>
