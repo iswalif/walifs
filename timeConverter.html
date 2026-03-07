@@ -1,624 +1,71 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Time Converter — Global Time Zones</title>
-<style>
-  :root{
-    --bg:#0b0f14; --panel:#071019; --accent:#00ff9f; --muted:#6b7280;
-    --glow:0 0 18px rgba(0,255,159,0.12);
-    font-family:"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  }
-  html,body{
-    height:100%;
-    margin:0;
-    background: linear-gradient(180deg, #020408 0%, #07101a 70%, #07101a 100%);
-    color:#c7f7e6;
-    background-attachment: fixed;
-  }
-  .wrap{
-    max-width:900px;
-    margin:24px auto;
-    padding:28px;
-    border-radius:12px;
-    background:linear-gradient(135deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
-    box-shadow:0 8px 40px rgba(0,0,0,0.6),var(--glow);
-    border:1px solid rgba(0,255,159,0.06);
-  }
-  header{
-    display:flex;
-    gap:16px;
-    align-items:center;
-    margin-bottom:18px
-  }
-  .logo{
-    width:64px;
-    height:64px;
-    border-radius:50%;
-    background:linear-gradient(135deg,#001f1a,#00332d);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    color:var(--accent);
-    box-shadow:0 6px 20px rgba(0,255,159,0.05),inset 0 -6px 12px rgba(0,0,0,0.2);
-  }
-  h1{
-    font-size:20px;
-    margin:0
-  }
-  .grid{
-    display:grid;
-    grid-template-columns:1fr 360px;
-    gap:18px;
-    margin-top:18px
-  }
-  .card{
-    background:linear-gradient(0deg,rgba(255,255,255,0.012),rgba(255,255,255,0.01));
-    padding:18px;
-    border-radius:10px;
-    border:1px solid rgba(255,255,255,0.02)
-  }
-  label{
-    display:block;
-    font-size:13px;
-    color:var(--muted);
-    margin-bottom:6px
-  }
-  input[type="text"],select{
-    width:100%;
-    padding:10px;
-    border-radius:8px;
-    border:1px solid rgba(255,255,255,0.03);
-    background:#061016;
-    color:#dfffe7;
-    font-size:15px;
-    box-sizing:border-box
-  }
-  .buttons{
-    display:flex;
-    gap:10px;
-    margin-top:12px
-  }
-  .btn{
-    flex:1;
-    padding:12px;
-    border-radius:10px;
-    border:0;
-    font-weight:700;
-    cursor:pointer;
-    background:linear-gradient(90deg,#002b20,#00332b);
-    color:var(--accent);
-    box-shadow:0 6px 18px rgba(0,0,0,0.5);
-    transition:transform .12s ease,box-shadow .12s;
-    letter-spacing:0.6px;
-  }
-  .btn:hover{
-    transform:translateY(-3px);
-    box-shadow:0 12px 30px rgba(0,255,159,0.06)
-  }
-  .btn.secondary{
-    background:linear-gradient(90deg,#081026,#0b1120);
-    color:#bfe7d3
-  }
-  .result{
-    margin-top:14px;
-    padding:12px;
-    border-radius:8px;
-    background:linear-gradient(180deg,rgba(0,0,0,0.12),rgba(255,255,255,0.01));
-    border:1px solid rgba(0,255,159,0.06);
-    min-height:72px;
-    font-family:monospace;
-  }
-  .hacker{
-    height:220px;
-    border-radius:8px;
-    padding:12px;
-    background:#02050a;
-    border:1px solid rgba(0,255,159,0.03);
-    font-family:"Courier New", monospace;
-    color:#00ff9f;
-    font-size:13px;
-    position:relative;
-    display:flex;
-    flex-direction:column;
-  }
-  .hacker-content{
-    flex:1;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    position:relative;
-  }
-  .scanline{
-    position:absolute;
-    left:-40%;
-    top:0;
-    width:200%;
-    height:2px;
-    background:linear-gradient(90deg,transparent,rgba(0,255,159,0.06),transparent);
-    animation:scan 2.8s linear infinite;
-    mix-blend-mode:screen;
-    pointer-events:none;
-    z-index:2
-  }
-  @keyframes scan{
-    0%{transform:translateY(-20%)}
-    50%{transform:translateY(60%)}
-    100%{transform:translateY(120%)}
-  }
-  .binary{
-    font-size:10px;
-    color:rgba(0,255,159,0.08);
-    line-height:1.1;
-    white-space:pre-wrap;
-    user-select:none;
-    position:absolute;
-    top:0;
-    left:0;
-    right:0;
-    z-index:1;
-    pointer-events:none
-  }
-  .type{
-    margin-top:8px;
-    white-space:pre-wrap;
-    line-height:1.5;
-    min-height:60px;
-    position:relative;
-    z-index:3
-  }
-  .progressOuter{
-    height:8px;
-    background:rgba(255,255,255,0.03);
-    border-radius:999px;
-    margin-top:12px;
-    overflow:hidden;
-    position:relative;
-    z-index:3
-  }
-  .progressInner{
-    height:100%;
-    width:0;
-    background:linear-gradient(90deg, rgba(0,255,159,0.25), rgba(0,255,159,0.8));
-    transition:width .3s linear
-  }
-  .controls-row{
-    display:flex;
-    gap:8px;
-    align-items:center;
-    position:relative;
-    z-index:3;
-    margin-top:12px
-  }
-  .mini{
-    font-size:12px;
-    color:var(--muted)
-  }
-  .copyBtn{
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.04);
-    color:var(--accent);
-    padding:8px 10px;
-    border-radius:8px;
-    cursor:pointer
-  }
-  footer{
-    margin-top:16px;
-    color:var(--muted);
-    font-size:12px;
-    text-align:right
-  }
-  .badge{
-    font-size:11px;
-    color:#001b04;
-    background:rgba(0,255,159,0.08);
-    padding:6px 8px;
-    border-radius:999px;
-    border:1px solid rgba(0,255,159,0.06)
-  }
-  .city-select{
-    margin-top:12px
-  }
-  .current-time{
-    font-size:14px;
-    color:var(--muted);
-    margin-bottom:12px;
-    padding:8px;
-    background:rgba(0,0,0,0.1);
-    border-radius:6px;
-    text-align:center
-  }
-  .search-container{
-    position:relative
-  }
-  .search-results{
-    position:absolute;
-    top:100%;
-    left:0;
-    right:0;
-    background:var(--panel);
-    border:1px solid rgba(255,255,255,0.05);
-    border-top:none;
-    border-radius:0 0 8px 8px;
-    max-height:200px;
-    overflow-y:auto;
-    z-index:10;
-    display:none
-  }
-  .search-result-item{
-    padding:10px;
-    cursor:pointer;
-    border-bottom:1px solid rgba(255,255,255,0.03)
-  }
-  .search-result-item:hover{
-    background:rgba(0,255,159,0.05)
-  }
-  .search-result-item:last-child{
-    border-bottom:none
-  }
-  @media(max-width:880px){
-    .grid{
-      grid-template-columns:1fr
-    }
-    .hacker{
-      height:240px
-    }
-    .hacker-content{
-      overflow-y:auto;
-      -webkit-overflow-scrolling:touch;
-    }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send WhatsApp Message</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+        button {
+            padding: 12px 30px;
+            font-size: 18px;
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #128C7E;
+        }
+        .note {
+            margin-top: 20px;
+            color: #555;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-<div id="cityPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; backdrop-filter: blur(4px);">
-  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 600px; max-height: 80vh; background: var(--panel); border-radius: 12px; padding: 24px; box-shadow: var(--glow); border: 1px solid rgba(0,255,159,0.1); overflow: hidden;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-      <h2 style="margin: 0; color: var(--accent);">City Not Found</h2>
-      <button id="closePopup" style="background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer;">&times;</button>
-    </div>
-    <div style="overflow-y: auto; max-height: 60vh; padding-right: 8px;">
-      <p style="margin-top: 0; color: #bfe7d3; line-height: 1.5;">It looks like your city is not currently available in our system. To ensure you can still check accurate local time, please select the nearest available city from the list below that shares your timezone:</p>
-      
-      <h3 style="color: var(--accent); margin: 20px 0 10px 0;">Available Cities by Timezone:</h3>
-      
-      <div style="font-family: monospace; font-size: 13px; line-height: 1.6;">
-        <div>UTC−12:00 — Baker Island, Howland Island</div>
-        <div>UTC−11:00 — American Samoa, Niue</div>
-        <div>UTC−10:00 — Hawaii, Tahiti</div>
-        <div>UTC−09:30 — Marquesas Islands</div>
-        <div>UTC−09:00 — Alaska</div>
-        <div>UTC−08:00 — Los Angeles, Vancouver</div>
-        <div>UTC−07:00 — Denver, Calgary</div>
-        <div>UTC−06:00 — Chicago, Mexico City</div>
-        <div>UTC−05:00 — New York, Toronto, Lima</div>
-        <div>UTC−04:00 — Caracas, La Paz</div>
-        <div>UTC−03:30 — St. John's (Newfoundland)</div>
-        <div>UTC−03:00 — Buenos Aires, São Paulo</div>
-        <div>UTC−02:00 — South Georgia & South Sandwich Islands</div>
-        <div>UTC−01:00 — Azores, Cape Verde</div>
-        <div>UTC±00:00 — London, Dublin, Lisbon</div>
-        <div>UTC+01:00 — Paris, Berlin, Rome, Madrid</div>
-        <div>UTC+02:00 — Athens, Johannesburg, Cairo</div>
-        <div>UTC+03:00 — Moscow, Nairobi, Riyadh</div>
-        <div>UTC+03:30 — Tehran</div>
-        <div>UTC+04:00 — Dubai, Baku</div>
-        <div>UTC+04:30 — Kabul</div>
-        <div>UTC+05:00 — Islamabad, Tashkent</div>
-        <div>UTC+05:30 — New Delhi, Colombo</div>
-        <div>UTC+05:45 — Kathmandu</div>
-        <div>UTC+06:00 — Dhaka, Almaty</div>
-        <div>UTC+06:30 — Yangon, Cocos Islands</div>
-        <div>UTC+07:00 — Bangkok, Jakarta, Ho Chi Minh City</div>
-        <div>UTC+08:00 — Singapore, Beijing, Manila</div>
-        <div>UTC+08:45 — Eucla (Australia)</div>
-        <div>UTC+09:00 — Tokyo, Seoul</div>
-        <div>UTC+09:30 — Adelaide, Darwin</div>
-        <div>UTC+10:00 — Sydney, Port Moresby</div>
-        <div>UTC+10:30 — Lord Howe Island</div>
-        <div>UTC+11:00 — Solomon Islands, New Caledonia</div>
-        <div>UTC+12:00 — Auckland, Fiji</div>
-        <div>UTC+12:45 — Chatham Islands</div>
-        <div>UTC+13:00 — Tonga, Samoa</div>
-        <div>UTC+14:00 — Line Islands (Kiribati)</div>
-      </div>
-      
-      <p style="color: #bfe7d3; line-height: 1.5; margin-top: 20px;">Please choose the closest city from the list above that matches your timezone. This will ensure your local time is displayed correctly.</p>
-    </div>
-  </div>
-</div>
+    <h2>Send WhatsApp Message</h2>
+    <p>Enter your message below:</p>
+    <textarea id="message" placeholder="Type your message here..."></textarea>
+    <br>
+    <button onclick="sendMessage()">Send via WhatsApp</button>
+    <p class="note">The message will be sent to <strong>+8801761149535</strong> (01761149535).<br>WhatsApp will open with the pre‑filled text – just tap send.</p>
 
-<div class="wrap">
-  <header>
-    <div class="logo"></div>
-    <div>
-      <h1>Global Time Converter</h1>
-    </div>
-  </header>
+    <script>
+        function sendMessage() {
+            const message = document.getElementById('message').value.trim();
+            if (!message) {
+                alert('Please enter a message.');
+                return;
+            }
 
-  <div class="grid">
-    <div class="card">
-      <div class="current-time" id="currentTime">Current local time: <span id="localTimeDisplay">--:-- --</span></div>
-      
-      <input id="timeInput" type="text" value="11:30" />
-      
-      <div class="search-container">
-        <input type="text" id="sourceSearch" placeholder="Search for source location..." autocomplete="off" />
-        <div class="search-results" id="sourceResults"></div>
-      </div>
+            // Target number: +8801761149535 → without '+' for the link
+            const phoneNumber = '8801761149535';
+            const encodedMessage = encodeURIComponent(message);
+            const url = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 
-      <div class="search-container" style="margin-top: 12px;">
-        <input type="text" id="targetSearch" placeholder="Search for target location..." autocomplete="off" />
-        <div class="search-results" id="targetResults"></div>
-      </div>
-
-      <div class="buttons">
-        <button class="btn" id="convertBtn">Convert Time</button>
-      </div>
-<div style="text-align: center; margin-top: 15px; text-decoration:none;">
-    <a href="#" id="cityHelpLink" style="color: var(--accent); text-decoration: none; font-size: 14px;padding-bottom: 2px;">
-      Can't find your city?
-    </a>
-  </div>
-      <div class="result" id="resultArea"></div>
-    </div>
-
-    <div class="card">
-      <div class="hacker" id="hackerPanel">
-        <div class="hacker-content">
-          <div class="scanline"></div>
-          <div class="binary" id="binaryRain"></div>
-          <div class="type" id="typeWriter">Idle — waiting for your command...</div>
-        </div>
-        <div class="progressOuter"><div class="progressInner" id="progressBar"></div></div>
-        <div class="controls-row">
-          <div class="mini">Status: <span id="statusTag" class="badge">idle</span></div>
-          <div style="flex:1"></div>
-          <button class="copyBtn" id="copyRes">Copy result</button>
-        </div>
-      </div>
-      <footer>Made by h1m</footer>
-    </div>
-  </div>
-  
-  
-</div>
-
-<script>
-// Timezone data with cities and offsets
-const timezones = [
-  { id: "LOCAL", name: "Local Time", offset: null, display: "Local Time" },
-  { id: "UTC", name: "UTC", offset: 0, display: "UTC" },
-  { id: "TZ-12", name: "Baker Island, Howland Island", offset: -12, display: "Baker Island, Howland Island" },
-  { id: "TZ-11", name: "American Samoa, Niue", offset: -11, display: "American Samoa, Niue" },
-  { id: "TZ-10", name: "Hawaii, Tahiti", offset: -10, display: "Hawaii, Tahiti" },
-  { id: "TZ-9.5", name: "Marquesas Islands", offset: -9.5, display: "Marquesas Islands" },
-  { id: "TZ-9", name: "Alaska", offset: -9, display: "Alaska" },
-  { id: "TZ-8", name: "Los Angeles, Vancouver", offset: -8, display: "Los Angeles, Vancouver" },
-  { id: "TZ-7", name: "Denver, Calgary", offset: -7, display: "Denver, Calgary" },
-  { id: "TZ-6", name: "Chicago, Mexico City", offset: -6, display: "Chicago, Mexico City" },
-  { id: "TZ-5", name: "New York, Toronto, Lima", offset: -5, display: "New York, Toronto, Lima" },
-  { id: "TZ-4", name: "Caracas, La Paz", offset: -4, display: "Caracas, La Paz" },
-  { id: "TZ-3.5", name: "St. John's (Newfoundland)", offset: -3.5, display: "St. John's (Newfoundland)" },
-  { id: "TZ-3", name: "Buenos Aires, São Paulo", offset: -3, display: "Buenos Aires, São Paulo" },
-  { id: "TZ-2", name: "South Georgia & South Sandwich Islands", offset: -2, display: "South Georgia & South Sandwich Islands" },
-  { id: "TZ-1", name: "Azores, Cape Verde", offset: -1, display: "Azores, Cape Verde" },
-  { id: "TZ0", name: "London, Dublin, Lisbon", offset: 0, display: "London, Dublin, Lisbon" },
-  { id: "TZ1", name: "Paris, Berlin, Rome, Madrid", offset: 1, display: "Paris, Berlin, Rome, Madrid" },
-  { id: "TZ2", name: "Athens, Johannesburg, Cairo", offset: 2, display: "Athens, Johannesburg, Cairo" },
-  { id: "TZ3", name: "Moscow, Nairobi, Riyadh", offset: 3, display: "Moscow, Nairobi, Riyadh" },
-  { id: "TZ3.5", name: "Tehran", offset: 3.5, display: "Tehran" },
-  { id: "TZ4", name: "Dubai, Baku", offset: 4, display: "Dubai, Baku" },
-  { id: "TZ4.5", name: "Kabul", offset: 4.5, display: "Kabul" },
-  { id: "TZ5", name: "Islamabad, Tashkent", offset: 5, display: "Islamabad, Tashkent" },
-  { id: "TZ5.5", name: "New Delhi, Colombo", offset: 5.5, display: "New Delhi, Colombo" },
-  { id: "TZ5.75", name: "Kathmandu", offset: 5.75, display: "Kathmandu" },
-  { id: "TZ6", name: "Dhaka, Almaty", offset: 6, display: "Dhaka, Almaty" },
-  { id: "TZ6.5", name: "Yangon, Cocos Islands", offset: 6.5, display: "Yangon, Cocos Islands" },
-  { id: "TZ7", name: "Bangkok, Jakarta, Ho Chi Minh City", offset: 7, display: "Bangkok, Jakarta, Ho Chi Minh City" },
-  { id: "TZ8", name: "Singapore, Beijing, Manila", offset: 8, display: "Singapore, Beijing, Manila" },
-  { id: "TZ8.75", name: "Eucla (Australia)", offset: 8.75, display: "Eucla (Australia)" },
-  { id: "TZ9", name: "Tokyo, Seoul", offset: 9, display: "Tokyo, Seoul" },
-  { id: "TZ9.5", name: "Adelaide, Darwin", offset: 9.5, display: "Adelaide, Darwin" },
-  { id: "TZ10", name: "Sydney, Port Moresby", offset: 10, display: "Sydney, Port Moresby" },
-  { id: "TZ10.5", name: "Lord Howe Island", offset: 10.5, display: "Lord Howe Island" },
-  { id: "TZ11", name: "Solomon Islands, New Caledonia", offset: 11, display: "Solomon Islands, New Caledonia" },
-  { id: "TZ12", name: "Auckland, Fiji", offset: 12, display: "Auckland, Fiji" },
-  { id: "TZ12.75", name: "Chatham Islands", offset: 12.75, display: "Chatham Islands" },
-  { id: "TZ13", name: "Tonga, Samoa", offset: 13, display: "Tonga, Samoa" },
-  { id: "TZ14", name: "Line Islands (Kiribati)", offset: 14, display: "Line Islands (Kiribati)" }
-];
-
-// Store selected timezones
-let selectedSource = { id: "LOCAL", name: "Local Time", offset: null, display: "Local Time" };
-let selectedTarget = null;
-
-// Update current time display
-function updateCurrentTime() {
-  const now = new Date();
-  const hours = now.getHours().toString().padStart(2, '0');
-  const minutes = now.getMinutes().toString().padStart(2, '0');
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const hours12 = hours % 12 || 12;
-  
-  document.getElementById('localTimeDisplay').textContent = `${hours12}:${minutes} ${ampm}`;
-}
-
-// Initialize current time and update every minute
-updateCurrentTime();
-setInterval(updateCurrentTime, 60000);
-
-// Search functionality
-function setupSearch(inputId, resultsId, onSelect) {
-  const input = document.getElementById(inputId);
-  const results = document.getElementById(resultsId);
-  
-  input.addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase();
-    
-    if (searchTerm.length < 2) {
-      results.style.display = 'none';
-      return;
-    }
-    
-    const filtered = timezones.filter(tz => 
-      tz.name.toLowerCase().includes(searchTerm) || 
-      tz.display.toLowerCase().includes(searchTerm)
-    );
-    
-    results.innerHTML = '';
-    
-    if (filtered.length === 0) {
-      results.innerHTML = '<div class="search-result-item">No results found</div>';
-    } else {
-      filtered.forEach(tz => {
-        const item = document.createElement('div');
-        item.className = 'search-result-item';
-        item.textContent = tz.display;
-        item.addEventListener('click', () => {
-          input.value = tz.display;
-          results.style.display = 'none';
-          onSelect(tz);
-        });
-        results.appendChild(item);
-      });
-    }
-    
-    results.style.display = 'block';
-  });
-  
-  input.addEventListener('blur', function() {
-    setTimeout(() => {
-      results.style.display = 'none';
-    }, 200);
-  });
-  
-  input.addEventListener('focus', function() {
-    if (this.value.length >= 2) {
-      results.style.display = 'block';
-    }
-  });
-}
-
-// Initialize search boxes
-setupSearch('sourceSearch', 'sourceResults', (tz) => {
-  selectedSource = tz;
-});
-
-setupSearch('targetSearch', 'targetResults', (tz) => {
-  selectedTarget = tz;
-});
-
-// Set default source to Local Time
-document.getElementById('sourceSearch').value = selectedSource.display;
-
-// Time conversion functions
-function parseTimeString(s){
-  if(!s) return null;
-  s=s.trim().toLowerCase();
-  let ampm=null;
-  if(s.includes("am")){ampm="am"; s=s.replace("am","").trim();}
-  if(s.includes("pm")){ampm="pm"; s=s.replace("pm","").trim();}
-  const m=s.match(/^(\d{1,2}):(\d{2})$/);
-  if(!m) return null;
-  let hh=parseInt(m[1],10), mm=parseInt(m[2],10);
-  if(mm<0||mm>59||hh<0||hh>23) return null;
-  if(ampm){
-    if(hh<1||hh>12) return null;
-    if(ampm==="am"){if(hh===12) hh=0;} else {if(hh!==12) hh+=12;}
-  }
-  return {h:hh,m:mm};
-}
-function minutesFromMidnight(t){return t.h*60+t.m;}
-function format24(m){m=(m%1440+1440)%1440;const hh=Math.floor(m/60),mm=m%60;return`${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;}
-function format12(m){m=(m%1440+1440)%1440;let hh=Math.floor(m/60),mm=m%60;const ap=hh>=12?"PM":"AM";hh=hh%12;if(hh===0) hh=12; return `${hh}:${String(mm).padStart(2,"0")} ${ap}`;}
-function getOffsetHours(tz){
-  if(tz.id === "LOCAL"){const offMin=-(new Date()).getTimezoneOffset();return offMin/60;}
-  return tz.offset ?? 0;
-}
-function convertTimeToTarget(m,src,tgt){return m+(tgt-src)*60;}
-
-const typeWriter=document.getElementById("typeWriter");
-const binaryRain=document.getElementById("binaryRain");
-const progressInner=document.getElementById("progressBar");
-const statusTag=document.getElementById("statusTag");
-const resultArea=document.getElementById("resultArea");
-const copyBtn=document.getElementById("copyRes");
-let currentResultText="";
-function setStatus(text,color=true){statusTag.textContent=text;statusTag.style.background=color?"rgba(0,255,159,0.08)":"rgba(255,255,255,0.03)";statusTag.style.color=color?"#001f10":"#bfe7d3";}
-function spawnBinary(){const lines=[];for(let i=0;i<8;i++){let line="";for(let j=0;j<60;j++){line+=Math.random()>0.75?(Math.random()>0.5?"1":"0"):" ";}lines.push(line);}binaryRain.textContent=lines.join("\n");}
-function runHackerSequence(msgs=[],onFinish=null){
-  setStatus("processing");progressInner.style.width="0%";spawnBinary();
-  let step=0;
-  function next(){
-    if(step>=msgs.length){progressInner.style.width="100%";setTimeout(()=>{setStatus("done");if(onFinish)onFinish();},300);return;}
-  const msg=msgs[step];typeWriter.textContent="";let i=0;
-  const charInterval=8+Math.floor(Math.random()*10);
-  const t=setInterval(()=>{
-    if(i>=msg.length){clearInterval(t);progressInner.style.width=Math.round(((step+1)/msgs.length)*100)+"%";step++;setTimeout(next,200+Math.random()*400);}
-    else{typeWriter.textContent+=msg.charAt(i);i++;}
-  },charInterval);
-  const br=setInterval(()=>spawnBinary(),350);setTimeout(()=>clearInterval(br),msg.length*(charInterval+2)+700);
-  }
-  next();
-}
-function showResultText(text){currentResultText=text;resultArea.innerHTML=`<div style="font-family:monospace;font-size:15px;color:#c8ffee">${text}</div>`;}
-copyBtn.addEventListener("click",()=>{if(!currentResultText)return;navigator.clipboard?.writeText(currentResultText).then(()=>{copyBtn.textContent="Copied ✓";setTimeout(()=>copyBtn.textContent="Copy result",1200);}).catch(()=>{copyBtn.textContent="Copy (failed)";setTimeout(()=>copyBtn.textContent="Copy result",1200);});});
-
-document.getElementById("convertBtn").addEventListener("click", startConversion);
-
-function startConversion(){
-  const timeStr=document.getElementById("timeInput").value;
-  
-  if (!selectedTarget) {
-    showResultText("Please select a target city");
-    setStatus("error",false);
-    return;
-  }
-  
-  const parsed=parseTimeString(timeStr);
-  if(!parsed){showResultText("Invalid time format");setStatus("error",false);return;}
-  const srcOff=getOffsetHours(selectedSource);
-  const tgtOff=getOffsetHours(selectedTarget);
-  const input24=format24(minutesFromMidnight(parsed));
-  
-  const msgIntro=`> input detected: ${timeStr} → ${input24}\n> source zone: ${selectedSource.display}\n> target zone: ${selectedTarget.display}`;
-  const messages=["initializing chrono-stack...","probing timezone offsets...","calculating delta matrix...","applying offset adjustment...","finalizing time warp..."];
-  runHackerSequence([msgIntro,...messages],()=>{
-    const minsSrc=minutesFromMidnight(parsed);
-    const minsTgt=Math.round(convertTimeToTarget(minsSrc,srcOff,tgtOff));
-    const out24=format24(minsTgt),out12=format12(minsTgt);
-    const human=`${out12} (${out24}) — in ${selectedTarget.display}`;
-    const finalMsg=`> computed result: ${human}`;
-    runHackerSequence([finalMsg],()=>{showResultText(finalMsg);setStatus("idle");});
-  });
-}
-
-// Popup functionality
-const cityPopup = document.getElementById('cityPopup');
-const cityHelpLink = document.getElementById('cityHelpLink');
-const closePopup = document.getElementById('closePopup');
-
-cityHelpLink.addEventListener('click', function(e) {
-  e.preventDefault();
-  cityPopup.style.display = 'block';
-  document.body.style.overflow = 'hidden';
-});
-
-closePopup.addEventListener('click', function() {
-  cityPopup.style.display = 'none';
-  document.body.style.overflow = 'auto';
-});
-
-cityPopup.addEventListener('click', function(e) {
-  if (e.target === cityPopup) {
-    cityPopup.style.display = 'none';
-    document.body.style.overflow = 'auto';
-  }
-});
-
-spawnBinary();setInterval(spawnBinary,4000);
-</script>
+            // Open WhatsApp
+            window.open(url, '_blank');
+        }
+    </script>
 </body>
 </html>
