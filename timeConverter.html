@@ -1,690 +1,657 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>GXB — lounge booking system</title>
-    <!-- Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* ----- RESET & VARIABLES (unchanged, keeping original design) ----- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Website Widget</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{
+      --widget-width: clamp(14rem, 22vw, 18rem);
+      --expanded-width: clamp(20rem, 40vw, 32rem);
+      --radius: 1rem;
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+      --bg-light: #f9f9f9;
+      --border-light: #eee;
+    }
 
-        :root {
-            --bg-primary: rgb(8, 8, 8);
-            --bg-secondary: rgb(12, 12, 12);
-            --bg-card: rgba(255, 255, 255, 0.015);
-            --bg-card-hover: rgba(255, 255, 255, 0.03);
-            --bg-glass: rgba(11, 11, 12, 0.6);
-            --bg-glass-strong: rgba(11, 11, 12, 0.85);
-            --text-primary: rgba(255, 255, 255, 0.9);
-            --text-secondary: rgba(255, 255, 255, 0.5);
-            --text-muted: rgba(255, 255, 255, 0.3);
-            --accent: rgba(255, 255, 255, 0.85);
-            --accent-glow: rgba(255, 255, 255, 0.05);
-            --accent-bright: #ffffff;
-            --accent-dark: rgba(255, 255, 255, 0.6);
-            --border: rgba(255, 255, 255, 0.08);
-            --border-hover: rgba(255, 255, 255, 0.15);
-            --border-accent: rgba(255, 255, 255, 0.2);
-            --section-py: clamp(5rem, 10vw, 8rem);
-            --container-px: clamp(1.25rem, 4vw, 3rem);
-            --container-max: 900px;
-            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-heading: 'Inter', monospace;
-            --radius-sm: 0px;
-            --radius-md: 0px;
-            --radius-lg: 0px;
-            --radius-xl: 0px;
-            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
-            --shadow-glow: 0 0 30px rgba(255, 255, 255, 0.04);
-            --transition: 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-            --transition-slow: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+    body{
+      min-height:200vh;
+      font-family: 'Courier New', Courier, monospace;
+      background: linear-gradient(145deg, #f0f2f5 0%, #eef0f3 100%);
+      margin:0;
+    }
 
-        /* ----- BASE (unchanged) ----- */
-        html {
-            scroll-behavior: smooth;
-            background-color: var(--bg-primary);
-        }
-        body {
-            font-family: var(--font-body);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-        }
-        .section {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-        .section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .container {
-            max-width: var(--container-max);
-            margin: 0 auto;
-            padding: 0 var(--container-px);
-        }
-        h1, h2, h3 {
-            font-weight: 400;
-            letter-spacing: -0.02em;
-        }
-        h1 {
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            font-weight: 500;
-        }
-        h2 {
-            font-size: clamp(2rem, 6vw, 2.8rem);
-            margin-bottom: 2.5rem;
-            font-weight: 450;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.75rem;
-        }
-        h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-            font-weight: 450;
-        }
-        .text-secondary {
-            color: var(--text-secondary);
-        }
-        .btn {
-            display: inline-block;
-            background: transparent;
-            border: 1px solid var(--border-accent);
-            color: var(--accent-bright);
-            padding: 1rem 2.5rem;
-            font-size: 1.1rem;
-            font-weight: 450;
-            text-decoration: none;
-            cursor: pointer;
-            transition: var(--transition);
-            letter-spacing: 0.5px;
-            text-align: center;
-            background-color: var(--bg-glass);
-        }
-        .btn:hover {
-            border-color: var(--accent-bright);
-            background-color: rgba(255, 255, 255, 0.02);
-            box-shadow: var(--shadow-glow);
-        }
-        .btn-block {
-            width: 100%;
-        }
-        .btn-outline {
-            border-color: var(--border);
-            background: transparent;
-        }
-        .btn-outline:hover {
-            border-color: var(--accent-bright);
-        }
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 2rem 1.5rem;
-            transition: var(--transition);
-            box-shadow: var(--shadow-card);
-        }
-        .card:hover {
-            background-color: var(--bg-card-hover);
-            border-color: var(--border-hover);
-        }
-        .glass-panel {
-            background: var(--bg-glass-strong);
-            backdrop-filter: blur(4px);
-            border: 1px solid var(--border);
-            padding: 2rem;
-        }
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 2px;
-            background-color: var(--border);
-            border: 1px solid var(--border);
-        }
-        .feature-card {
-            background-color: var(--bg-primary);
-            padding: 2rem 1.5rem;
-            transition: var(--transition);
-            height: 100%;
-        }
-        .feature-card i {
-            font-size: 2rem;
-            margin-bottom: 1.2rem;
-            color: var(--accent);
-        }
-        .feature-card p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-        .addons-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0 1rem;
-        }
-        .addon-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .addon-card.selected {
-            border-color: var(--accent-bright);
-            background-color: var(--bg-card-hover);
-        }
-        .addon-card input[type="checkbox"] {
-            width: 1.3rem;
-            height: 1.3rem;
-            accent-color: white;
-            background: transparent;
-            border: 1px solid var(--border-accent);
-        }
-        .addon-info {
-            flex: 1;
-        }
-        .addon-price {
-            color: var(--accent-bright);
-            font-weight: 500;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
-        .form-field {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .form-field.full-width {
-            grid-column: span 2;
-        }
-        label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            letter-spacing: 0.3px;
-        }
-        input, textarea, select {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            padding: 0.9rem 1rem;
-            color: var(--text-primary);
-            font-family: var(--font-body);
-            transition: var(--transition);
-            border-radius: 0;
-        }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent-bright);
-            background: var(--bg-card);
-        }
-        .summary-box {
-            background: var(--bg-glass-strong);
-            border: 1px solid var(--border-accent);
-            padding: 2rem;
-            margin-top: 2rem;
-        }
-        .summary-line {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .summary-line.total {
-            border-bottom: none;
-            margin-top: 0.5rem;
-            font-size: 1.3rem;
-            font-weight: 450;
-            color: var(--accent-bright);
-        }
-        .info-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 2rem;
-            color: var(--text-secondary);
-        }
-        .info-box p {
-            margin: 0.8rem 0;
-            display: flex;
-            gap: 1rem;
-        }
-        .info-box i {
-            width: 1.5rem;
-            color: var(--accent);
-        }
-        .scroll-indicator {
-            margin-top: 3rem;
-            animation: float 2s infinite;
-        }
-        @keyframes float {
-            0% { transform: translateY(0); opacity: 0.3; }
-            50% { transform: translateY(10px); opacity: 1; }
-            100% { transform: translateY(0); opacity: 0.3; }
-        }
-        /* fallback panel */
-        .fallback-panel {
-            margin-top: 1.5rem;
-            padding: 1.5rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-accent);
-            display: none;
-        }
-        .fallback-panel.visible {
-            display: block;
-        }
-        .copy-btn {
-            margin-top: 0.5rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        @media (max-width: 640px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            .form-field.full-width {
-                grid-column: span 1;
-            }
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 2rem 0;
-            margin-top: 3rem;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            text-align: center;
-        }
-    </style>
+    .floating-widget{
+      position:fixed;
+      top:20vh;
+      left:70vw;
+      z-index:9999;
+      display:flex;
+      flex-direction:column;
+      transition:
+        width .0s ease,
+        height .0s ease,
+        transform .0s ease,
+        opacity .0s ease;
+    }
+
+    .state-notch{
+      width:3rem;
+      height:3rem;
+    }
+    .state-mini{
+      width:var(--widget-width);
+		
+    }
+    .state-expanded{
+      width:var(--expanded-width);
+      height:60vh;
+      max-height:80vh;
+    }
+
+    .notch{
+      width:100%;
+      height:100%;
+      border-radius:50%;
+      background:#111;
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+      font-size:1.2rem;
+    }
+
+    .window{
+      width:100%;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      border-radius:var(--radius);
+      background:white;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      transform-origin:bottom right;
+    }
+
+    .header{
+      padding:.6rem;
+      cursor:grab;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:#f3f3f3;
+      user-select: none;
+    }
+    .header button{
+      border:none;
+      background:none;
+      cursor:pointer;
+      font-size:1rem;
+    }
+
+    .mini-content{
+      padding:1.2rem;
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      gap:0 rem;
+    }
+    .mini-content button{
+      padding:.5rem .8rem;
+      border:none;
+      border-radius:.5rem;
+      background:#111;
+      color:white;
+      cursor:pointer;
+    }
+
+    .expanded-content {
+      flex:1;
+      overflow-y: auto;
+      padding: 1.2rem 1rem;
+      background: white;
+      scroll-behavior: smooth;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .receipt {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      background: #fefefe;
+      padding: 0.8rem;
+    }
+
+    .receipt-header {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+      border-bottom: 2px dashed #aaa;
+      padding-bottom: 0.5rem;
+    }
+
+    .receipt-section {
+      margin-top: 0.3rem;
+    }
+    .receipt-section-title {
+      font-weight: bold;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #444;
+      border-bottom: 1px dotted #aaa;
+      padding-bottom: 0.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .receipt-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .receipt-dots {
+      flex: 1;
+      border-bottom: 1px dotted #aaa;
+      margin: 0 0.4rem 0.3rem 0.4rem;
+    }
+
+    .receipt-note {
+      font-size: 0.75rem;
+      color: #555;
+      text-align: center;
+      margin-top: 0.5rem;
+      border-top: 1px dashed #ccc;
+      padding-top: 0.5rem;
+    }
+
+    .client-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin: 1rem 0 0.5rem;
+    }
+    .client-info input {
+      padding: 0.6rem 0.8rem;
+      border: none;
+      background: #f1f1f1;
+      font-family: inherit;
+      font-size: 0.9rem;
+      border-radius: 0;
+    }
+    .client-info input:focus {
+      outline: 1px solid #aaa;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.8rem;
+      margin: 0.8rem 0 0.2rem;
+    }
+    .action-buttons button {
+      flex: 1;
+      padding: 0.6rem 0.2rem;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.1s;
+      font-size: 0.9rem;
+      color: #111;
+    }
+    .action-buttons .secondary {
+      color: #333;
+    }
+    .action-buttons button:hover {
+      background: #f1f1f1;
+    }
+
+    .counter-window {
+      position: fixed;
+      top: 30vh;
+      left: 50vw;
+      width: 18rem;
+      background: white;
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .counter-window.visible {
+      display: flex;
+    }
+    .counter-header {
+      padding: 0.6rem;
+      cursor: grab;
+      background: #f3f3f3;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .counter-header span {
+      font-weight: bold;
+    }
+    .counter-header button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .counter-content {
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .counter-content label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .counter-content input,
+    .counter-content textarea {
+      padding: 0.6rem 0.8rem;
+      border: none;
+      background: #f1f1f1;
+      font-family: inherit;
+      font-size: 0.9rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .counter-content textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+    #sendCounterOfferBtn {
+      background: #111;
+      color: white;
+      border: none;
+      padding: 0.7rem;
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    #sendCounterOfferBtn:hover {
+      background: #2a2a2a;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- HERO SECTION (unchanged) -->
-    <section class="section" id="hero">
-        <div class="container" style="padding-top: 6rem; padding-bottom: 4rem; text-align: center;">
-            <h1>Turn Your Gaming Lounge<br>Into a Smart Booking System</h1>
-            <p class="text-secondary" style="font-size: 1.3rem; max-width: 700px; margin: 0 auto 2rem;">
-                The demo you just experienced is a real, customizable website. <br>Own it for your lounge — complete with online bookings, admin tools, and SMS.
-            </p>
-            <a href="#order" class="btn" style="min-width: 240px;">Get This Website</a>
-            <div class="scroll-indicator">
-                <i class="fa-solid fa-chevron-down" style="color: var(--text-muted); font-size: 1.5rem;"></i>
-            </div>
+<div id="widget" class="floating-widget state-mini">
+
+  <div id="notch" class="notch hidden">
+    <i class="fas fa-shopping-cart"></i>
+  </div>
+
+  <div id="window" class="window">
+
+    <div id="dragHandle" class="header">
+      <span>☰</span>
+      <button id="closeBtn">✕</button>
+    </div>
+
+    <div id="miniContent" class="mini-content">
+      <h3>This website is a demo</h3>
+      <button id="expandBtn">Own this site</button>
+    </div>
+
+    <div id="expandedContent" class="expanded-content hidden">
+      <div class="receipt">
+
+        <div class="receipt-header">WEBSITE RECEIPT</div>
+
+        <div class="receipt-section">
+          <div class="receipt-section-title">base creation</div>
+          <div class="receipt-item">
+            <span>one‑time design & build</span>
+            <span class="receipt-dots"></span>
+            <span id="basePrice">৳15,000</span>
+          </div>
         </div>
-    </section>
 
-    <!-- SECTION 2: FEATURES (unchanged) -->
-    <section class="section" id="features">
-        <div class="container" style="padding: var(--section-py) 0;">
-            <h2>What you get</h2>
-            <div class="features-grid">
-                <div class="feature-card"><i class="fa-regular fa-calendar-check"></i><h3>Online station booking</h3><p>24/7 automated reservations, no manual entry.</p></div>
-                <div class="feature-card"><i class="fa-regular fa-clock"></i><h3>Real-time availability</h3><p>Live station status, updated instantly.</p></div>
-                <div class="feature-card"><i class="fa-regular fa-chart-bar"></i><h3>Admin dashboard</h3><p>Full control: bookings, stations, earnings.</p></div>
-                <div class="feature-card"><i class="fa-regular fa-eye"></i><h3>Analytics (optional)</h3><p>Track peak hours, revenue, and more.</p></div>
-                <div class="feature-card"><i class="fa-regular fa-mobile-notch"></i><h3>Mobile friendly</h3><p>Flawless on phones, tablets, desktops.</p></div>
-                <div class="feature-card"><i class="fa-regular fa-message"></i><h3>SMS notifications</h3><p>Confirm bookings & reminders via SMS.</p></div>
-                <div class="feature-card"><i class="fa-regular fa-check-circle"></i><h3>Booking approval</h3><p>Approve or decline requests manually.</p></div>
-                <div class="feature-card"><i class="fa-regular fa-gear"></i><h3>Station management</h3><p>Add/remove PCs, consoles, set pricing.</p></div>
-            </div>
+        <div class="receipt-section">
+          <div class="receipt-section-title">yearly amenities</div>
+          <div class="receipt-item">
+            <span>hosting</span>
+            <span class="receipt-dots"></span>
+            <span id="hostingPrice">৳3,000</span>
+          </div>
+          <div class="receipt-item">
+            <span>domain</span>
+            <span class="receipt-dots"></span>
+            <span id="domainPrice">৳1,200</span>
+          </div>
         </div>
-    </section>
 
-    <!-- SECTION 3: BASE PRICE (unchanged) -->
-    <section class="section" id="base-price">
-        <div class="container" style="padding: var(--section-py) 0;">
-            <h2>Base website</h2>
-            <div class="card" style="max-width: 600px; margin: 0 auto;">
-                <h3 style="font-size: 1.8rem;">Gaming Lounge Booking System</h3>
-                <div style="font-size: 3.5rem; margin: 1rem 0 0.5rem; color: var(--accent-bright);">$240</div>
-                <p class="text-secondary" style="font-size: 1.1rem;">A fully functional gaming lounge booking platform with admin control, station management, and SMS booking confirmation system.</p>
-            </div>
+        <div class="receipt-section">
+          <div class="receipt-section-title">per‑use feature</div>
+          <div class="receipt-item">
+            <span>SMS (SSL Wireless)</span>
+            <span class="receipt-dots"></span>
+            <span id="smsPrice">৳0.30/msg</span>
+          </div>
         </div>
-    </section>
 
-    <!-- SECTION 4: ADD-ONS (unchanged) -->
-    <section class="section" id="addons">
-        <div class="container" style="padding: var(--section-py) 0;">
-            <h2>Optional upgrades</h2>
-            <div class="addons-grid" id="addons-grid">
-                <div class="addon-card" data-addon-id="analytics">
-                    <input type="checkbox" id="addon-analytics" class="addon-checkbox" value="30">
-                    <div class="addon-info">
-                        <label for="addon-analytics" style="cursor: pointer; color: var(--text-primary);"><strong>Admin Analytics Dashboard</strong></label>
-                        <div class="text-secondary">Detailed reports, graphs & metrics</div>
-                    </div>
-                    <span class="addon-price">$30</span>
-                </div>
-                <div class="addon-card" data-addon-id="maps">
-                    <input type="checkbox" id="addon-maps" class="addon-checkbox" value="15">
-                    <div class="addon-info">
-                        <label for="addon-maps" style="cursor: pointer; color: var(--text-primary);"><strong>Google Maps Integration</strong></label>
-                        <div class="text-secondary">Show lounge location & directions</div>
-                    </div>
-                    <span class="addon-price">$15</span>
-                </div>
-            </div>
+        <div class="receipt-note">* everything you need to start — no hidden fees</div>
+
+        <div class="client-info">
+          <input type="text" id="clientName" placeholder="Your name">
+          <input type="text" id="clientBusiness" placeholder="Business name">
+          <input type="text" id="clientPhone" placeholder="Phone number">
         </div>
-    </section>
 
-    <!-- SECTION 5: RUNNING COST NOTICE (unchanged) -->
-    <section class="section" id="running-costs">
-        <div class="container" style="padding: var(--section-py) 0;">
-            <h2>Operational costs (industry standard)</h2>
-            <div class="info-box">
-                <p><i class="fa-regular fa-globe"></i> <strong>Domain:</strong> $10–15 per year</p>
-                <p><i class="fa-regular fa-server"></i> <strong>Hosting:</strong> $5–10 per month</p>
-                <p><i class="fa-regular fa-message"></i> <strong>SMS Provider (SSL Wireless):</strong> ~0.30 BDT per SMS</p>
-                <p style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 0.5rem;"><i class="fa-regular fa-circle-info"></i> These are direct costs you pay to domain/ SMS providers. No hidden fees.</p>
-            </div>
+        <div class="action-buttons">
+          <button id="sendRequestBtn" class="primary">Send Request</button>
+          <button id="counterOfferBtn" class="secondary">Make Counter Offer</button>
         </div>
-    </section>
 
-    <!-- SECTION 6+7: ORDER FORM & BUTTON with FALLBACKS -->
-    <section class="section" id="order">
-        <div class="container" style="padding: var(--section-py) 0;">
-            <h2>Start your lounge website</h2>
-            <div class="form-grid">
-                <div class="form-field"><label>Gaming Lounge Name *</label><input type="text" id="loungeName" placeholder="e.g. NetPlay Arena" required></div>
-                <div class="form-field"><label>Owner Name *</label><input type="text" id="ownerName" placeholder="Alex Chen" required></div>
-                <div class="form-field"><label>WhatsApp Number *</label><input type="tel" id="whatsapp" placeholder="+8801xxxxxxxx" pattern="[+][0-9]{1,4}[0-9]{6,12}" title="Please enter a valid international number starting with +" required></div>
-                <div class="form-field"><label>Email *</label><input type="email" id="email" placeholder="owner@lounge.com" required></div>
-                <div class="form-field"><label>City / Location *</label><input type="text" id="city" placeholder="Dhaka" required></div>
-                <div class="form-field"><label>Number of Stations *</label><input type="number" id="stations" value="10" min="1" required></div>
-                <div class="form-field full-width"><label>Custom Requests (optional)</label><textarea id="customRequests" rows="3" placeholder="Tell us about specific needs..."></textarea></div>
-            </div>
+      </div> 
+    </div> 
 
-            <!-- ORDER SUMMARY (LIVE) -->
-            <div class="summary-box" id="summaryBox">
-                <h3 style="margin-bottom: 1.5rem;">Order summary</h3>
-                <div class="summary-line"><span>Base Website</span> <span>$240</span></div>
-                <div class="summary-line" id="addonsSummaryLine"><span>Add-ons</span> <span id="addonTotal">$0</span></div>
-                <div class="summary-line total"><span>Final price</span> <span id="finalTotal">$240</span></div>
-                <div style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;" id="selectedAddonsList"></div>
-            </div>
+  </div> 
+</div> 
 
-            <!-- ACTION BUTTONS -->
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2.5rem;">
-                <button class="btn btn-block" id="placeOrderBtn" style="flex: 2;">Send Order on WhatsApp</button>
-                <button class="btn btn-outline" id="copySummaryBtn" style="flex: 1;"><i class="fa-regular fa-clipboard"></i> Copy Summary</button>
-            </div>
-            <p class="text-muted" style="margin-top: 0.5rem; text-align: center; font-size: 0.85rem;">
-                You'll be redirected to WhatsApp. Both +8801761149535 & +8801932-411622 will be notified.<br>
-                If the chat doesn't open automatically, copy the summary and send it manually.
-            </p>
+<div id="counterWindow" class="counter-window">
+  <div class="counter-header" id="counterDragHandle">
+    <span>✎ counter offer</span>
+    <button id="closeCounterBtn">✕</button>
+  </div>
+  <div class="counter-content">
+    <label>Your offer (৳)</label>
+    <input type="number" id="offerPrice" placeholder="e.g. 12000" min="0">
+    <label>Message (optional)</label>
+    <textarea id="offerMessage" placeholder="Write your negotiation message..."></textarea>
+    <button id="sendCounterOfferBtn">Send Counter Offer</button>
+  </div>
+</div>
 
-            <!-- FALLBACK PANEL (hidden by default) -->
-            <div class="fallback-panel" id="fallbackPanel">
-                <h4 style="margin-bottom: 1rem;">📋 Manual order message</h4>
-                <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">If WhatsApp didn't open, copy the text below and send it to <strong>+8801761149535</strong> or <strong>+8801932-411622</strong>:</p>
-                <textarea id="fallbackMessage" rows="8" readonly style="width: 100%; background: var(--bg-secondary); color: var(--text-primary); padding: 1rem; border: 1px solid var(--border); font-family: monospace;"></textarea>
-                <button class="btn copy-btn" id="copyFallbackBtn"><i class="fa-regular fa-copy"></i> Copy message</button>
-            </div>
-        </div>
-    </section>
+<script>
+  (function() {
+    const PRICES = {
+      base: 15000,
+      sms: 0.30,
+      hosting: 3000,
+      domain: 1200
+    };
+    const WHATSAPP_NUMBER = '8801761149535';
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="container">
-            <p>walif.services@email.com | +8801761149535 / +8801932-411622</p>
-            <p style="margin-top: 1rem;">© gaming lounge system — demo to real in one click</p>
-        </div>
-    </footer>
+    const widget = document.getElementById("widget");
+    const notch = document.getElementById("notch");
+    const windowEl = document.getElementById("window");
+    const miniContent = document.getElementById("miniContent");
+    const expandedContent = document.getElementById("expandedContent");
+    const expandBtn = document.getElementById("expandBtn");
+    const closeBtn = document.getElementById("closeBtn");
 
-    <!-- JavaScript with robust fallbacks -->
-    <script>
-        (function() {
-            // ----- SELECTABLE ADDONS & LIVE TOTAL (unchanged) -----
-            const addonCheckboxes = document.querySelectorAll('.addon-checkbox');
-            const addonCards = document.querySelectorAll('.addon-card');
-            const addonTotalSpan = document.getElementById('addonTotal');
-            const finalTotalSpan = document.getElementById('finalTotal');
-            const selectedAddonsListDiv = document.getElementById('selectedAddonsList');
+    const basePriceSpan = document.getElementById("basePrice");
+    const smsPriceSpan = document.getElementById("smsPrice");
+    const hostingPriceSpan = document.getElementById("hostingPrice");
+    const domainPriceSpan = document.getElementById("domainPrice");
 
-            function updateSummaryAndTotal() {
-                let totalAddons = 0;
-                const selectedNames = [];
+    const clientName = document.getElementById("clientName");
+    const clientBusiness = document.getElementById("clientBusiness");
+    const clientPhone = document.getElementById("clientPhone");
 
-                addonCheckboxes.forEach(cb => {
-                    if (cb.checked) {
-                        totalAddons += parseInt(cb.value, 10);
-                        const parentCard = cb.closest('.addon-card');
-                        const strongLabel = parentCard ? parentCard.querySelector('strong') : null;
-                        if (strongLabel) selectedNames.push(strongLabel.innerText.trim());
-                    }
-                });
+    const sendRequestBtn = document.getElementById("sendRequestBtn");
+    const counterOfferBtn = document.getElementById("counterOfferBtn");
 
-                addonCards.forEach(card => {
-                    const chk = card.querySelector('.addon-checkbox');
-                    if (chk && chk.checked) {
-                        card.classList.add('selected');
-                    } else {
-                        card.classList.remove('selected');
-                    }
-                });
+    const counterWindow = document.getElementById("counterWindow");
+    const closeCounterBtn = document.getElementById("closeCounterBtn");
+    const offerPrice = document.getElementById("offerPrice");
+    const offerMessage = document.getElementById("offerMessage");
+    const sendCounterOfferBtn = document.getElementById("sendCounterOfferBtn");
+    const counterDragHandle = document.getElementById("counterDragHandle");
 
-                addonTotalSpan.textContent = '$' + totalAddons;
-                const base = 240;
-                const final = base + totalAddons;
-                finalTotalSpan.textContent = '$' + final;
+    function updatePriceDisplay() {
+      if (basePriceSpan) basePriceSpan.textContent = `৳${PRICES.base.toLocaleString()}`;
+      if (smsPriceSpan) smsPriceSpan.textContent = `৳${PRICES.sms}/msg`;
+      if (hostingPriceSpan) hostingPriceSpan.textContent = `৳${PRICES.hosting.toLocaleString()}`;
+      if (domainPriceSpan) domainPriceSpan.textContent = `৳${PRICES.domain.toLocaleString()}`;
+    }
+    updatePriceDisplay();
 
-                if (selectedNames.length > 0) {
-                    selectedAddonsListDiv.innerHTML = 'Selected: ' + selectedNames.join(' · ');
-                } else {
-                    selectedAddonsListDiv.innerHTML = 'No add-ons selected';
-                }
-            }
-            updateSummaryAndTotal();
+    let state = "mini";
 
-            addonCheckboxes.forEach(cb => {
-                cb.addEventListener('change', updateSummaryAndTotal);
-            });
+    function setState(newState) {
+      const rect = widget.getBoundingClientRect();
+      let left = parseFloat(widget.style.left) || rect.left;
+      let top = parseFloat(widget.style.top) || rect.top;
 
-            addonCards.forEach(card => {
-                card.addEventListener('click', (e) => {
-                    if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') return;
-                    const chk = card.querySelector('.addon-checkbox');
-                    if (chk) {
-                        chk.checked = !chk.checked;
-                        updateSummaryAndTotal();
-                    }
-                });
-            });
+      widget.classList.remove("state-notch", "state-mini", "state-expanded");
+      state = newState;
+      widget.classList.add(
+        state === "notch" ? "state-notch" :
+        state === "mini" ? "state-mini" : "state-expanded"
+      );
 
-            // ----- FORM DATA & MESSAGE GENERATION -----
-            function getFormData() {
-                return {
-                    loungeName: document.getElementById('loungeName').value.trim(),
-                    ownerName: document.getElementById('ownerName').value.trim(),
-                    whatsapp: document.getElementById('whatsapp').value.trim(),
-                    email: document.getElementById('email').value.trim(),
-                    city: document.getElementById('city').value.trim(),
-                    stations: document.getElementById('stations').value.trim(),
-                    custom: document.getElementById('customRequests').value.trim()
-                };
-            }
+      if (state === "notch") {
+        notch.classList.remove("hidden");
+        windowEl.classList.add("hidden");
+      } else {
+        notch.classList.add("hidden");
+        windowEl.classList.remove("hidden");
 
-            function getSelectedAddonsText() {
-                let names = [];
-                addonCheckboxes.forEach(cb => {
-                    if (cb.checked) {
-                        const parent = cb.closest('.addon-card');
-                        const strong = parent ? parent.querySelector('strong') : null;
-                        if (strong) names.push(strong.innerText.trim());
-                    }
-                });
-                return names.length ? names.join(', ') : 'None';
-            }
+        if (state === "mini") {
+          miniContent.classList.remove("hidden");
+          expandedContent.classList.add("hidden");
+        } else {
+          miniContent.classList.add("hidden");
+          expandedContent.classList.remove("hidden");
+        }
+      }
 
-            function getAddonsTotal() {
-                let total = 0;
-                addonCheckboxes.forEach(cb => { if (cb.checked) total += parseInt(cb.value, 10); });
-                return total;
-            }
+      setTimeout(() => {
+        const newRect = widget.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
 
-            function buildOrderMessage() {
-                const data = getFormData();
-                const selectedAddonsStr = getSelectedAddonsText();
-                const addonsTotal = getAddonsTotal();
-                const finalPrice = 240 + addonsTotal;
+        let newLeft = left;
+        let newTop = top;
 
-                let message = `NEW WEBSITE ORDER REQUEST\n\n`;
-                message += `Lounge Name: ${data.loungeName || '(not provided)'}\n`;
-                message += `Owner Name: ${data.ownerName || '(not provided)'}\n`;
-                message += `WhatsApp Number: ${data.whatsapp || '(not provided)'}\n`;
-                message += `Email: ${data.email || '(not provided)'}\n`;
-                message += `City: ${data.city || '(not provided)'}\n`;
-                message += `Number of Stations: ${data.stations || '(not provided)'}\n\n`;
-                message += `Selected Features:\n${selectedAddonsStr}\n\n`;
-                message += `Base Price: $240\n`;
-                message += `Add-ons Total: $${addonsTotal}\n`;
-                message += `Final Price: $${finalPrice}\n\n`;
-                message += `Custom Requests:\n${data.custom || '(none)'}\n\n`;
-                message += `---\nAlso notify: +8801932-411622\nDeveloper Email: walif.services@email.com`;
-                return message;
-            }
+        if (newLeft + newRect.width > vw) {
+          newLeft = vw - newRect.width;
+        }
+        if (newLeft < 0) newLeft = 0;
 
-            // ----- VALIDATION (improved) -----
-            function validateForm() {
-                const data = getFormData();
-                if (!data.loungeName) return 'Gaming Lounge Name is required.';
-                if (!data.ownerName) return 'Owner Name is required.';
-                if (!data.whatsapp) return 'WhatsApp Number is required.';
-                // Simple international phone pattern check
-                const phonePattern = /^\+[0-9]{1,4}[0-9]{6,12}$/;
-                if (!phonePattern.test(data.whatsapp)) {
-                    return 'Please enter a valid WhatsApp number with country code, starting with + (e.g., +8801761149535).';
-                }
-                if (!data.email) return 'Email is required.';
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailPattern.test(data.email)) return 'Please enter a valid email address.';
-                if (!data.city) return 'City is required.';
-                if (!data.stations || parseInt(data.stations) < 1) return 'Number of Stations must be at least 1.';
-                return null;
-            }
+        if (newTop + newRect.height > vh) {
+          newTop = vh - newRect.height;
+        }
+        if (newTop < 0) newTop = 0;
 
-            // ----- WHATSAPP LINK (with fallback panel) -----
-            const placeOrderBtn = document.getElementById('placeOrderBtn');
-            const fallbackPanel = document.getElementById('fallbackPanel');
-            const fallbackMessage = document.getElementById('fallbackMessage');
-            const copyFallbackBtn = document.getElementById('copyFallbackBtn');
-            const copySummaryBtn = document.getElementById('copySummaryBtn');
+        widget.style.left = newLeft + 'px';
+        widget.style.top = newTop + 'px';
+      }, 10);
+    }
 
-            function updateFallbackMessage() {
-                fallbackMessage.value = buildOrderMessage();
-            }
+    expandBtn.onclick = () => setState("expanded");
+    closeBtn.onclick = () => setState("notch");
+    notch.onclick = () => setState("mini");
 
-            // Show fallback panel with latest message
-            function showFallback() {
-                updateFallbackMessage();
-                fallbackPanel.classList.add('visible');
-            }
+    const dragHandle = document.getElementById("dragHandle");
+    let isDragging = false;
+    let offsetX = 0, offsetY = 0;
 
-            placeOrderBtn.addEventListener('click', () => {
-                const validationError = validateForm();
-                if (validationError) {
-                    alert(validationError);
-                    return;
-                }
+    function startDrag(e) {
+      isDragging = true;
+      const rect = widget.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      offsetX = clientX - rect.left;
+      offsetY = clientY - rect.top;
+    }
 
-                const message = buildOrderMessage();
-                const encoded = encodeURIComponent(message);
-                const whatsappLink = `https://wa.me/8801761149535?text=${encoded}`;
+    function drag(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      let x = clientX - offsetX;
+      let y = clientY - offsetY;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const rect = widget.getBoundingClientRect();
+      const maxX = vw - rect.width;
+      const maxY = vh - rect.height;
+      x = Math.max(0, Math.min(x, maxX));
+      y = Math.max(0, Math.min(y, maxY));
+      widget.style.left = x + "px";
+      widget.style.top = y + "px";
+    }
 
-                // Try to open WhatsApp
-                const newWindow = window.open(whatsappLink, '_blank');
+    function stopDrag() { isDragging = false; }
 
-                // Fallback if popup blocked or window didn't open
-                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                    showFallback();
-                } else {
-                    // Still show fallback after a delay in case it doesn't actually open (e.g., no app)
-                    setTimeout(() => {
-                        try {
-                            if (newWindow.closed) {
-                                showFallback();
-                            }
-                        } catch (e) {
-                            // Cross-origin? just show fallback anyway
-                            showFallback();
-                        }
-                    }, 1000);
-                }
+    dragHandle.addEventListener("mousedown", startDrag);
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", stopDrag);
+    dragHandle.addEventListener("touchstart", startDrag);
+    document.addEventListener("touchmove", drag, { passive: false });
+    document.addEventListener("touchend", stopDrag);
+    notch.addEventListener("mousedown", startDrag);
+    notch.addEventListener("touchstart", startDrag);
 
-                // Always update fallback message (in case user needs it)
-                updateFallbackMessage();
-            });
+    let counterDragging = false;
+    let counterOffsetX = 0, counterOffsetY = 0;
 
-            // Copy summary button (copies the message to clipboard)
-            copySummaryBtn.addEventListener('click', async () => {
-                const message = buildOrderMessage();
-                try {
-                    await navigator.clipboard.writeText(message);
-                    alert('Order summary copied to clipboard! You can now paste it into WhatsApp.');
-                } catch (err) {
-                    // Fallback for older browsers
-                    const textarea = document.createElement('textarea');
-                    textarea.value = message;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    alert('Order summary copied (fallback method).');
-                }
-            });
+    function startCounterDrag(e) {
+      counterDragging = true;
+      const rect = counterWindow.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      counterOffsetX = clientX - rect.left;
+      counterOffsetY = clientY - rect.top;
+    }
 
-            // Copy from fallback textarea
-            copyFallbackBtn.addEventListener('click', () => {
-                fallbackMessage.select();
-                document.execCommand('copy');
-                alert('Message copied to clipboard. Now paste it into WhatsApp.');
-            });
+    function dragCounter(e) {
+      if (!counterDragging) return;
+      e.preventDefault();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      let x = clientX - counterOffsetX;
+      let y = clientY - counterOffsetY;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const rect = counterWindow.getBoundingClientRect();
+      const maxX = vw - rect.width;
+      const maxY = vh - rect.height;
+      x = Math.max(0, Math.min(x, maxX));
+      y = Math.max(0, Math.min(y, maxY));
+      counterWindow.style.left = x + "px";
+      counterWindow.style.top = y + "px";
+    }
 
-            // Also update fallback message whenever form changes (optional)
-            const formInputs = document.querySelectorAll('#order input, #order textarea');
-            formInputs.forEach(input => {
-                input.addEventListener('input', updateFallbackMessage);
-            });
-            addonCheckboxes.forEach(cb => {
-                cb.addEventListener('change', updateFallbackMessage);
-            });
+    function stopCounterDrag() { counterDragging = false; }
 
-            // Initial update
-            updateFallbackMessage();
+    counterDragHandle.addEventListener("mousedown", startCounterDrag);
+    document.addEventListener("mousemove", dragCounter);
+    document.addEventListener("mouseup", stopCounterDrag);
+    counterDragHandle.addEventListener("touchstart", startCounterDrag);
+    document.addEventListener("touchmove", dragCounter, { passive: false });
+    document.addEventListener("touchend", stopCounterDrag);
 
-            // ----- SCROLL REVEAL (unchanged) -----
-            const sections = document.querySelectorAll('.section');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
-            sections.forEach(section => observer.observe(section));
-            setTimeout(() => {
-                document.getElementById('hero')?.classList.add('visible');
-            }, 100);
-        })();
-    </script>
+    function getClientInfo() {
+      return {
+        name: clientName ? clientName.value.trim() || 'Not provided' : 'Not provided',
+        business: clientBusiness ? clientBusiness.value.trim() || 'Not provided' : 'Not provided',
+        phone: clientPhone ? clientPhone.value.trim() || 'Not provided' : 'Not provided'
+      };
+    }
+
+    function generateRequestMessage(info) {
+      return `Website Request
+
+Client Name: ${info.name}
+Business Name: ${info.business}
+Phone Number: ${info.phone}
+
+Requested Website
+
+Base Price Shown:
+৳${PRICES.base}`;
+    }
+
+    function generateCounterOfferMessage(info, price, message) {
+      return `Counter Offer for Website
+
+Name: ${info.name}
+Business: ${info.business}
+Phone: ${info.phone}
+
+Offered Price:
+${price ? '৳' + price : 'Not specified'}
+
+Message:
+${message || 'No message'}`;
+    }
+
+    function openWhatsApp(text) {
+      const encoded = encodeURIComponent(text);
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
+    }
+
+    if (sendRequestBtn) {
+      sendRequestBtn.addEventListener('click', () => {
+        const info = getClientInfo();
+        const msg = generateRequestMessage(info);
+        openWhatsApp(msg);
+      });
+    }
+
+    if (counterOfferBtn) {
+      counterOfferBtn.addEventListener('click', () => {
+        counterWindow.classList.add('visible');
+        const mainRect = widget.getBoundingClientRect();
+        let left = mainRect.right + 10;
+        let top = mainRect.top;
+        const winW = counterWindow.offsetWidth;
+        const winH = counterWindow.offsetHeight;
+        if (left + winW > window.innerWidth) {
+          left = mainRect.left - winW - 10;
+        }
+        if (left < 0) left = 20;
+        if (top + winH > window.innerHeight) {
+          top = window.innerHeight - winH - 20;
+        }
+        if (top < 0) top = 20;
+        counterWindow.style.left = left + 'px';
+        counterWindow.style.top = top + 'px';
+      });
+    }
+
+    if (closeCounterBtn) {
+      closeCounterBtn.addEventListener('click', () => {
+        counterWindow.classList.remove('visible');
+      });
+    }
+
+    if (sendCounterOfferBtn) {
+      sendCounterOfferBtn.addEventListener('click', () => {
+        const info = getClientInfo();
+        const price = offerPrice.value.trim();
+        const message = offerMessage.value.trim();
+        const counterMsg = generateCounterOfferMessage(info, price, message);
+        openWhatsApp(counterMsg);
+
+        counterWindow.classList.remove('visible');
+        offerPrice.value = '';
+        offerMessage.value = '';
+      });
+    }
+  })();
+</script>
+
 </body>
 </html>
