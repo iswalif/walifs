@@ -116,7 +116,7 @@
       height: 320px;
       border-radius: 28px;
       background-color: #1a1a1a;
-      background-size: cover;
+      background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
       display: flex;
@@ -180,7 +180,7 @@
 
   <main>
     <div class="input-row">
-      <input type="text" id="imageUrlInput" class="url-input" placeholder="image URL (https://...)" value="">
+      <input type="text" id="imageUrlInput" class="url-input" placeholder="image URL" value="">
       <button class="btn" id="loadBtn" aria-label="load image"><i class="fa-solid fa-eye"></i></button>
     </div>
 
@@ -218,8 +218,44 @@
       spinner.style.display = state ? 'flex' : 'none';
     }
 
-    function loadImageFromUrl(url) {
-      if (!url.trim()) {
+    function extractGoogleDriveFileId(url) {
+      if (!url || typeof url !== 'string') return null;
+      
+      const patterns = [
+        /\/file\/d\/([a-zA-Z0-9_-]+)/,
+        /[?&]id=([a-zA-Z0-9_-]+)/,
+        /\/open\?id=([a-zA-Z0-9_-]+)/,
+        /\/d\/([a-zA-Z0-9_-]+)/
+      ];
+      
+      for (let pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) {
+          return match[1];
+        }
+      }
+      
+      if (/^[a-zA-Z0-9_-]{15,}$/.test(url)) {
+        return url;
+      }
+      
+      return null;
+    }
+
+    function isGoogleDriveLink(url) {
+      return url.includes('drive.google.com') || extractGoogleDriveFileId(url) !== null;
+    }
+
+    function convertToDirectImageUrl(url) {
+      const fileId = extractGoogleDriveFileId(url);
+      if (fileId) {
+        return `https://drive.google.com/uc?export=view&id=${fileId}`;
+      }
+      return url;
+    }
+
+    function loadImageFromUrl(inputUrl) {
+      if (!inputUrl.trim()) {
         showError('please paste an image link');
         return;
       }
@@ -227,19 +263,45 @@
       setLoading(true);
       errorBox.style.display = 'none';
 
+      const finalUrl = convertToDirectImageUrl(inputUrl.trim());
+      
       const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
       img.onload = () => {
-        imageDisplay.style.backgroundImage = `url('${url}')`;
+        imageDisplay.style.backgroundImage = `url('${finalUrl}')`;
         placeholder.style.display = 'none';
         setLoading(false);
       };
+      
       img.onerror = () => {
-        imageDisplay.style.backgroundImage = 'none';
-        placeholder.style.display = 'flex';
-        setLoading(false);
-        showError('image not found or invalid link');
+        if (isGoogleDriveLink(inputUrl)) {
+          const fileId = extractGoogleDriveFileId(inputUrl);
+          const alternativeUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
+          
+          const altImg = new Image();
+          altImg.crossOrigin = 'anonymous';
+          altImg.onload = () => {
+            imageDisplay.style.backgroundImage = `url('${alternativeUrl}')`;
+            placeholder.style.display = 'none';
+            setLoading(false);
+          };
+          altImg.onerror = () => {
+            imageDisplay.style.backgroundImage = 'none';
+            placeholder.style.display = 'flex';
+            setLoading(false);
+            showError('image not found or invalid link');
+          };
+          altImg.src = alternativeUrl;
+        } else {
+          imageDisplay.style.backgroundImage = 'none';
+          placeholder.style.display = 'flex';
+          setLoading(false);
+          showError('image not found or invalid link');
+        }
       };
-      img.src = url;
+      
+      img.src = finalUrl;
     }
 
     loadBtn.addEventListener('click', () => {
