@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>journal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Cutive+Mono&family=VT323&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --paper: #f7f3e8;
+      --ink: #2b2b2b;
+      --warm-gray: #5e5a55;
+      --line-color: rgba(0, 0, 0, 0.08);
+      --caret-color: #2b2b2b;
+    }
+    body {
+      background-color: #e8e0d0;
+      font-family: 'Special Elite', 'Cutive Mono', 'Courier New', monospace;
+      color: var(--ink);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background-image: 
+        repeating-linear-gradient(0deg, var(--line-color), var(--line-color) 1px, transparent 1px, transparent 4px),
+        radial-gradient(circle at 20% 30%, rgba(0,0,0,0.02) 0%, transparent 30%);
+    }
+    .journal {
+      max-width: 720px;
+      width: 100%;
+      background-color: var(--paper);
+      padding: 2rem 1.5rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.05);
+      border-radius: 2px 2px 12px 12px;
+      position: relative;
+      border-top: 6px solid #b8a99a;
+    }
+    .journal::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: repeating-linear-gradient(90deg, #b8a99a, #b8a99a 6px, #9e8b7a 6px, #9e8b7a 12px);
+    }
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      border-bottom: 1px dashed #b8a99a;
+      padding-bottom: 0.5rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: normal;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+      font-family: 'VT323', monospace;
+      color: #4f4a44;
+      margin-right: 1rem;
+    }
+    .font-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .font-select {
+      background: transparent;
+      border: 1px solid #b8a99a;
+      padding: 0.3rem 2rem 0.3rem 0.8rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--ink);
+      cursor: pointer;
+      border-radius: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 8"><path fill="%235e5a55" d="M6 8L0 0h12z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 10px;
+      height: 38px;
+      line-height: 1;
+      box-sizing: border-box;
+    }
+    .icon-btn {
+      background: none;
+      border: 1px solid #b8a99a;
+      padding: 0.3rem 0.8rem;
+      font-size: 1rem;
+      color: #5e5a55;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      border-radius: 0;
+      height: 38px;
+      line-height: 1;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-btn:hover {
+      background-color: #e0d6c8;
+      border-color: #8f7e6b;
+    }
+    .metadata {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+      align-items: center;
+      background: rgba(255,255,240,0.6);
+      padding: 0.8rem 1rem;
+      border-left: 3px solid #cfc1b0;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 1rem;
+    }
+    .meta-item i {
+      color: #8f7e6b;
+      width: 1.2rem;
+      font-size: 0.9rem;
+    }
+    .meta-item input, .meta-item select {
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed #b8a99a;
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 0.2rem 0.2rem;
+      color: var(--ink);
+      width: auto;
+      max-width: 140px;
+    }
+    .meta-item input:focus, .meta-item select:focus {
+      outline: none;
+      border-bottom: 1px solid #5e5a55;
+    }
+    .weather-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    #weather-input {
+      max-width: 140px;
+    }
+    .note-editor {
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+    .editor-toolbar {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 10;
+    }
+    .editor-btn {
+      background: transparent;
+      border: 1px solid #b8a99a;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: #5e5a55;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      border-radius: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .editor-btn:hover {
+      background-color: #e0d6c8;
+      border-color: #8f7e6b;
+    }
+    .note-content {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-top: 2px solid #cfc1b0;
+      border-bottom: 2px solid #cfc1b0;
+      padding: calc(0.8rem + 30px) 0.5rem 0.8rem 0.5rem;
+      font-family: inherit;
+      font-size: 18px;
+      line-height: 30px;
+      color: var(--ink);
+      resize: vertical;
+      min-height: 220px;
+      box-shadow: inset 0 0 0 1px rgba(184, 169, 154, 0.2);
+      background-image: repeating-linear-gradient(transparent, transparent 29px, rgba(110, 90, 70, 0.12) 29px, rgba(110, 90, 70, 0.12) 30px);
+      caret-color: var(--caret-color);
+    }
+    .note-content:focus {
+      outline: none;
+      border-bottom-color: #9e8b7a;
+      border-top-color: #9e8b7a;
+    }
+    .entries-list {
+      border-top: 3px double #b8a99a;
+      padding-top: 1.5rem;
+    }
+    .entries-list h3 {
+      font-family: 'VT323', monospace;
+      font-size: 1.6rem;
+      font-weight: normal;
+      margin-bottom: 1rem;
+      color: #6e5e4e;
+      letter-spacing: 0px;
+    }
+    .list-container {
+      list-style: none;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.3rem;
+      border-bottom: 1px dashed #d4c8ba;
+      transition: background 0.1s;
+    }
+    .list-item:hover {
+      background: rgba(184, 169, 154, 0.15);
+    }
+    .item-preview {
+      flex: 1;
+      cursor: pointer;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 0.95rem;
+      margin-right: 0.5rem;
+    }
+    .item-meta {
+      font-size: 0.75rem;
+      color: #7a6b5c;
+      margin-right: 1rem;
+      min-width: 120px;
+      text-align: right;
+      font-family: 'Courier Prime', monospace;
+    }
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #b28b7a;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem 0.4rem;
+    }
+    .delete-btn:hover {
+      color: #b1452b;
+    }
+    .empty-message {
+      color: #9b8b7a;
+      font-style: italic;
+      padding: 1rem 0;
+      text-align: center;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.3);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-card {
+      background: #f2eadc;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      border: 6px solid #b8a99a;
+      box-shadow: 8px 8px 0 #6e5e4e;
+    }
+    .modal-card h3 {
+      font-family: 'VT323', monospace;
+      font-size: 2rem;
+      font-weight: normal;
+      margin-bottom: 1.2rem;
+    }
+    .modal-card p {
+      margin-bottom: 1rem;
+    }
+    .modal-card input {
+      width: 100%;
+      padding: 0.6rem;
+      background: #fffcf4;
+      border: 1px solid #b8a99a;
+      font-family: 'Courier Prime', monospace;
+      margin-bottom: 1.5rem;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+    @media (max-width: 550px) {
+      .journal { padding: 1.2rem 1rem; }
+      .metadata { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+      .meta-item input, .meta-item select { max-width: 100%; }
+      .item-meta { min-width: 90px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="journal">
+    <div class="header">
+      <h1>journal</h1>
+      <div class="font-controls">
+        <select id="fontSelector" class="font-select" aria-label="Typewriter font"></select>
+        <button class="icon-btn" id="openFontModal" title="add custom font"><i class="fas fa-font"></i> +</button>
+      </div>
+    </div>
+    <div class="metadata">
+      <div class="meta-item"><i class="far fa-calendar-alt"></i> <input type="date" id="note-date"></div>
+      <div class="meta-item"><i class="far fa-clock"></i> <input type="time" id="note-time"></div>
+      <div class="meta-item"><i class="far fa-smile"></i> <input type="text" id="note-mood" placeholder="mood" maxlength="20" spellcheck="false" autocorrect="off" autocapitalize="none"></div>
+      <div class="meta-item"><i class="fas fa-cloud-sun"></i> 
+        <select id="weather-input">
+          <option value="">— weather —</option>
+          <option value="sunny">sunny</option>
+          <option value="cloudy">cloudy</option>
+          <option value="rainy">rainy</option>
+          <option value="stormy">stormy</option>
+          <option value="snowy">snowy</option>
+          <option value="foggy">foggy</option>
+          <option value="windy">windy</option>
+          <option value="clear">clear</option>
+          <option value="partly cloudy">partly cloudy</option>
+        </select>
+      </div>
+    </div>
+    <div class="note-editor">
+      <div class="editor-toolbar">
+        <button id="saveNote" class="editor-btn" title="save entry"><i class="far fa-save"></i></button>
+        <button id="newNote" class="editor-btn" title="new entry"><i class="far fa-file"></i></button>
+      </div>
+      <textarea id="noteContent" class="note-content" placeholder="Begin typing your entry ..." spellcheck="false" autocorrect="off" autocapitalize="none"></textarea>
+    </div>
+    <div class="entries-list">
+      <h3><i class="fas fa-receipt"></i> past entries</h3>
+      <ul id="entryList" class="list-container">
+        <li class="empty-message">no entries yet · write something</li>
+      </ul>
+    </div>
+  </div>
+  <div id="fontModal" class="modal">
+    <div class="modal-card">
+      <h3><i class="fas fa-font"></i> load typewriter font</h3>
+      <p>paste Google Fonts <strong>&lt;link&gt;</strong> tag:</p>
+      <input type="text" id="fontLinkInput" placeholder='e.g. <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">'>
+      <div class="modal-actions">
+        <button id="cancelFontBtn" class="btn">cancel</button>
+        <button id="loadFontBtn" class="btn">load</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function() {
+      let notes = [];
+      let currentId = null;
+      let customFonts = [];
+      const PRESET_FONTS = [
+        { name: 'Special Elite', family: 'Special Elite', type: 'preset' },
+        { name: 'Cutive Mono', family: 'Cutive Mono', type: 'preset' },
+        { name: 'VT323', family: 'VT323', type: 'preset' },
+        { name: 'Courier Prime', family: 'Courier Prime', type: 'preset' }
+      ];
+      const dateInput = document.getElementById('note-date');
+      const timeInput = document.getElementById('note-time');
+      const moodInput = document.getElementById('note-mood');
+      const weatherInput = document.getElementById('weather-input');
+      const contentTextarea = document.getElementById('noteContent');
+      const saveBtn = document.getElementById('saveNote');
+      const newBtn = document.getElementById('newNote');
+      const entryListEl = document.getElementById('entryList');
+      const fontSelector = document.getElementById('fontSelector');
+      const openModalBtn = document.getElementById('openFontModal');
+      const fontModal = document.getElementById('fontModal');
+      const fontLinkInput = document.getElementById('fontLinkInput');
+      const cancelFontBtn = document.getElementById('cancelFontBtn');
+      const loadFontBtn = document.getElementById('loadFontBtn');
+
+      function setCurrentDateTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        dateInput.value = `${year}-${month}-${day}`;
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        timeInput.value = `${hours}:${minutes}`;
+      }
+
+      function loadNotesFromStorage() {
+        const stored = localStorage.getItem('journal-notes');
+        if (stored) {
+          try {
+            notes = JSON.parse(stored);
+          } catch (e) { notes = []; }
+        } else {
+          notes = [];
+        }
+        renderNotesList();
+      }
+
+      function saveNotesToStorage() {
+        localStorage.setItem('journal-notes', JSON.stringify(notes));
+      }
+
+      function renderNotesList() {
+        if (notes.length === 0) {
+          entryListEl.innerHTML = '<li class="empty-message">no entries yet · write something</li>';
+          return;
+        }
+        const sorted = [...notes].sort((a, b) => (b.date + 'T' + b.time).localeCompare(a.date + 'T' + a.time));
+        let html = '';
+        sorted.forEach(note => {
+          let title = '(empty)';
+          if (note.content) {
+            const firstLine = note.content.split('\n')[0].trim();
+            title = firstLine.length > 0 ? firstLine : '(empty)';
+          }
+          if (title.length > 40) title = title.substring(0, 40) + '…';
+          const dateStr = note.date ? note.date.slice(5) : '??-??';
+          const weather = note.weather && note.weather.trim() ? note.weather : '—';
+          html += `<li class="list-item" data-id="${note.id}">
+            <span class="item-preview" data-id="${note.id}">${title}</span>
+            <span class="item-meta">${dateStr} · ${weather}</span>
+            <button class="delete-btn" data-id="${note.id}" title="delete entry"><i class="fas fa-trash-alt"></i></button>
+          </li>`;
+        });
+        entryListEl.innerHTML = html;
+        document.querySelectorAll('.item-preview').forEach(el => {
+          el.addEventListener('click', (e) => {
+            const id = e.currentTarget.dataset.id;
+            loadNoteById(id);
+          });
+        });
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.id;
+            deleteNoteById(id);
+          });
+        });
+      }
+
+      function loadNoteById(id) {
+        const note = notes.find(n => n.id === id);
+        if (!note) return;
+        currentId = note.id;
+        dateInput.value = note.date || '';
+        timeInput.value = note.time || '';
+        moodInput.value = note.mood || '';
+        weatherInput.value = note.weather || '';
+        contentTextarea.value = note.content || '';
+      }
+
+      function deleteNoteById(id) {
+        notes = notes.filter(n => n.id !== id);
+        saveNotesToStorage();
+        if (currentId === id) {
+          newNote();
+        }
+        renderNotesList();
+      }
+
+      function saveCurrentNote() {
+        const id = currentId || Date.now().toString();
+        const note = {
+          id: id,
+          date: dateInput.value,
+          time: timeInput.value,
+          mood: moodInput.value,
+          weather: weatherInput.value,
+          content: contentTextarea.value,
+        };
+        if (!currentId) {
+          notes.push(note);
+        } else {
+          const index = notes.findIndex(n => n.id === currentId);
+          if (index > -1) notes[index] = note;
+          else notes.push(note);
+        }
+        saveNotesToStorage();
+        currentId = id;
+        renderNotesList();
+      }
+
+      function newNote() {
+        currentId = null;
+        setCurrentDateTime();
+        moodInput.value = '';
+        weatherInput.value = '';
+        contentTextarea.value = '';
+      }
+
+      function loadCustomFontsFromStorage() {
+        const stored = localStorage.getItem('custom-fonts');
+        if (stored) {
+          try {
+            customFonts = JSON.parse(stored);
+            customFonts.forEach(cf => {
+              injectFontLink(cf.href);
+            });
+          } catch (e) { customFonts = []; }
+        } else {
+          customFonts = [];
+        }
+      }
+
+      function injectFontLink(href) {
+        if (!href) return;
+        if (document.querySelector(`link[href="${href}"]`)) return;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        document.head.appendChild(link);
+      }
+
+      function rebuildFontDropdown() {
+        fontSelector.innerHTML = '';
+        [...PRESET_FONTS, ...customFonts].forEach(f => {
+          const option = document.createElement('option');
+          option.value = f.family || f.name;
+          option.textContent = f.name;
+          fontSelector.appendChild(option);
+        });
+        if (!fontSelector.value) fontSelector.value = 'Special Elite';
+        applyFont(fontSelector.value);
+      }
+
+      function applyFont(family) {
+        document.body.style.fontFamily = family + ', "Courier New", monospace';
+      }
+
+      fontSelector.addEventListener('change', (e) => {
+        applyFont(e.target.value);
+      });
+
+      openModalBtn.addEventListener('click', () => {
+        fontLinkInput.value = '';
+        fontModal.classList.add('active');
+      });
+
+      cancelFontBtn.addEventListener('click', () => {
+        fontModal.classList.remove('active');
+      });
+
+      loadFontBtn.addEventListener('click', () => {
+        const rawLink = fontLinkInput.value.trim();
+        if (!rawLink) return;
+        const hrefMatch = rawLink.match(/href=["'](.*?)["']/);
+        if (!hrefMatch) {
+          alert('Could not find href in the link tag. Please paste a valid Google Fonts <link>.');
+          return;
+        }
+        const href = hrefMatch[1];
+        const familyMatch = href.match(/family=([^&:]+)/);
+        if (!familyMatch) {
+          alert('Could not parse font family from the URL.');
+          return;
+        }
+        let familyName = decodeURIComponent(familyMatch[1].replace(/\+/g, ' '));
+        if (familyName.includes('|')) familyName = familyName.split('|')[0];
+        if (familyName.includes(',')) familyName = familyName.split(',')[0];
+        injectFontLink(href);
+        if (!customFonts.some(f => f.href === href)) {
+          customFonts.push({ name: familyName, family: familyName, href: href });
+          localStorage.setItem('custom-fonts', JSON.stringify(customFonts));
+        }
+        rebuildFontDropdown();
+        fontSelector.value = familyName;
+        applyFont(familyName);
+        fontModal.classList.remove('active');
+      });
+
+      fontModal.addEventListener('click', (e) => {
+        if (e.target === fontModal) fontModal.classList.remove('active');
+      });
+
+      saveBtn.addEventListener('click', saveCurrentNote);
+      newBtn.addEventListener('click', newNote);
+
+      function init() {
+        loadNotesFromStorage();
+        loadCustomFontsFromStorage();
+        rebuildFontDropdown();
+        setCurrentDateTime();
+        if (notes.length === 0) newNote();
+        else {
+          const sorted = [...notes].sort((a, b) => (b.date + 'T' + b.time).localeCompare(a.date + 'T' + a.time));
+          if (sorted.length) loadNoteById(sorted[0].id);
+          else newNote();
+        }
+      }
+      init();
+    })();
+  </script>
+</body>
+</html>
