@@ -2,320 +2,881 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>image · paste & view</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Archivue · booking reports</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-      height: 100%;
-      background: #0e0e0e;
-      color: #e5e5e5;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      overflow: hidden;
     }
 
     body {
+      background: #0e0e0e;
+      color: #e5e5e5;
+      font-family: system-ui, -apple-system, 'Inter', 'Segoe UI', sans-serif;
+      line-height: 1.4;
+      overflow-x: hidden;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: #141414;
+      border-right: 1px solid #2a2a2a;
+      padding: 28px 20px;
       display: flex;
       flex-direction: column;
+      gap: 2rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: width 0.2s ease, padding 0.2s ease;
+      flex-shrink: 0;
     }
 
-    nav {
-      display: flex;
-      justify-content: space-between;
-      padding: 16px 24px;
-      font-size: 13px;
-      letter-spacing: 0.25em;
-      text-transform: lowercase;
-      opacity: 0.75;
+    .sidebar.collapsed {
+      width: 80px;
+      padding: 28px 12px;
     }
 
-    main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 28px;
-      padding: 20px;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .url-input {
-      background: transparent;
-      border: none;
-      color: #e5e5e5;
-      padding: 12px 18px;
-      border-radius: 40px;
-      font-size: 13px;
-      letter-spacing: 0.1em;
-      min-width: 260px;
-      font-family: inherit;
-    }
-
-    .url-input:focus {
-      outline: none;
-      background: rgba(229,229,229,0.1);
-    }
-
-    .url-input::placeholder {
-      color: #e5e5e5;
-      opacity: 0.5;
-      letter-spacing: 0.1em;
-    }
-
-    .btn {
-      background: transparent;
-      border: none;
-      color: #e5e5e5;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn:hover {
-      background: #e5e5e5;
-      color: #0e0e0e;
-    }
-
-    .image-card {
-      border: none;
-      border-radius: 32px;
-      padding: 32px 28px;
-      max-width: 600px;
-      width: 100%;
-      background: transparent;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .image-display {
-      width: 100%;
-      height: 320px;
-      border-radius: 28px;
-      background-color: #1a1a1a;
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s ease;
-      box-shadow: 0 0 0 1px rgba(229,229,229,0.05);
-    }
-
-    .placeholder {
-      background: rgba(20,20,20,0.8);
-      backdrop-filter: blur(4px);
-      padding: 0.8rem 1.6rem;
-      border-radius: 60px;
-      font-size: 0.95rem;
-      letter-spacing: 0.1em;
-      color: #e5e5e5;
-      border: 1px solid rgba(229,229,229,0.15);
-      text-transform: lowercase;
-    }
-
-    .error-msg {
-      border: none;
-      color: #e5e5e5;
-      padding: 8px 16px;
-      border-radius: 40px;
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      text-align: center;
-      background: rgba(229,229,229,0.05);
-      margin-bottom: 10px;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(229,229,229,0.3);
-      border-radius: 50%;
-      border-top-color: #e5e5e5;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .hidden {
+    .sidebar.collapsed .sidebar-content > *:not(.sidebar-toggle-wrapper) {
       display: none;
     }
 
+    .sidebar.collapsed .sidebar-toggle-wrapper {
+      justify-content: center;
+    }
+
+    .sidebar.collapsed .sidebar-toggle-wrapper .sidebar-toggle {
+      margin: 0;
+    }
+
+    .sidebar-toggle-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1rem;
+    }
+
+    .sidebar-toggle {
+      background: #2a2a2a;
+      border: none;
+      color: #e5e5e5;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .sidebar-toggle:hover {
+      background: #3a3a3a;
+    }
+
+    .main {
+      flex: 1;
+      padding: 28px 32px;
+      transition: padding 0.2s;
+      min-width: 0;
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #a0a0a0;
+      margin-bottom: 1rem;
+    }
+
+    .upload-card, .filter-card {
+      background: #1a1a1a;
+      border-radius: 24px;
+      padding: 1.2rem 1rem;
+      border: 1px solid #2c2c2c;
+    }
+
+    .dropzone {
+      border: 1.5px dashed #3a3a3a;
+      border-radius: 18px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .dropzone.active {
+      border-color: #5a9eff;
+      background: rgba(90, 158, 255, 0.05);
+    }
+
+    .filter-group {
+      margin-bottom: 1.2rem;
+    }
+    .filter-group label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #bbb;
+      display: block;
+      margin-bottom: 6px;
+    }
+    select, input, .date-inputs {
+      width: 100%;
+      background: #0f0f0f;
+      border: 1px solid #2e2e2e;
+      border-radius: 40px;
+      padding: 8px 14px;
+      color: #e5e5e5;
+      font-size: 0.8rem;
+      font-family: inherit;
+    }
+    select:focus, input:focus {
+      outline: none;
+      border-color: #5a9eff;
+    }
+    .date-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .date-row input {
+      flex: 1;
+      min-width: 110px;
+    }
+    .preset-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .preset-btn {
+      background: #1f1f1f;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #ccc;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .preset-btn:hover {
+      background: #2e2e2e;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .toggle-row input {
+      width: auto;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      background: #1f1f1f;
+      border: 1px solid #2e2e2e;
+      padding: 6px 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #ccc;
+      cursor: pointer;
+      transition: 0.1s;
+      flex: 1;
+      text-align: center;
+    }
+    .action-btn:hover {
+      background: #2e2e2e;
+    }
+    .danger-btn {
+      border-color: #ff6b6b;
+      color: #ff6b6b;
+    }
+    .danger-btn:hover {
+      background: #ff6b6b;
+      color: #0e0e0e;
+    }
+
+    .summary-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: #141414;
+      border-radius: 24px;
+      border: 1px solid #2a2a2a;
+      padding: 1rem 1.4rem;
+      min-width: 140px;
+      flex: 1 0 auto;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #8f8f8f;
+      letter-spacing: 0.1em;
+    }
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: #e5e5e5;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 28px;
+      margin-bottom: 40px;
+    }
+    .chart-card {
+      background: #141414;
+      border-radius: 28px;
+      border: 1px solid #2a2a2a;
+      padding: 1rem;
+      transition: opacity 0.2s;
+    }
+    .chart-card.hidden {
+      display: none;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chart-title {
+      font-weight: 500;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+    }
+    .chart-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .chart-btn {
+      background: transparent;
+      border: 1px solid #3a3a3a;
+      border-radius: 40px;
+      padding: 5px 10px;
+      font-size: 0.7rem;
+      color: #ccc;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .chart-btn:hover {
+      background: #2a2a2a;
+    }
+    canvas {
+      max-height: 260px;
+      width: 100%;
+    }
+    .top-customers {
+      background: #141414;
+      border-radius: 28px;
+      border: 1px solid #2a2a2a;
+      padding: 1rem;
+      margin-top: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 6px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    th {
+      font-weight: 500;
+      color: #aaa;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #7a7a7a;
+    }
+    .bulk-btn {
+      background: #1e1e2a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      color: white;
+      font-weight: 500;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-bottom: 24px;
+      transition: 0.1s;
+    }
+    .bulk-btn:hover {
+      background: #2c2c3a;
+    }
+    .footer-note {
+      font-size: 0.7rem;
+      color: #6a6a6a;
+      margin-top: 1rem;
+    }
+    button, .dropzone {
+      user-select: none;
+    }
+    i {
+      margin-right: 6px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 260px;
+      }
+      .sidebar.collapsed {
+        width: 70px;
+      }
+      .main {
+        padding: 20px;
+      }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      .stat-card {
+        min-width: 120px;
+      }
+      .date-row {
+        flex-direction: column;
+      }
+      .date-row input {
+        width: 100%;
+      }
+    }
+
     @media (max-width: 480px) {
-      .image-card { padding: 20px; }
-      .image-display { height: 240px; }
-      .url-input { min-width: 200px; }
+      .sidebar {
+        width: 240px;
+      }
+      .sidebar.collapsed {
+        width: 60px;
+      }
+      .stat-value {
+        font-size: 1.4rem;
+      }
+      .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body>
-  <nav>
-    <div>image viewer</div>
-    <div>paste & show</div>
-  </nav>
-
-  <main>
-    <div class="input-row">
-      <input type="text" id="imageUrlInput" class="url-input" placeholder="image URL" value="">
-      <button class="btn" id="loadBtn" aria-label="load image"><i class="fa-solid fa-eye"></i></button>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-toggle-wrapper">
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="fa-solid fa-bars"></i>
+      </button>
     </div>
-
-    <div id="errorBox" class="error-msg" style="display: none;"></div>
-
-    <div class="image-card">
-      <div class="image-display" id="imageDisplay">
-        <span id="placeholderText" class="placeholder">paste url ↑</span>
+    <div class="sidebar-content">
+      <div style="font-weight: 500; font-size: 1.2rem; margin-bottom: 1rem;"><i class="fa-regular fa-file-lines"></i> archivue</div>
+      <div class="upload-card">
+        <div class="section-title"><i class="fa-regular fa-cloud-arrow-up"></i> import</div>
+        <div id="dropzone" class="dropzone">
+          <i class="fa-regular fa-folder-open"></i> drag & drop<br>
+          <span style="font-size: 0.7rem;">or click to select CSV</span>
+          <input type="file" id="csvUpload" multiple accept=".csv" style="display: none;">
+        </div>
+        <div class="toggle-row">
+          <label><i class="fa-regular fa-circle-xmark"></i> include cancelled</label>
+          <input type="checkbox" id="includeCancelledToggle">
+        </div>
       </div>
-      <div style="text-align: center; font-size: 12px; letter-spacing: 0.2em; opacity: 0.5; text-transform: lowercase; padding-top: 8px;">
-        image shows above
+
+      <div class="filter-card">
+        <div class="section-title"><i class="fa-regular fa-sliders"></i> filters</div>
+        <div class="filter-group">
+          <label>📅 date range</label>
+          <div class="date-row">
+            <input type="date" id="dateFrom">
+            <span>—</span>
+            <input type="date" id="dateTo">
+          </div>
+          <div class="preset-buttons">
+            <button class="preset-btn" data-preset="today">today</button>
+            <button class="preset-btn" data-preset="yesterday">yesterday</button>
+            <button class="preset-btn" data-preset="last7">last 7 days</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label><i class="fa-regular fa-gamepad"></i> game</label>
+          <select id="gameFilter"><option value="ALL">all games</option></select>
+        </div>
+        <div class="filter-group">
+          <label><i class="fa-regular fa-location-dot"></i> station</label>
+          <select id="stationFilter"><option value="ALL">all stations</option></select>
+        </div>
+        <div class="filter-group">
+          <label><i class="fa-regular fa-flag"></i> status</label>
+          <select id="statusFilter"><option value="ALL">all status</option></select>
+        </div>
+        <div class="filter-group">
+          <label><i class="fa-regular fa-user"></i> customer name</label>
+          <input type="text" id="customerNameFilter" placeholder="search">
+        </div>
+        <div class="action-buttons">
+          <button id="resetFiltersBtn" class="action-btn"><i class="fa-regular fa-rotate-left"></i> reset filters</button>
+          <button id="resetDataBtn" class="action-btn danger-btn"><i class="fa-regular fa-trash-can"></i> reset all data</button>
+        </div>
       </div>
+      <div class="footer-note"><i class="fa-regular fa-database"></i> data stored locally</div>
     </div>
+  </aside>
 
-    <div id="loadingSpinner" style="display: none;"><div class="spinner"></div></div>
+  <main class="main">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
+      <button id="showAllChartsBtn" class="bulk-btn" style="margin-bottom: 0;"><i class="fa-regular fa-eye"></i> show all charts</button>
+      <button id="bulkExportBtn" class="bulk-btn" style="margin-bottom: 0;"><i class="fa-regular fa-camera"></i> export full report (PNG+JSON)</button>
+    </div>
+    <div id="summaryContainer" class="summary-grid"></div>
+    <div id="chartsGrid" class="charts-grid"></div>
+    <div class="top-customers" id="topCustomersContainer">
+      <div class="chart-header"><span class="chart-title"><i class="fa-regular fa-trophy"></i> top customers (by hours)</span></div>
+      <div id="topCustomersTableBody">—</div>
+    </div>
   </main>
+</div>
 
-  <script>
-    const urlInput = document.getElementById('imageUrlInput');
-    const loadBtn = document.getElementById('loadBtn');
-    const imageDisplay = document.getElementById('imageDisplay');
-    const placeholder = document.getElementById('placeholderText');
-    const errorBox = document.getElementById('errorBox');
-    const spinner = document.getElementById('loadingSpinner');
+<script>
+  let masterBookings = [];
+  let filteredBookings = [];
+  let chartInstances = {};
 
-    function showError(text) {
-      errorBox.style.display = 'block';
-      errorBox.textContent = text;
-      setTimeout(() => {
-        errorBox.style.display = 'none';
-      }, 3000);
+  const filterState = {
+    dateFrom: '',
+    dateTo: '',
+    game: 'ALL',
+    station: 'ALL',
+    status: 'ALL',
+    customerName: '',
+    includeCancelled: false
+  };
+
+  function parseCSV(text) {
+    const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+    if (!lines.length) return [];
+    const headers = lines[0].split(',').map(h => h.trim());
+    return lines.slice(1).map(line => {
+      const vals = line.split(',').map(v => v.trim());
+      if (vals.length !== headers.length) return null;
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = vals[i]);
+      return obj;
+    }).filter(r => r);
+  }
+
+  function normalizePhone(phone) {
+    let p = phone.replace(/[^\d+]/g, '');
+    if (p.startsWith('+880')) return p.slice(0, 14);
+    if (p.startsWith('880')) return '+' + p.slice(0, 13);
+    if (p.startsWith('0')) return '+88' + p.slice(1, 11);
+    if (p.length === 10) return '+880' + p;
+    return p;
+  }
+
+  function cleanRow(row) {
+    const id = row.ID?.trim();
+    const date = row.Date?.trim();
+    const game = row.Game?.trim();
+    const station = row.Station?.trim();
+    const hours = parseFloat(row.Hours);
+    if (!id || !date || !game || !station || isNaN(hours)) return null;
+    let status = (row.Status || '').toLowerCase();
+    if (!['confirmed', 'cancelled', 'awaiting_payment'].includes(status)) status = 'awaiting_payment';
+    return {
+      ID: id,
+      Name: row.Name?.trim() || 'Anonymous',
+      Phone: normalizePhone(row.Phone || ''),
+      Station: station,
+      Game: game,
+      Date: date,
+      Hours: hours,
+      StartTime: row.StartTime || '00:00',
+      Status: status
+    };
+  }
+
+  async function processFiles(files) {
+    const allRows = [];
+    for (const file of files) {
+      const text = await file.text();
+      const rows = parseCSV(text);
+      rows.forEach(r => { const cleaned = cleanRow(r); if (cleaned) allRows.push(cleaned); });
     }
+    const merged = new Map();
+    allRows.forEach(r => { if (!merged.has(r.ID)) merged.set(r.ID, r); });
+    masterBookings = Array.from(merged.values());
+    saveToLocalStorage();
+    refreshFilterDropdowns();
+    applyFiltersAndRender();
+  }
 
-    function setLoading(state) {
-      spinner.style.display = state ? 'flex' : 'none';
+  function refreshFilterDropdowns() {
+    const games = [...new Set(masterBookings.map(b => b.Game))];
+    const stations = [...new Set(masterBookings.map(b => b.Station))];
+    const statuses = [...new Set(masterBookings.map(b => b.Status))];
+    const gameSel = document.getElementById('gameFilter');
+    const stationSel = document.getElementById('stationFilter');
+    const statusSel = document.getElementById('statusFilter');
+    gameSel.innerHTML = '<option value="ALL">all games</option>';
+    stationSel.innerHTML = '<option value="ALL">all stations</option>';
+    statusSel.innerHTML = '<option value="ALL">all status</option>';
+    games.sort().forEach(g => gameSel.innerHTML += `<option value="${escapeHtml(g)}">${g}</option>`);
+    stations.sort().forEach(s => stationSel.innerHTML += `<option value="${escapeHtml(s)}">${s}</option>`);
+    statuses.forEach(s => statusSel.innerHTML += `<option value="${s}">${s}</option>`);
+    if (games.includes(filterState.game)) gameSel.value = filterState.game;
+    if (stations.includes(filterState.station)) stationSel.value = filterState.station;
+    if (statuses.includes(filterState.status)) statusSel.value = filterState.status;
+  }
+
+  function applyFilters() {
+    if (!masterBookings.length) { filteredBookings = []; return; }
+    let temp = [...masterBookings];
+    if (!filterState.includeCancelled) temp = temp.filter(b => b.Status !== 'cancelled');
+    if (filterState.dateFrom) temp = temp.filter(b => b.Date >= filterState.dateFrom);
+    if (filterState.dateTo) temp = temp.filter(b => b.Date <= filterState.dateTo);
+    if (filterState.game !== 'ALL') temp = temp.filter(b => b.Game === filterState.game);
+    if (filterState.station !== 'ALL') temp = temp.filter(b => b.Station === filterState.station);
+    if (filterState.status !== 'ALL') temp = temp.filter(b => b.Status === filterState.status);
+    if (filterState.customerName.trim()) {
+      const search = filterState.customerName.trim().toLowerCase();
+      temp = temp.filter(b => b.Name.toLowerCase().includes(search));
     }
+    filteredBookings = temp;
+  }
 
-    function extractGoogleDriveFileId(url) {
-      if (!url || typeof url !== 'string') return null;
-      
-      const patterns = [
-        /\/file\/d\/([a-zA-Z0-9_-]+)/,
-        /[?&]id=([a-zA-Z0-9_-]+)/,
-        /\/open\?id=([a-zA-Z0-9_-]+)/,
-        /\/d\/([a-zA-Z0-9_-]+)/
-      ];
-      
-      for (let pattern of patterns) {
-        const match = url.match(pattern);
-        if (match && match[1]) {
-          return match[1];
-        }
-      }
-      
-      if (/^[a-zA-Z0-9_-]{15,}$/.test(url)) {
-        return url;
-      }
-      
-      return null;
-    }
-
-    function isGoogleDriveLink(url) {
-      return url.includes('drive.google.com') || extractGoogleDriveFileId(url) !== null;
-    }
-
-    function convertToDirectImageUrl(url) {
-      const fileId = extractGoogleDriveFileId(url);
-      if (fileId) {
-        return `https://drive.google.com/uc?export=view&id=${fileId}`;
-      }
-      return url;
-    }
-
-    function loadImageFromUrl(inputUrl) {
-      if (!inputUrl.trim()) {
-        showError('please paste an image link');
-        return;
-      }
-
-      setLoading(true);
-      errorBox.style.display = 'none';
-
-      const finalUrl = convertToDirectImageUrl(inputUrl.trim());
-      
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      img.onload = () => {
-        imageDisplay.style.backgroundImage = `url('${finalUrl}')`;
-        placeholder.style.display = 'none';
-        setLoading(false);
-      };
-      
-      img.onerror = () => {
-        if (isGoogleDriveLink(inputUrl)) {
-          const fileId = extractGoogleDriveFileId(inputUrl);
-          const alternativeUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
-          
-          const altImg = new Image();
-          altImg.crossOrigin = 'anonymous';
-          altImg.onload = () => {
-            imageDisplay.style.backgroundImage = `url('${alternativeUrl}')`;
-            placeholder.style.display = 'none';
-            setLoading(false);
-          };
-          altImg.onerror = () => {
-            imageDisplay.style.backgroundImage = 'none';
-            placeholder.style.display = 'flex';
-            setLoading(false);
-            showError('image not found or invalid link');
-          };
-          altImg.src = alternativeUrl;
-        } else {
-          imageDisplay.style.backgroundImage = 'none';
-          placeholder.style.display = 'flex';
-          setLoading(false);
-          showError('image not found or invalid link');
-        }
-      };
-      
-      img.src = finalUrl;
-    }
-
-    loadBtn.addEventListener('click', () => {
-      loadImageFromUrl(urlInput.value);
+  function getSummary() {
+    if (!filteredBookings.length) return { totalBookings:0, totalHours:0, topCustomer:'-', topGame:'-', topStation:'-' };
+    const total = filteredBookings.length;
+    const hours = filteredBookings.reduce((s,b)=> s + b.Hours, 0);
+    const gameMap = new Map(), stationMap = new Map(), custMap = new Map();
+    filteredBookings.forEach(b => {
+      gameMap.set(b.Game, (gameMap.get(b.Game)||0)+1);
+      stationMap.set(b.Station, (stationMap.get(b.Station)||0)+1);
+      custMap.set(b.Name, (custMap.get(b.Name)||0)+b.Hours);
     });
+    const topGame = [...gameMap.entries()].sort((a,b)=>b[1]-a[1])[0]?.[0] || '-';
+    const topStation = [...stationMap.entries()].sort((a,b)=>b[1]-a[1])[0]?.[0] || '-';
+    const topCust = [...custMap.entries()].sort((a,b)=>b[1]-a[1])[0]?.[0] || '-';
+    return { totalBookings: total, totalHours: hours, topCustomer: topCust, topGame, topStation };
+  }
 
-    urlInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        loadImageFromUrl(urlInput.value);
-      }
+  function bookingsOverTime() {
+    const map = new Map();
+    filteredBookings.forEach(b => map.set(b.Date, (map.get(b.Date)||0)+1));
+    return [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+  }
+
+  function gamesCount() {
+    const map = new Map();
+    filteredBookings.forEach(b => map.set(b.Game, (map.get(b.Game)||0)+1));
+    return [...map.entries()].sort((a,b)=>b[1]-a[1]);
+  }
+
+  function stationsCount() {
+    const map = new Map();
+    filteredBookings.forEach(b => map.set(b.Station, (map.get(b.Station)||0)+1));
+    return [...map.entries()].sort((a,b)=>b[1]-a[1]);
+  }
+
+  function statusBreakdown() {
+    const confirmed = filteredBookings.filter(b=>b.Status==='confirmed').length;
+    const cancelled = filteredBookings.filter(b=>b.Status==='cancelled').length;
+    const awaiting = filteredBookings.filter(b=>b.Status==='awaiting_payment').length;
+    return { confirmed, cancelled, awaiting };
+  }
+
+  function peakHoursData() {
+    const hourCount = new Array(24).fill(0);
+    filteredBookings.forEach(b => {
+      const hour = parseInt(b.StartTime.split(':')[0]);
+      if (!isNaN(hour) && hour>=0 && hour<=23) hourCount[hour]++;
     });
+    return hourCount;
+  }
 
-    urlInput.focus();
-  </script>
+  function topCustomers() {
+    const map = new Map();
+    filteredBookings.forEach(b => map.set(b.Name, (map.get(b.Name)||0)+b.Hours));
+    return [...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10);
+  }
+
+  function destroyCharts() {
+    Object.values(chartInstances).forEach(chart => chart.destroy());
+    chartInstances = {};
+  }
+
+  function renderCharts() {
+    const grid = document.getElementById('chartsGrid');
+    const chartConfigs = [
+      { id: 'lineChart', title: 'bookings over time', icon: 'fa-chart-line', type: 'line' },
+      { id: 'gamesChart', title: 'most popular games', icon: 'fa-chart-bar', type: 'games' },
+      { id: 'stationsChart', title: 'most used stations', icon: 'fa-chart-bar', type: 'stations' },
+      { id: 'pieChart', title: 'payment status', icon: 'fa-chart-pie', type: 'pie' },
+      { id: 'heatmapChart', title: 'peak hours (heatmap)', icon: 'fa-clock', type: 'heat' }
+    ];
+    grid.innerHTML = chartConfigs.map(cfg => `
+      <div class="chart-card" data-chart-id="${cfg.id}">
+        <div class="chart-header">
+          <span class="chart-title"><i class="fa-regular ${cfg.icon}"></i> ${cfg.title}</span>
+          <div class="chart-actions">
+            <button class="chart-btn hide-chart-btn" data-chart-id="${cfg.id}"><i class="fa-regular fa-eye-slash"></i> hide</button>
+            <button class="chart-btn export-btn" data-chart="${cfg.id}">export PNG</button>
+          </div>
+        </div>
+        <canvas id="${cfg.id}"></canvas>
+      </div>
+    `).join('');
+
+    const lineData = bookingsOverTime();
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    chartInstances.line = new Chart(lineCtx, {
+      type: 'line',
+      data: { labels: lineData.map(d=>d[0]), datasets: [{ label: 'bookings', data: lineData.map(d=>d[1]), borderColor: '#5a9eff', backgroundColor: 'rgba(90,158,255,0.1)', tension: 0.3, pointBackgroundColor: '#5a9eff', pointBorderColor: '#fff', borderWidth: 2 }] },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#ccc' } } }, scales: { y: { grid: { color: '#2a2a2a' }, ticks: { color: '#aaa' } }, x: { ticks: { color: '#aaa' } } } }
+    });
+    const gamesData = gamesCount();
+    chartInstances.games = new Chart(document.getElementById('gamesChart'), { type: 'bar', data: { labels: gamesData.map(d=>d[0]), datasets: [{ label: 'count', data: gamesData.map(d=>d[1]), backgroundColor: '#4caf50', borderRadius: 6 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#ccc' } } }, scales: { y: { grid: { color: '#2a2a2a' } }, x: { ticks: { color: '#aaa' } } } } });
+    const stationsData = stationsCount();
+    chartInstances.stations = new Chart(document.getElementById('stationsChart'), { type: 'bar', data: { labels: stationsData.map(d=>d[0]), datasets: [{ label: 'usage', data: stationsData.map(d=>d[1]), backgroundColor: '#ff9f4a', borderRadius: 6 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#ccc' } } }, scales: { y: { grid: { color: '#2a2a2a' } }, x: { ticks: { color: '#aaa' } } } } });
+    const status = statusBreakdown();
+    chartInstances.pie = new Chart(document.getElementById('pieChart'), { type: 'pie', data: { labels: ['confirmed', 'cancelled', 'awaiting_payment'], datasets: [{ data: [status.confirmed, status.cancelled, status.awaiting], backgroundColor: ['#5a9eff', '#ff6b6b', '#ffb347'], borderWidth: 0 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#ccc' } } } } });
+    const peak = peakHoursData();
+    const peakLabels = Array.from({length:24}, (_,i)=> i+':00');
+    const heatColors = peak.map(v => `hsl(${30 + v*8}, 80%, 60%)`);
+    chartInstances.heat = new Chart(document.getElementById('heatmapChart'), { type: 'bar', data: { labels: peakLabels, datasets: [{ label: 'frequency', data: peak, backgroundColor: heatColors, borderRadius: 4 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#ccc' } } }, scales: { y: { grid: { color: '#2a2a2a' } }, x: { ticks: { color: '#aaa', maxRotation: 45, minRotation: 45 } } } } });
+
+    document.querySelectorAll('.export-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const chartId = btn.getAttribute('data-chart');
+        const canvas = document.getElementById(chartId);
+        if (canvas) downloadCanvas(canvas, `report_${chartId}_${Date.now()}.png`);
+      });
+    });
+    document.querySelectorAll('.hide-chart-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const chartId = btn.getAttribute('data-chart-id');
+        const card = document.querySelector(`.chart-card[data-chart-id="${chartId}"]`);
+        if (card) card.classList.add('hidden');
+      });
+    });
+  }
+
+  function downloadCanvas(canvas, filename) {
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL();
+    link.click();
+  }
+
+  function showAllCharts() {
+    document.querySelectorAll('.chart-card').forEach(card => card.classList.remove('hidden'));
+  }
+
+  async function bulkExport() {
+    const visibleCards = document.querySelectorAll('.chart-card:not(.hidden)');
+    for (let card of visibleCards) {
+      const canvas = card.querySelector('canvas');
+      if (canvas) {
+        await new Promise(r => setTimeout(r, 200));
+        downloadCanvas(canvas, `report_${canvas.id}_${Date.now()}.png`);
+      }
+    }
+    const stats = getSummary();
+    const meta = {
+      totalBookings: stats.totalBookings,
+      totalHours: stats.totalHours,
+      dateRange: `${filterState.dateFrom || 'any'} → ${filterState.dateTo || 'any'}`,
+      topCustomer: stats.topCustomer,
+      mostPopularGame: stats.topGame,
+      mostUsedStation: stats.topStation
+    };
+    const jsonBlob = new Blob([JSON.stringify(meta, null, 2)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(jsonBlob);
+    a.download = `report_summary_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function renderSummaryCards() {
+    const stats = getSummary();
+    const container = document.getElementById('summaryContainer');
+    container.innerHTML = `
+      <div class="stat-card"><div class="stat-label"><i class="fa-regular fa-calendar"></i> bookings</div><div class="stat-value">${stats.totalBookings}</div></div>
+      <div class="stat-card"><div class="stat-label"><i class="fa-regular fa-hourglass-half"></i> total hours</div><div class="stat-value">${stats.totalHours.toFixed(1)}</div></div>
+      <div class="stat-card"><div class="stat-label"><i class="fa-regular fa-crown"></i> top customer</div><div class="stat-value">${escapeHtml(stats.topCustomer)}</div></div>
+      <div class="stat-card"><div class="stat-label"><i class="fa-regular fa-gamepad"></i> top game</div><div class="stat-value">${escapeHtml(stats.topGame)}</div></div>
+      <div class="stat-card"><div class="stat-label"><i class="fa-regular fa-location-dot"></i> top station</div><div class="stat-value">${escapeHtml(stats.topStation)}</div></div>
+    `;
+  }
+
+  function renderTopCustomers() {
+    const top = topCustomers();
+    const tbody = document.getElementById('topCustomersTableBody');
+    if (!top.length) { tbody.innerHTML = '<div class="empty-state">no data</div>'; return; }
+    let html = '</table><thead><tr><th>customer</th><th>hours</th></tr></thead><tbody>';
+    top.forEach(([name, hrs]) => html += `<tr><td>${escapeHtml(name)}</td><td>${hrs.toFixed(1)}h</td></tr>`);
+    html += '</tbody></table>';
+    tbody.innerHTML = html;
+  }
+
+  function renderEmptyState() {
+    document.getElementById('summaryContainer').innerHTML = '<div class="empty-state"><i class="fa-regular fa-folder-open"></i> upload CSV to start</div>';
+    document.getElementById('chartsGrid').innerHTML = '<div class="empty-state">📁 no data — import bookings</div>';
+    document.getElementById('topCustomersTableBody').innerHTML = '<div class="empty-state">—</div>';
+  }
+
+  function renderDashboard() {
+    if (!masterBookings.length) { renderEmptyState(); return; }
+    renderSummaryCards();
+    destroyCharts();
+    renderCharts();
+    renderTopCustomers();
+  }
+
+  function syncFiltersAndRender() {
+    filterState.dateFrom = document.getElementById('dateFrom').value;
+    filterState.dateTo = document.getElementById('dateTo').value;
+    filterState.game = document.getElementById('gameFilter').value;
+    filterState.station = document.getElementById('stationFilter').value;
+    filterState.status = document.getElementById('statusFilter').value;
+    filterState.customerName = document.getElementById('customerNameFilter').value;
+    filterState.includeCancelled = document.getElementById('includeCancelledToggle').checked;
+    saveToLocalStorage();
+    applyFilters();
+    renderDashboard();
+  }
+
+  function resetFilters() {
+    document.getElementById('dateFrom').value = '';
+    document.getElementById('dateTo').value = '';
+    document.getElementById('gameFilter').value = 'ALL';
+    document.getElementById('stationFilter').value = 'ALL';
+    document.getElementById('statusFilter').value = 'ALL';
+    document.getElementById('customerNameFilter').value = '';
+    document.getElementById('includeCancelledToggle').checked = false;
+    filterState.dateFrom = '';
+    filterState.dateTo = '';
+    filterState.game = 'ALL';
+    filterState.station = 'ALL';
+    filterState.status = 'ALL';
+    filterState.customerName = '';
+    filterState.includeCancelled = false;
+    saveToLocalStorage();
+    applyFilters();
+    renderDashboard();
+  }
+
+  function resetAllData() {
+    if (confirm('Delete all uploaded data and saved settings? This cannot be undone.')) {
+      localStorage.removeItem('archivueData');
+      localStorage.removeItem('archivueFilters');
+      masterBookings = [];
+      filteredBookings = [];
+      Object.assign(filterState, {
+        dateFrom: '', dateTo: '', game: 'ALL', station: 'ALL', status: 'ALL', customerName: '', includeCancelled: false
+      });
+      refreshFilterDropdowns();
+      renderDashboard();
+      document.getElementById('dateFrom').value = '';
+      document.getElementById('dateTo').value = '';
+      document.getElementById('gameFilter').value = 'ALL';
+      document.getElementById('stationFilter').value = 'ALL';
+      document.getElementById('statusFilter').value = 'ALL';
+      document.getElementById('customerNameFilter').value = '';
+      document.getElementById('includeCancelledToggle').checked = false;
+    }
+  }
+
+  function saveToLocalStorage() {
+    localStorage.setItem('archivueData', JSON.stringify(masterBookings));
+    localStorage.setItem('archivueFilters', JSON.stringify(filterState));
+  }
+
+  function loadFromStorage() {
+    const saved = localStorage.getItem('archivueData');
+    if (saved) masterBookings = JSON.parse(saved);
+    const savedFilters = localStorage.getItem('archivueFilters');
+    if (savedFilters) Object.assign(filterState, JSON.parse(savedFilters));
+    refreshFilterDropdowns();
+    applyFilters();
+    renderDashboard();
+    document.getElementById('dateFrom').value = filterState.dateFrom;
+    document.getElementById('dateTo').value = filterState.dateTo;
+    document.getElementById('gameFilter').value = filterState.game;
+    document.getElementById('stationFilter').value = filterState.station;
+    document.getElementById('statusFilter').value = filterState.status;
+    document.getElementById('customerNameFilter').value = filterState.customerName;
+    document.getElementById('includeCancelledToggle').checked = filterState.includeCancelled;
+  }
+
+  function initEventListeners() {
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('csvUpload');
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('active'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('active'));
+    dropzone.addEventListener('drop', e => {
+      e.preventDefault(); dropzone.classList.remove('active');
+      const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.csv'));
+      if (files.length) processFiles(files);
+    });
+    fileInput.addEventListener('change', e => { if (e.target.files.length) processFiles(e.target.files); });
+
+    document.getElementById('dateFrom').addEventListener('change', syncFiltersAndRender);
+    document.getElementById('dateTo').addEventListener('change', syncFiltersAndRender);
+    document.getElementById('gameFilter').addEventListener('change', syncFiltersAndRender);
+    document.getElementById('stationFilter').addEventListener('change', syncFiltersAndRender);
+    document.getElementById('statusFilter').addEventListener('change', syncFiltersAndRender);
+    document.getElementById('customerNameFilter').addEventListener('input', syncFiltersAndRender);
+    document.getElementById('includeCancelledToggle').addEventListener('change', syncFiltersAndRender);
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = btn.dataset.preset;
+        const today = new Date().toISOString().slice(0,10);
+        if (preset === 'today') { document.getElementById('dateFrom').value = today; document.getElementById('dateTo').value = today; }
+        else if (preset === 'yesterday') { const y = new Date(Date.now()-86400000).toISOString().slice(0,10); document.getElementById('dateFrom').value = y; document.getElementById('dateTo').value = y; }
+        else if (preset === 'last7') { const week = new Date(Date.now()-6*86400000).toISOString().slice(0,10); document.getElementById('dateFrom').value = week; document.getElementById('dateTo').value = today; }
+        syncFiltersAndRender();
+      });
+    });
+    document.getElementById('bulkExportBtn').addEventListener('click', bulkExport);
+    document.getElementById('resetFiltersBtn').addEventListener('click', resetFilters);
+    document.getElementById('resetDataBtn').addEventListener('click', resetAllData);
+    document.getElementById('showAllChartsBtn').addEventListener('click', showAllCharts);
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+  }
+
+  function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  initEventListeners();
+  loadFromStorage();
+</script>
 </body>
 </html>
