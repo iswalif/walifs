@@ -6,6 +6,7 @@
   <title>Archivue · booking reports</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -402,17 +403,17 @@
         </div>
         <div class="toggle-row">
           <label><i class="fa-regular fa-circle-xmark"></i> include cancelled</label>
-          <input type="checkbox" id="includeCancelledToggle">
+          <input type="checkbox" id="includeCancelledToggle" checked>
         </div>
       </div>
 
       <div class="filter-card">
         <div class="section-title"><i class="fa-regular fa-sliders"></i> filters</div>
         <div class="filter-group">
-          <label>📅 date range</label>
+          <label>date range</label>
           <div class="date-row">
             <input type="date" id="dateFrom">
-            <span>—</span>
+           
             <input type="date" id="dateTo">
           </div>
           <div class="preset-buttons">
@@ -449,7 +450,7 @@
   <main class="main">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
       <button id="showAllChartsBtn" class="bulk-btn" style="margin-bottom: 0;"><i class="fa-regular fa-eye"></i> show all charts</button>
-      <button id="bulkExportBtn" class="bulk-btn" style="margin-bottom: 0;"><i class="fa-regular fa-camera"></i> export full report (PNG+JSON)</button>
+      <button id="bulkExportBtn" class="bulk-btn" style="margin-bottom: 0;"><i class="fa-regular fa-camera"></i> export full report (ZIP)</button>
     </div>
     <div id="summaryContainer" class="summary-grid"></div>
     <div id="chartsGrid" class="charts-grid"></div>
@@ -472,7 +473,7 @@
     station: 'ALL',
     status: 'ALL',
     customerName: '',
-    includeCancelled: false
+    includeCancelled: true
   };
 
   function parseCSV(text) {
@@ -531,7 +532,8 @@
     masterBookings = Array.from(merged.values());
     saveToLocalStorage();
     refreshFilterDropdowns();
-    applyFiltersAndRender();
+    applyFilters();
+    renderDashboard();
   }
 
   function refreshFilterDropdowns() {
@@ -632,11 +634,11 @@
   function renderCharts() {
     const grid = document.getElementById('chartsGrid');
     const chartConfigs = [
-      { id: 'lineChart', title: 'bookings over time', icon: 'fa-chart-line', type: 'line' },
-      { id: 'gamesChart', title: 'most popular games', icon: 'fa-chart-bar', type: 'games' },
-      { id: 'stationsChart', title: 'most used stations', icon: 'fa-chart-bar', type: 'stations' },
-      { id: 'pieChart', title: 'payment status', icon: 'fa-chart-pie', type: 'pie' },
-      { id: 'heatmapChart', title: 'peak hours (heatmap)', icon: 'fa-clock', type: 'heat' }
+      { id: 'lineChart', title: 'bookings over time', icon: 'fa-chart-line' },
+      { id: 'gamesChart', title: 'most popular games', icon: 'fa-chart-bar' },
+      { id: 'stationsChart', title: 'most used stations', icon: 'fa-chart-bar' },
+      { id: 'pieChart', title: 'payment status', icon: 'fa-chart-pie' },
+      { id: 'heatmapChart', title: 'peak hours (heatmap)', icon: 'fa-clock' }
     ];
     grid.innerHTML = chartConfigs.map(cfg => `
       <div class="chart-card" data-chart-id="${cfg.id}">
@@ -696,13 +698,16 @@
     document.querySelectorAll('.chart-card').forEach(card => card.classList.remove('hidden'));
   }
 
-  async function bulkExport() {
+  async function bulkExportZip() {
+    const zip = new JSZip();
     const visibleCards = document.querySelectorAll('.chart-card:not(.hidden)');
     for (let card of visibleCards) {
       const canvas = card.querySelector('canvas');
       if (canvas) {
-        await new Promise(r => setTimeout(r, 200));
-        downloadCanvas(canvas, `report_${canvas.id}_${Date.now()}.png`);
+        const dataURL = canvas.toDataURL();
+        const base64Data = dataURL.split(',')[1];
+        const filename = `report_${canvas.id}_${Date.now()}.png`;
+        zip.file(filename, base64Data, { base64: true });
       }
     }
     const stats = getSummary();
@@ -714,12 +719,13 @@
       mostPopularGame: stats.topGame,
       mostUsedStation: stats.topStation
     };
-    const jsonBlob = new Blob([JSON.stringify(meta, null, 2)], {type: 'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(jsonBlob);
-    a.download = `report_summary_${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    zip.file(`report_summary_${Date.now()}.json`, JSON.stringify(meta, null, 2));
+    const content = await zip.generateAsync({ type: 'blob' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = `archivue_report_${Date.now()}.zip`;
+    link.click();
+    URL.revokeObjectURL(link.href);
   }
 
   function renderSummaryCards() {
@@ -738,7 +744,7 @@
     const top = topCustomers();
     const tbody = document.getElementById('topCustomersTableBody');
     if (!top.length) { tbody.innerHTML = '<div class="empty-state">no data</div>'; return; }
-    let html = '</table><thead><tr><th>customer</th><th>hours</th></tr></thead><tbody>';
+    let html = '<table><thead><tr><th>customer</th><th>hours</th></tr></thead><tbody>';
     top.forEach(([name, hrs]) => html += `<tr><td>${escapeHtml(name)}</td><td>${hrs.toFixed(1)}h</td></tr>`);
     html += '</tbody></table>';
     tbody.innerHTML = html;
@@ -778,14 +784,14 @@
     document.getElementById('stationFilter').value = 'ALL';
     document.getElementById('statusFilter').value = 'ALL';
     document.getElementById('customerNameFilter').value = '';
-    document.getElementById('includeCancelledToggle').checked = false;
+    document.getElementById('includeCancelledToggle').checked = true;
     filterState.dateFrom = '';
     filterState.dateTo = '';
     filterState.game = 'ALL';
     filterState.station = 'ALL';
     filterState.status = 'ALL';
     filterState.customerName = '';
-    filterState.includeCancelled = false;
+    filterState.includeCancelled = true;
     saveToLocalStorage();
     applyFilters();
     renderDashboard();
@@ -798,7 +804,7 @@
       masterBookings = [];
       filteredBookings = [];
       Object.assign(filterState, {
-        dateFrom: '', dateTo: '', game: 'ALL', station: 'ALL', status: 'ALL', customerName: '', includeCancelled: false
+        dateFrom: '', dateTo: '', game: 'ALL', station: 'ALL', status: 'ALL', customerName: '', includeCancelled: true
       });
       refreshFilterDropdowns();
       renderDashboard();
@@ -808,7 +814,7 @@
       document.getElementById('stationFilter').value = 'ALL';
       document.getElementById('statusFilter').value = 'ALL';
       document.getElementById('customerNameFilter').value = '';
-      document.getElementById('includeCancelledToggle').checked = false;
+      document.getElementById('includeCancelledToggle').checked = true;
     }
   }
 
@@ -864,7 +870,7 @@
         syncFiltersAndRender();
       });
     });
-    document.getElementById('bulkExportBtn').addEventListener('click', bulkExport);
+    document.getElementById('bulkExportBtn').addEventListener('click', bulkExportZip);
     document.getElementById('resetFiltersBtn').addEventListener('click', resetFilters);
     document.getElementById('resetDataBtn').addEventListener('click', resetAllData);
     document.getElementById('showAllChartsBtn').addEventListener('click', showAllCharts);
