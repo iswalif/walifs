@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>3D Carousel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      background: #0e0e0e;
+      color: #e5e5e5;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 24px;
+      font-size: 13px;
+      letter-spacing: 0.25em;
+      text-transform: lowercase;
+      opacity: 0.75;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 28px;
+      padding: 20px;
+    }
+
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      height: 480px;
+      margin: 0 auto;
+      border-radius: 32px;
+      overflow: visible;
+    }
+
+    .carousel-perspective {
+      perspective: 1200px;
+      transform-style: preserve-3d;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .carousel-inner {
+      transform-style: preserve-3d;
+      will-change: transform;
+      cursor: grab;
+      user-select: none;
+      position: relative;
+      height: 100%;
+    }
+    .carousel-inner:active { cursor: grabbing; }
+
+    .card-3d {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      transform-style: preserve-3d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      transition: opacity 0.2s ease;
+    }
+
+    .card-inner {
+      width: calc(100% - 16px);
+      height: calc(100% - 16px);
+      margin: 8px;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.5);
+      background: rgba(20, 20, 35, 0.4);
+      backdrop-filter: blur(2px);
+    }
+
+    .card-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 0.9rem;
+      transition: filter 0.2s;
+      filter: blur(4px);
+    }
+    .card-inner img.loaded { filter: blur(0px); }
+
+    @media (max-width: 640px) {
+      .carousel-container { height: 420px; }
+    }
+
+    .control-panel {
+      background: rgba(15, 15, 25, 0.6);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.8rem;
+      max-width: 320px;
+      width: 100%;
+    }
+
+    .ctrl-group {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+    }
+
+    .ctrl-group i {
+      font-size: 1rem;
+      opacity: 0.7;
+      width: 20px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      background: rgba(255,255,255,0.2);
+      height: 2px;
+      border-radius: 2px;
+      width: 140px;
+    }
+    input[type="range"]:focus { outline: none; }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e5e5e5;
+      cursor: pointer;
+    }
+
+    .speed-value {
+      background: rgba(0,0,0,0.5);
+      padding: 0.2rem 0.7rem;
+      border-radius: 2rem;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    @media (max-width: 560px) {
+      .control-panel { gap: 1rem; padding: 1rem; }
+      .ctrl-group { gap: 0.4rem; }
+      input[type="range"] { width: 100px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div>3d · carousel</div>
+    <div>by h1m</div>
+  </nav>
+
+  <main>
+    <div class="carousel-container">
+      <div class="carousel-perspective">
+        <div id="carouselInner" class="carousel-inner"></div>
+      </div>
+    </div>
+
+    <div class="control-panel">
+      <div class="ctrl-group">
+        <i class="fa-solid fa-gauge-high"></i>
+        <input type="range" id="speedSlider" min="0" max="1.6" step="0.02" value="0.56">
+        <span id="speedValue" class="speed-value">0.56</span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const KEYWORDS = ["night","city","sky","sunset","sunrise","winter","skyscraper","building","cityscape","architecture","street","lights","downtown","bridge"];
+      const images = KEYWORDS.map(k => `https://picsum.photos/seed/${k}/400/400`);
+      const faceCount = images.length;
+      
+      let currentAngle = 28;
+      let isCarouselActive = true;
+      let activeModalImg = null;
+      let carouselInner = null;
+      let cardElements = [];
+      let autoRotateId = null;
+      let currentSpeed = 0.56;
+      let autoDirection = 1;
+      
+      let dragState = {
+        isDragging: false,
+        startX: 0,
+        startAngle: 0,
+        lastX: 0,
+        lastTimestamp: 0,
+        velocity: 0,
+        animFrame: null
+      };
+      
+      let cylinderWidth = 1800;
+      let radius = 0;
+      let faceWidth = 0;
+      
+      const getCylinderWidth = () => window.innerWidth <= 640 ? 1100 : 1800;
+      
+      function updateGeometry() {
+        if(!carouselInner) return;
+        cylinderWidth = getCylinderWidth();
+        faceWidth = cylinderWidth / faceCount;
+        radius = cylinderWidth / (2 * Math.PI);
+        carouselInner.style.width = `${cylinderWidth}px`;
+        for(let i=0;i<faceCount;i++){
+          if(!cardElements[i]) continue;
+          const card = cardElements[i];
+          const anglePerCard = (360 / faceCount) * i;
+          card.style.width = `${faceWidth}px`;
+          card.style.height = `${faceWidth}px`;
+          card.style.transform = `rotateY(${anglePerCard}deg) translateZ(${radius}px)`;
+        }
+      }
+      
+      function applyRotation() {
+        if(carouselInner) carouselInner.style.transform = `rotate3d(0,1,0,${currentAngle}deg)`;
+      }
+      
+      function stopAutoRotate() {
+        if(autoRotateId){ cancelAnimationFrame(autoRotateId); autoRotateId = null; }
+      }
+      
+      function startAutoRotate() {
+        if(!isCarouselActive || activeModalImg !== null) return;
+        if(dragState.isDragging || dragState.animFrame) return;
+        if(autoRotateId) stopAutoRotate();
+        function step(){
+          if(!isCarouselActive || activeModalImg !== null || dragState.isDragging || dragState.animFrame){
+            autoRotateId = null;
+            return;
+          }
+          if(currentSpeed === 0){ autoRotateId = requestAnimationFrame(step); return; }
+          currentAngle += currentSpeed * autoDirection;
+          currentAngle = ((currentAngle % 360) + 360) % 360;
+          applyRotation();
+          autoRotateId = requestAnimationFrame(step);
+        }
+        autoRotateId = requestAnimationFrame(step);
+      }
+      
+      function startInertia(initialVelocity) {
+        if(dragState.animFrame) cancelAnimationFrame(dragState.animFrame);
+        let velocity = initialVelocity;
+        const friction = 0.95;
+        const minVel = 0.06;
+        function step(){
+          if(!isCarouselActive){
+            dragState.animFrame = null;
+            startAutoRotate();
+            return;
+          }
+          velocity *= friction;
+          if(Math.abs(velocity) < minVel){
+            dragState.animFrame = null;
+            if(velocity !== 0) autoDirection = velocity > 0 ? 1 : -1;
+            startAutoRotate();
+            return;
+          }
+          currentAngle += velocity;
+          currentAngle = ((currentAngle % 360) + 360) % 360;
+          applyRotation();
+          dragState.animFrame = requestAnimationFrame(step);
+        }
+        dragState.animFrame = requestAnimationFrame(step);
+      }
+      
+      function onPointerDown(e){
+        if(!isCarouselActive || activeModalImg) return;
+        e.preventDefault();
+        stopAutoRotate();
+        if(dragState.animFrame){ cancelAnimationFrame(dragState.animFrame); dragState.animFrame = null; }
+        dragState.isDragging = true;
+        const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
+        dragState.startX = clientX;
+        dragState.startAngle = currentAngle;
+        dragState.lastX = clientX;
+        dragState.lastTimestamp = performance.now();
+        dragState.velocity = 0;
+        if(carouselInner) carouselInner.style.cursor = 'grabbing';
+      }
+      
+      function onPointerMove(e){
+        if(!dragState.isDragging || !isCarouselActive || activeModalImg) return;
+        e.preventDefault();
+        const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
+        const now = performance.now();
+        const deltaX = clientX - dragState.startX;
+        let newAngle = dragState.startAngle + deltaX * 0.25;
+        newAngle = ((newAngle % 360) + 360) % 360;
+        currentAngle = newAngle;
+        applyRotation();
+        const dt = Math.max(8, now - dragState.lastTimestamp);
+        const deltaSinceLast = clientX - dragState.lastX;
+        const instantVel = (deltaSinceLast / dt) * 12;
+        dragState.velocity = instantVel * 0.9 + dragState.velocity * 0.1;
+        dragState.lastX = clientX;
+        dragState.lastTimestamp = now;
+      }
+      
+      function onPointerUp(e){
+        if(!dragState.isDragging) return;
+        dragState.isDragging = false;
+        if(carouselInner) carouselInner.style.cursor = 'grab';
+        if(!isCarouselActive || activeModalImg){ dragState.velocity = 0; return; }
+        if(Math.abs(dragState.velocity) > 0.28){
+          autoDirection = dragState.velocity > 0 ? 1 : -1;
+          startInertia(dragState.velocity);
+        } else {
+          startAutoRotate();
+        }
+        dragState.velocity = 0;
+      }
+      
+      function attachDragEvents(){
+        if(!carouselInner) return;
+        carouselInner.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+        carouselInner.addEventListener('touchstart', onPointerDown, { passive: false });
+        window.addEventListener('touchmove', onPointerMove, { passive: false });
+        window.addEventListener('touchend', onPointerUp);
+      }
+      
+      let modalManager = null;
+      function createModal(){
+        const existing = document.getElementById('imageModal');
+        if(existing) existing.remove();
+        const modalDiv = document.createElement('div');
+        modalDiv.id = 'imageModal';
+        modalDiv.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 transition-all duration-300';
+        modalDiv.style.visibility = 'hidden';
+        modalDiv.style.opacity = '0';
+        modalDiv.style.backgroundColor = 'rgba(0,0,0,0.85)';
+        modalDiv.style.backdropFilter = 'blur(16px)';
+        modalDiv.style.cursor = 'pointer';
+        const inner = document.createElement('div');
+        inner.className = 'relative max-w-[90vw] max-h-[85vh] flex items-center justify-center';
+        const modalImg = document.createElement('img');
+        modalImg.className = 'rounded-2xl shadow-2xl object-contain max-w-full max-h-full border-4 border-white/20';
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '✕';
+        closeBtn.className = 'absolute -top-12 right-0 md:-right-12 md:top-0 bg-black/60 text-white text-2xl w-10 h-10 rounded-full backdrop-blur-sm hover:bg-white/30 transition flex items-center justify-center';
+        inner.appendChild(modalImg);
+        inner.appendChild(closeBtn);
+        modalDiv.appendChild(inner);
+        document.body.appendChild(modalDiv);
+        const closeModal = () => {
+          if(!activeModalImg) return;
+          modalDiv.style.opacity = '0';
+          modalDiv.style.visibility = 'hidden';
+          setTimeout(() => {
+            if(modalImg.src) modalImg.src = '';
+            activeModalImg = null;
+            isCarouselActive = true;
+            if(carouselInner) carouselInner.style.cursor = 'grab';
+            startAutoRotate();
+          }, 250);
+        };
+        modalDiv.addEventListener('click', (e) => {
+          if(e.target === modalDiv || e.target === closeBtn) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+          if(e.key === 'Escape' && activeModalImg) closeModal();
+        });
+        return { modalDiv, modalImg, closeModal };
+      }
+      
+      function openModal(imgUrl){
+        if(!modalManager) modalManager = createModal();
+        const { modalDiv, modalImg, closeModal } = modalManager;
+        if(activeModalImg === imgUrl) return;
+        activeModalImg = imgUrl;
+        modalImg.src = imgUrl;
+        modalDiv.style.visibility = 'visible';
+        modalDiv.style.opacity = '1';
+        isCarouselActive = false;
+        stopAutoRotate();
+        if(dragState.animFrame){ cancelAnimationFrame(dragState.animFrame); dragState.animFrame = null; }
+        if(carouselInner) carouselInner.style.cursor = 'default';
+        modalManager.closeModal = closeModal;
+      }
+      
+      function buildCarousel(){
+        const container = document.getElementById('carouselInner');
+        if(!container) return;
+        container.innerHTML = '';
+        carouselInner = container;
+        cardElements = [];
+        for(let i=0;i<faceCount;i++){
+          const card = document.createElement('div');
+          card.className = 'card-3d';
+          card.style.position = 'absolute';
+          card.style.top = '0';
+          card.style.left = '0';
+          card.style.right = '0';
+          card.style.bottom = '0';
+          card.style.margin = 'auto';
+          card.style.display = 'flex';
+          card.style.alignItems = 'center';
+          card.style.justifyContent = 'center';
+          const innerWrap = document.createElement('div');
+          innerWrap.className = 'card-inner';
+          const img = document.createElement('img');
+          img.src = images[i];
+          img.onload = () => img.classList.add('loaded');
+          innerWrap.appendChild(img);
+          card.appendChild(innerWrap);
+          carouselInner.appendChild(card);
+          cardElements.push(card);
+          card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(!isCarouselActive) return;
+            openModal(img.src);
+          });
+        }
+        updateGeometry();
+        currentAngle = 28;
+        applyRotation();
+        attachDragEvents();
+        startAutoRotate();
+      }
+      
+      let resizeTimer;
+      function onResize(){
+        if(resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if(carouselInner){
+            const oldAngle = currentAngle;
+            updateGeometry();
+            currentAngle = oldAngle;
+            applyRotation();
+          }
+        }, 100);
+      }
+      
+      function initControls(){
+        const speedSlider = document.getElementById('speedSlider');
+        const speedVal = document.getElementById('speedValue');
+        
+        if(speedSlider && speedVal){
+          speedSlider.addEventListener('input', (e) => {
+            currentSpeed = parseFloat(e.target.value);
+            speedVal.innerText = currentSpeed.toFixed(2);
+            if(currentSpeed === 0) stopAutoRotate();
+            else if(autoRotateId === null && !dragState.isDragging && !dragState.animFrame && isCarouselActive && !activeModalImg){
+              startAutoRotate();
+            }
+          });
+        }
+      }
+      
+      window.addEventListener('load', () => {
+        buildCarousel();
+        initControls();
+        window.addEventListener('resize', onResize);
+      });
+      
+      window.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape' && activeModalImg && modalManager && modalManager.closeModal) modalManager.closeModal();
+      });
+    })();
+  </script>
+</body>
+</html>
