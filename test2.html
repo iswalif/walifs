@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D Carousel</title>
+  <title>perlin noise visualizer</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     * {
@@ -11,7 +11,6 @@
       padding: 0;
       box-sizing: border-box;
       -webkit-user-select: none;
-      -ms-user-select: none;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
@@ -20,8 +19,8 @@
       height: 100%;
       background: #0e0e0e;
       color: #e5e5e5;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow-x: hidden;
     }
 
     body {
@@ -39,462 +38,633 @@
       opacity: 0.75;
     }
 
-    main {
+    .main-layout {
       flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 360px;
       gap: 28px;
-      padding: 20px;
+      padding: 20px 28px 32px 28px;
+      align-items: start;
     }
 
-    .carousel-container {
-      position: relative;
-      width: 100%;
-      max-width: 1000px;
-      height: 480px;
-      margin: 0 auto;
+    .canvas-area {
+      background: transparent;
       border-radius: 32px;
-      overflow: visible;
-    }
-
-    .carousel-perspective {
-      perspective: 1200px;
-      transform-style: preserve-3d;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .carousel-inner {
-      transform-style: preserve-3d;
-      will-change: transform;
-      cursor: grab;
-      user-select: none;
-      position: relative;
-      height: 100%;
-    }
-    .carousel-inner:active { cursor: grabbing; }
-
-    .card-3d {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      margin: auto;
-      transform-style: preserve-3d;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: auto;
-      transition: opacity 0.2s ease;
-    }
-
-    .card-inner {
-      width: calc(100% - 16px);
-      height: calc(100% - 16px);
-      margin: 8px;
-      border-radius: 1rem;
       overflow: hidden;
-      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.5);
-      background: rgba(20, 20, 35, 0.4);
-      backdrop-filter: blur(2px);
+      box-shadow: 0 0 0 1px rgba(229, 229, 229, 0.08);
     }
 
-    .card-inner img {
+    canvas {
+      display: block;
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 0.9rem;
-      transition: filter 0.2s;
-      filter: blur(4px);
-    }
-    .card-inner img.loaded { filter: blur(0px); }
-
-    @media (max-width: 640px) {
-      .carousel-container { height: 420px; }
+      height: auto;
+      background: #050505;
+      cursor: crosshair;
     }
 
     .control-panel {
-      background: rgba(15, 15, 25, 0.6);
-      backdrop-filter: blur(12px);
-      border-radius: 2rem;
-      padding: 1rem 1.5rem;
+      background: transparent;
+      border-radius: 32px;
+      padding: 8px 0 0 0;
+      position: sticky;
+      top: 24px;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.8rem;
-      max-width: 320px;
-      width: 100%;
+      flex-direction: column;
+      gap: 18px;
     }
 
-    .ctrl-group {
+    .control-group {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 28px;
+      padding: 14px 18px;
+      transition: all 0.2s ease;
+    }
+
+    .control-header {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 10px;
+      margin-bottom: 12px;
       font-size: 12px;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.15em;
       text-transform: lowercase;
+      opacity: 0.8;
     }
 
-    .ctrl-group i {
-      font-size: 1rem;
-      opacity: 0.7;
+    .control-header i {
       width: 20px;
+      font-size: 13px;
     }
 
     input[type="range"] {
+      width: 100%;
+      height: 4px;
       -webkit-appearance: none;
-      background: rgba(255,255,255,0.2);
-      height: 2px;
-      border-radius: 2px;
-      width: 140px;
+      background: rgba(229, 229, 229, 0.2);
+      border-radius: 10px;
+      outline: none;
     }
-    input[type="range"]:focus { outline: none; }
+
+    input[type="range"]:focus {
+      outline: none;
+    }
+
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
+      width: 14px;
+      height: 14px;
       background: #e5e5e5;
+      border-radius: 50%;
       cursor: pointer;
+      transition: 0.2s;
     }
 
-    .speed-value {
-      background: rgba(0,0,0,0.5);
-      padding: 0.2rem 0.7rem;
-      border-radius: 2rem;
-      font-family: monospace;
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #ffffff;
+      transform: scale(1.2);
+    }
+
+    .value-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      opacity: 0.6;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .btn-icon, .btn {
+      background: transparent;
+      border: none;
+      color: #e5e5e5;
+      width: 44px;
+      height: 44px;
+      border-radius: 44px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-text {
+      width: auto;
+      padding: 0 18px;
+      letter-spacing: 0.1em;
       font-size: 12px;
+      gap: 8px;
     }
 
-    @media (max-width: 560px) {
-      .control-panel { gap: 1rem; padding: 1rem; }
-      .ctrl-group { gap: 0.4rem; }
-      input[type="range"] { width: 100px; }
+    .btn-icon:hover, .btn:hover {
+      background: #e5e5e5;
+      color: #0e0e0e;
+    }
+
+    select {
+      background: transparent;
+      border: none;
+      color: #e5e5e5;
+      padding: 8px 14px;
+      border-radius: 44px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    select option {
+      background: #1a1a1a;
+      color: #e5e5e5;
+    }
+
+    input[type="number"] {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(229, 229, 229, 0.3);
+      color: #e5e5e5;
+      padding: 8px 0;
+      width: 80px;
+      text-align: center;
+      font-size: 13px;
+      font-family: monospace;
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: rgba(229, 229, 229, 0.1);
+      margin: 4px 0;
+    }
+
+    @media (max-width: 880px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding: 16px;
+      }
+      .control-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .btn-row {
+        justify-content: center;
+      }
+      .control-group {
+        padding: 12px 14px;
+      }
+    }
+
+    .badge-note {
+      font-size: 10px;
+      opacity: 0.5;
+      letter-spacing: 0.1em;
+      text-align: center;
+      margin-top: 12px;
     }
   </style>
 </head>
 <body>
-  <nav>
-    <div>3d · carousel</div>
-    <div>by h1m</div>
-  </nav>
+<nav>
+  <div>perlin flow</div>
+  <div>noise field</div>
+</nav>
 
-  <main>
-    <div class="carousel-container">
-      <div class="carousel-perspective">
-        <div id="carouselInner" class="carousel-inner"></div>
+<div class="main-layout">
+  <div class="canvas-area">
+    <canvas id="noiseCanvas" width="800" height="600" style="width:100%; height:auto; aspect-ratio:800/600"></canvas>
+  </div>
+
+  <div class="control-panel">
+    <div class="control-group">
+      <div class="control-header"><i class="fa-solid fa-arrows-up-down"></i> <span>scale</span></div>
+      <input type="range" id="scaleSlider" min="0.002" max="0.045" step="0.0005" value="0.012">
+      <div class="value-row"><span>zoom</span><span id="scaleVal">0.0120</span></div>
+    </div>
+
+    <div class="control-group">
+      <div class="control-header"><i class="fa-solid fa-th"></i> <span>pixel step</span></div>
+      <input type="range" id="resolutionSlider" min="1" max="8" step="1" value="2">
+      <div class="value-row"><span>detail / speed</span><span id="resVal">2</span></div>
+    </div>
+
+    <div class="control-group">
+      <div class="control-header"><i class="fa-solid fa-dice"></i> <span>seed</span></div>
+      <div class="flex-between">
+        <input type="number" id="seedInput" step="1" value="1337">
+        <button id="randomSeedBtn" class="btn-icon"><i class="fa-solid fa-shuffle"></i></button>
       </div>
     </div>
 
-    <div class="control-panel">
-      <div class="ctrl-group">
-        <i class="fa-solid fa-gauge-high"></i>
-        <input type="range" id="speedSlider" min="0" max="1.6" step="0.02" value="0.56">
-        <span id="speedValue" class="speed-value">0.56</span>
+    <div class="control-group">
+      <div class="control-header"><i class="fa-solid fa-layer-group"></i> <span>octaves</span></div>
+      <input type="range" id="octavesSlider" min="1" max="6" step="1" value="4">
+      <div class="value-row"><span>complexity</span><span id="octVal">4</span></div>
+    </div>
+
+    <div class="control-group">
+      <div class="control-header"><i class="fa-solid fa-waveform"></i> <span>persistence</span></div>
+      <input type="range" id="persistenceSlider" min="0.2" max="0.9" step="0.01" value="0.55">
+      <div class="value-row"><span>amplitude decay</span><span id="perVal">0.55</span></div>
+    </div>
+
+    <div class="control-group">
+      <div class="control-header"><i class="fa-solid fa-chart-line"></i> <span>lacunarity</span></div>
+      <input type="range" id="lacunaritySlider" min="1.2" max="3.5" step="0.02" value="2.0">
+      <div class="value-row"><span>frequency jump</span><span id="lacVal">2.00</span></div>
+    </div>
+
+    <div class="control-group">
+      <div class="control-header"><i class="fa-regular fa-clock"></i> <span>animation</span></div>
+      <div class="flex-between">
+        <button id="toggleAnimBtn" class="btn btn-text"><i class="fa-regular fa-circle-play"></i> start</button>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <i class="fa-solid fa-gauge-high"></i>
+          <input type="range" id="animSpeedSlider" min="0" max="2.2" step="0.02" value="0.8" style="width: 120px;">
+          <span id="speedVal" style="min-width: 35px;">0.80</span>
+        </div>
       </div>
     </div>
-  </main>
 
-  <script>
-    (function(){
-      const KEYWORDS = ["night","city","sky","sunset","sunrise","winter","skyscraper","building","cityscape","architecture","street","lights","downtown","bridge"];
-      const images = KEYWORDS.map(k => `https://picsum.photos/seed/${k}/400/400`);
-      const faceCount = images.length;
-      
-      let currentAngle = 28;
-      let isCarouselActive = true;
-      let activeModalImg = null;
-      let carouselInner = null;
-      let cardElements = [];
-      let autoRotateId = null;
-      let currentSpeed = 0.56;
-      let autoDirection = 1;
-      
-      let dragState = {
-        isDragging: false,
-        startX: 0,
-        startAngle: 0,
-        lastX: 0,
-        lastTimestamp: 0,
-        velocity: 0,
-        animFrame: null
-      };
-      
-      let cylinderWidth = 1800;
-      let radius = 0;
-      let faceWidth = 0;
-      
-      const getCylinderWidth = () => window.innerWidth <= 640 ? 1100 : 1800;
-      
-      function updateGeometry() {
-        if(!carouselInner) return;
-        cylinderWidth = getCylinderWidth();
-        faceWidth = cylinderWidth / faceCount;
-        radius = cylinderWidth / (2 * Math.PI);
-        carouselInner.style.width = `${cylinderWidth}px`;
-        for(let i=0;i<faceCount;i++){
-          if(!cardElements[i]) continue;
-          const card = cardElements[i];
-          const anglePerCard = (360 / faceCount) * i;
-          card.style.width = `${faceWidth}px`;
-          card.style.height = `${faceWidth}px`;
-          card.style.transform = `rotateY(${anglePerCard}deg) translateZ(${radius}px)`;
+    <div class="control-group">
+      <div class="btn-row">
+        <button id="colorModeBtn" class="btn btn-text"><i class="fa-solid fa-palette"></i> color</button>
+        <button id="exportBtn" class="btn btn-text"><i class="fa-regular fa-floppy-disk"></i> save</button>
+        <select id="presetSelect">
+          <option value="default">custom</option>
+          <option value="clouds">clouds</option>
+          <option value="terrain">terrain</option>
+          <option value="marble">marble</option>
+        </select>
+      </div>
+      <div class="badge-note">
+        <i class="fa-regular fa-keyboard"></i>  ▲/▼ scale &nbsp;|&nbsp; +/- zoom &nbsp;|&nbsp; R seed &nbsp;|&nbsp; space anim
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    let canvas = document.getElementById('noiseCanvas');
+    let ctx = canvas.getContext('2d');
+
+    let state = {
+      scale: 0.012,
+      resolutionStep: 2,
+      seed: 1337,
+      octaves: 4,
+      persistence: 0.55,
+      lacunarity: 2.0,
+      animationActive: false,
+      animSpeed: 0.8,
+      time: 0,
+      colorMode: false,
+      width: 800,
+      height: 600
+    };
+
+    let noiseInstance = null;
+    let animationFrameId = null;
+    let renderPending = false;
+    let currentTimeOffset = 0;
+
+    class SimplexNoise3D {
+      constructor(seed = 1337) {
+        this.grad3 = [
+          [1,1,0], [-1,1,0], [1,-1,0], [-1,-1,0],
+          [1,0,1], [-1,0,1], [1,0,-1], [-1,0,-1],
+          [0,1,1], [0,-1,1], [0,1,-1], [0,-1,-1]
+        ];
+        this.p = [151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
+          190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,
+          171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,
+          245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,
+          164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,
+          58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,
+          98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,
+          145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,
+          222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180];
+        this.perm = new Array(512);
+        this.gradP = new Array(512);
+        this.seed(seed);
+      }
+
+      seed(seed) {
+        let random = this.xorshift(seed);
+        for(let i=0;i<256;i++) {
+          let j = Math.floor(random() * (256 - i)) + i;
+          [this.p[i], this.p[j]] = [this.p[j], this.p[i]];
+        }
+        for(let i=0;i<512;i++) {
+          this.perm[i] = this.p[i & 255];
+          this.gradP[i] = this.grad3[this.perm[i] % this.grad3.length];
         }
       }
-      
-      function applyRotation() {
-        if(carouselInner) carouselInner.style.transform = `rotate3d(0,1,0,${currentAngle}deg)`;
-      }
-      
-      function stopAutoRotate() {
-        if(autoRotateId){ cancelAnimationFrame(autoRotateId); autoRotateId = null; }
-      }
-      
-      function startAutoRotate() {
-        if(!isCarouselActive || activeModalImg !== null) return;
-        if(dragState.isDragging || dragState.animFrame) return;
-        if(autoRotateId) stopAutoRotate();
-        function step(){
-          if(!isCarouselActive || activeModalImg !== null || dragState.isDragging || dragState.animFrame){
-            autoRotateId = null;
-            return;
-          }
-          if(currentSpeed === 0){ autoRotateId = requestAnimationFrame(step); return; }
-          currentAngle += currentSpeed * autoDirection;
-          currentAngle = ((currentAngle % 360) + 360) % 360;
-          applyRotation();
-          autoRotateId = requestAnimationFrame(step);
-        }
-        autoRotateId = requestAnimationFrame(step);
-      }
-      
-      function startInertia(initialVelocity) {
-        if(dragState.animFrame) cancelAnimationFrame(dragState.animFrame);
-        let velocity = initialVelocity;
-        const friction = 0.95;
-        const minVel = 0.06;
-        function step(){
-          if(!isCarouselActive){
-            dragState.animFrame = null;
-            startAutoRotate();
-            return;
-          }
-          velocity *= friction;
-          if(Math.abs(velocity) < minVel){
-            dragState.animFrame = null;
-            if(velocity !== 0) autoDirection = velocity > 0 ? 1 : -1;
-            startAutoRotate();
-            return;
-          }
-          currentAngle += velocity;
-          currentAngle = ((currentAngle % 360) + 360) % 360;
-          applyRotation();
-          dragState.animFrame = requestAnimationFrame(step);
-        }
-        dragState.animFrame = requestAnimationFrame(step);
-      }
-      
-      function onPointerDown(e){
-        if(!isCarouselActive || activeModalImg) return;
-        e.preventDefault();
-        stopAutoRotate();
-        if(dragState.animFrame){ cancelAnimationFrame(dragState.animFrame); dragState.animFrame = null; }
-        dragState.isDragging = true;
-        const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
-        dragState.startX = clientX;
-        dragState.startAngle = currentAngle;
-        dragState.lastX = clientX;
-        dragState.lastTimestamp = performance.now();
-        dragState.velocity = 0;
-        if(carouselInner) carouselInner.style.cursor = 'grabbing';
-      }
-      
-      function onPointerMove(e){
-        if(!dragState.isDragging || !isCarouselActive || activeModalImg) return;
-        e.preventDefault();
-        const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
-        const now = performance.now();
-        const deltaX = clientX - dragState.startX;
-        let newAngle = dragState.startAngle + deltaX * 0.25;
-        newAngle = ((newAngle % 360) + 360) % 360;
-        currentAngle = newAngle;
-        applyRotation();
-        const dt = Math.max(8, now - dragState.lastTimestamp);
-        const deltaSinceLast = clientX - dragState.lastX;
-        const instantVel = (deltaSinceLast / dt) * 12;
-        dragState.velocity = instantVel * 0.9 + dragState.velocity * 0.1;
-        dragState.lastX = clientX;
-        dragState.lastTimestamp = now;
-      }
-      
-      function onPointerUp(e){
-        if(!dragState.isDragging) return;
-        dragState.isDragging = false;
-        if(carouselInner) carouselInner.style.cursor = 'grab';
-        if(!isCarouselActive || activeModalImg){ dragState.velocity = 0; return; }
-        if(Math.abs(dragState.velocity) > 0.28){
-          autoDirection = dragState.velocity > 0 ? 1 : -1;
-          startInertia(dragState.velocity);
-        } else {
-          startAutoRotate();
-        }
-        dragState.velocity = 0;
-      }
-      
-      function attachDragEvents(){
-        if(!carouselInner) return;
-        carouselInner.addEventListener('pointerdown', onPointerDown);
-        window.addEventListener('pointermove', onPointerMove);
-        window.addEventListener('pointerup', onPointerUp);
-        carouselInner.addEventListener('touchstart', onPointerDown, { passive: false });
-        window.addEventListener('touchmove', onPointerMove, { passive: false });
-        window.addEventListener('touchend', onPointerUp);
-      }
-      
-      let modalManager = null;
-      function createModal(){
-        const existing = document.getElementById('imageModal');
-        if(existing) existing.remove();
-        const modalDiv = document.createElement('div');
-        modalDiv.id = 'imageModal';
-        modalDiv.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 transition-all duration-300';
-        modalDiv.style.visibility = 'hidden';
-        modalDiv.style.opacity = '0';
-        modalDiv.style.backgroundColor = 'rgba(0,0,0,0.85)';
-        modalDiv.style.backdropFilter = 'blur(16px)';
-        modalDiv.style.cursor = 'pointer';
-        const inner = document.createElement('div');
-        inner.className = 'relative max-w-[90vw] max-h-[85vh] flex items-center justify-center';
-        const modalImg = document.createElement('img');
-        modalImg.className = 'rounded-2xl shadow-2xl object-contain max-w-full max-h-full border-4 border-white/20';
-        const closeBtn = document.createElement('button');
-        closeBtn.innerHTML = '✕';
-        closeBtn.className = 'absolute -top-12 right-0 md:-right-12 md:top-0 bg-black/60 text-white text-2xl w-10 h-10 rounded-full backdrop-blur-sm hover:bg-white/30 transition flex items-center justify-center';
-        inner.appendChild(modalImg);
-        inner.appendChild(closeBtn);
-        modalDiv.appendChild(inner);
-        document.body.appendChild(modalDiv);
-        const closeModal = () => {
-          if(!activeModalImg) return;
-          modalDiv.style.opacity = '0';
-          modalDiv.style.visibility = 'hidden';
-          setTimeout(() => {
-            if(modalImg.src) modalImg.src = '';
-            activeModalImg = null;
-            isCarouselActive = true;
-            if(carouselInner) carouselInner.style.cursor = 'grab';
-            startAutoRotate();
-          }, 250);
+
+      xorshift(seed) {
+        let s = seed || 1337;
+        return function() {
+          s ^= s << 13;
+          s ^= s >> 17;
+          s ^= s << 5;
+          return (s >>> 0) / 4294967296;
         };
-        modalDiv.addEventListener('click', (e) => {
-          if(e.target === modalDiv || e.target === closeBtn) closeModal();
-        });
-        document.addEventListener('keydown', (e) => {
-          if(e.key === 'Escape' && activeModalImg) closeModal();
-        });
-        return { modalDiv, modalImg, closeModal };
       }
-      
-      function openModal(imgUrl){
-        if(!modalManager) modalManager = createModal();
-        const { modalDiv, modalImg, closeModal } = modalManager;
-        if(activeModalImg === imgUrl) return;
-        activeModalImg = imgUrl;
-        modalImg.src = imgUrl;
-        modalDiv.style.visibility = 'visible';
-        modalDiv.style.opacity = '1';
-        isCarouselActive = false;
-        stopAutoRotate();
-        if(dragState.animFrame){ cancelAnimationFrame(dragState.animFrame); dragState.animFrame = null; }
-        if(carouselInner) carouselInner.style.cursor = 'default';
-        modalManager.closeModal = closeModal;
+
+      dot(g, x, y, z) {
+        return g[0]*x + g[1]*y + g[2]*z;
       }
-      
-      function buildCarousel(){
-        const container = document.getElementById('carouselInner');
-        if(!container) return;
-        container.innerHTML = '';
-        carouselInner = container;
-        cardElements = [];
-        for(let i=0;i<faceCount;i++){
-          const card = document.createElement('div');
-          card.className = 'card-3d';
-          card.style.position = 'absolute';
-          card.style.top = '0';
-          card.style.left = '0';
-          card.style.right = '0';
-          card.style.bottom = '0';
-          card.style.margin = 'auto';
-          card.style.display = 'flex';
-          card.style.alignItems = 'center';
-          card.style.justifyContent = 'center';
-          const innerWrap = document.createElement('div');
-          innerWrap.className = 'card-inner';
-          const img = document.createElement('img');
-          img.src = images[i];
-          img.onload = () => img.classList.add('loaded');
-          innerWrap.appendChild(img);
-          card.appendChild(innerWrap);
-          carouselInner.appendChild(card);
-          cardElements.push(card);
-          card.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if(!isCarouselActive) return;
-            openModal(img.src);
-          });
+
+      noise3D(x, y, z) {
+        let n0=0, n1=0, n2=0, n3=0;
+        let s = (x+y+z)/3.0;
+        let i = Math.floor(x+s);
+        let j = Math.floor(y+s);
+        let k = Math.floor(z+s);
+        let t = (i+j+k)/6.0;
+        let X0 = i-t;
+        let Y0 = j-t;
+        let Z0 = k-t;
+        let x0 = x-X0;
+        let y0 = y-Y0;
+        let z0 = z-Z0;
+        let i1, j1, k1;
+        let i2, j2, k2;
+        if(x0 >= y0) {
+          if(y0 >= z0) { i1=1; j1=0; k1=0; i2=1; j2=1; k2=0; }
+          else if(x0 >= z0) { i1=1; j1=0; k1=0; i2=1; j2=0; k2=1; }
+          else { i1=0; j1=0; k1=1; i2=1; j2=0; k2=1; }
+        } else {
+          if(y0 < z0) { i1=0; j1=0; k1=1; i2=0; j2=1; k2=1; }
+          else if(x0 < z0) { i1=0; j1=1; k1=0; i2=0; j2=1; k2=1; }
+          else { i1=0; j1=1; k1=0; i2=1; j2=1; k2=0; }
         }
-        updateGeometry();
-        currentAngle = 28;
-        applyRotation();
-        attachDragEvents();
-        startAutoRotate();
+        let x1 = x0 - i1 + 1.0/6.0;
+        let y1 = y0 - j1 + 1.0/6.0;
+        let z1 = z0 - k1 + 1.0/6.0;
+        let x2 = x0 - i2 + 2.0/6.0;
+        let y2 = y0 - j2 + 2.0/6.0;
+        let z2 = z0 - k2 + 2.0/6.0;
+        let x3 = x0 - 1.0;
+        let y3 = y0 - 1.0;
+        let z3 = z0 - 1.0;
+        let ii = i & 255;
+        let jj = j & 255;
+        let kk = k & 255;
+        let gi0 = this.perm[ii + this.perm[jj + this.perm[kk]]] % 12;
+        let gi1 = this.perm[ii + i1 + this.perm[jj + j1 + this.perm[kk + k1]]] % 12;
+        let gi2 = this.perm[ii + i2 + this.perm[jj + j2 + this.perm[kk + k2]]] % 12;
+        let gi3 = this.perm[ii + 1 + this.perm[jj + 1 + this.perm[kk + 1]]] % 12;
+        let t0 = 0.6 - x0*x0 - y0*y0 - z0*z0;
+        if(t0<0) n0=0; else { t0 *= t0; n0 = t0 * t0 * this.dot(this.grad3[gi0], x0, y0, z0); }
+        let t1 = 0.6 - x1*x1 - y1*y1 - z1*z1;
+        if(t1<0) n1=0; else { t1 *= t1; n1 = t1 * t1 * this.dot(this.grad3[gi1], x1, y1, z1); }
+        let t2 = 0.6 - x2*x2 - y2*y2 - z2*z2;
+        if(t2<0) n2=0; else { t2 *= t2; n2 = t2 * t2 * this.dot(this.grad3[gi2], x2, y2, z2); }
+        let t3 = 0.6 - x3*x3 - y3*y3 - z3*z3;
+        if(t3<0) n3=0; else { t3 *= t3; n3 = t3 * t3 * this.dot(this.grad3[gi3], x3, y3, z3); }
+        return 32.0 * (n0 + n1 + n2 + n3);
       }
-      
-      let resizeTimer;
-      function onResize(){
-        if(resizeTimer) clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          if(carouselInner){
-            const oldAngle = currentAngle;
-            updateGeometry();
-            currentAngle = oldAngle;
-            applyRotation();
+    }
+
+    function initNoise() {
+      noiseInstance = new SimplexNoise3D(state.seed);
+    }
+
+    function fbm3D(x, y, t, octaves, persistence, lacunarity) {
+      let value = 0;
+      let amplitude = 0.5;
+      let frequency = 1.0;
+      let maxAmp = 0;
+      for(let i=0; i<octaves; i++) {
+        value += amplitude * noiseInstance.noise3D(x * frequency, y * frequency, t * frequency);
+        maxAmp += amplitude;
+        amplitude *= persistence;
+        frequency *= lacunarity;
+      }
+      return value / maxAmp;
+    }
+
+    function updateCanvasSize() {
+      const container = canvas.parentElement;
+      const containerWidth = container.clientWidth;
+      const targetHeight = Math.min(560, Math.max(300, containerWidth * 0.65));
+      canvas.width = containerWidth;
+      canvas.height = targetHeight;
+      state.width = canvas.width;
+      state.height = canvas.height;
+      ctx = canvas.getContext('2d');
+      requestRender();
+    }
+
+    function hslToRgb(h, s, l) {
+      let r, g, b;
+      if (s === 0) r = g = b = l;
+      else {
+        let hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        let p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return [Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255)];
+    }
+
+    function renderFull() {
+      if(!noiseInstance) initNoise();
+      const w = state.width;
+      const h = state.height;
+      const step = Math.max(1, Math.min(10, state.resolutionStep));
+      const imgData = ctx.createImageData(w, h);
+      const data = imgData.data;
+      const scaleVal = state.scale;
+      const oct = state.octaves;
+      const pers = state.persistence;
+      const lacu = state.lacunarity;
+      const timeVal = state.animationActive ? currentTimeOffset : 0;
+      const colorFlag = state.colorMode;
+
+      for(let y = 0; y < h; y += step) {
+        for(let x = 0; x < w; x += step) {
+          let nx = x * scaleVal;
+          let ny = y * scaleVal;
+          let noiseVal = fbm3D(nx, ny, timeVal, oct, pers, lacu);
+          let norm = (noiseVal + 1.0) / 2.0;
+          norm = Math.min(0.999, Math.max(0.0, norm));
+          let r, g, b;
+          if(colorFlag) {
+            let hue = norm * 280;
+            let rgb = hslToRgb(hue/360, 0.75, 0.55 + norm * 0.3);
+            r = rgb[0]; g = rgb[1]; b = rgb[2];
+          } else {
+            let valByte = Math.floor(norm * 255);
+            r = valByte; g = valByte; b = valByte;
           }
-        }, 100);
-      }
-      
-      function initControls(){
-        const speedSlider = document.getElementById('speedSlider');
-        const speedVal = document.getElementById('speedValue');
-        
-        if(speedSlider && speedVal){
-          speedSlider.addEventListener('input', (e) => {
-            currentSpeed = parseFloat(e.target.value);
-            speedVal.innerText = currentSpeed.toFixed(2);
-            if(currentSpeed === 0) stopAutoRotate();
-            else if(autoRotateId === null && !dragState.isDragging && !dragState.animFrame && isCarouselActive && !activeModalImg){
-              startAutoRotate();
+          let endX = Math.min(x + step, w);
+          let endY = Math.min(y + step, h);
+          for(let py = y; py < endY; py++) {
+            let rowStart = py * w * 4;
+            for(let px = x; px < endX; px++) {
+              let idx = rowStart + px * 4;
+              data[idx] = r;
+              data[idx+1] = g;
+              data[idx+2] = b;
+              data[idx+3] = 255;
             }
-          });
+          }
         }
       }
-      
-      window.addEventListener('load', () => {
-        buildCarousel();
-        initControls();
-        window.addEventListener('resize', onResize);
+      ctx.putImageData(imgData, 0, 0);
+    }
+
+    let resizeObserver = new ResizeObserver(() => updateCanvasSize());
+    resizeObserver.observe(canvas.parentElement);
+
+    function requestRender() {
+      if(renderPending) return;
+      renderPending = true;
+      requestAnimationFrame(() => {
+        renderFull();
+        renderPending = false;
       });
-      
-      window.addEventListener('keydown', (e) => {
-        if(e.key === 'Escape' && activeModalImg && modalManager && modalManager.closeModal) modalManager.closeModal();
-      });
-    })();
-  </script>
+    }
+
+    function updateStateAndRender(newState) {
+      let changed = false;
+      for(let key in newState) {
+        if(state[key] !== newState[key]) {
+          state[key] = newState[key];
+          changed = true;
+        }
+      }
+      if(changed) {
+        if('seed' in newState) initNoise();
+        requestRender();
+        updateUIelements();
+      }
+    }
+
+    function randomSeed() {
+      let newSeed = Math.floor(Math.random() * 90000) + 1;
+      updateStateAndRender({ seed: newSeed });
+    }
+
+    function updateUIelements() {
+      document.getElementById('scaleSlider').value = state.scale;
+      document.getElementById('scaleVal').innerText = state.scale.toFixed(4);
+      document.getElementById('resolutionSlider').value = state.resolutionStep;
+      document.getElementById('resVal').innerText = state.resolutionStep;
+      document.getElementById('seedInput').value = state.seed;
+      document.getElementById('octavesSlider').value = state.octaves;
+      document.getElementById('octVal').innerText = state.octaves;
+      document.getElementById('persistenceSlider').value = state.persistence;
+      document.getElementById('perVal').innerText = state.persistence.toFixed(2);
+      document.getElementById('lacunaritySlider').value = state.lacunarity;
+      document.getElementById('lacVal').innerText = state.lacunarity.toFixed(2);
+      document.getElementById('animSpeedSlider').value = state.animSpeed;
+      document.getElementById('speedVal').innerText = state.animSpeed.toFixed(2);
+      let animBtn = document.getElementById('toggleAnimBtn');
+      if(state.animationActive) {
+        animBtn.innerHTML = '<i class="fa-regular fa-circle-pause"></i> stop';
+      } else {
+        animBtn.innerHTML = '<i class="fa-regular fa-circle-play"></i> start';
+      }
+    }
+
+    function animateLoop() {
+      if(state.animationActive) {
+        currentTimeOffset += state.animSpeed * 0.012;
+        requestRender();
+      }
+      animationFrameId = requestAnimationFrame(animateLoop);
+    }
+
+    function toggleAnimation() {
+      updateStateAndRender({ animationActive: !state.animationActive });
+      if(!state.animationActive) {
+        currentTimeOffset = 0;
+        requestRender();
+      }
+    }
+
+    function setPreset(type) {
+      if(type === 'clouds') updateStateAndRender({ scale:0.007, octaves:3, persistence:0.4, lacunarity:2.1, resolutionStep:2 });
+      else if(type === 'terrain') updateStateAndRender({ scale:0.018, octaves:5, persistence:0.65, lacunarity:2.3, resolutionStep:2 });
+      else if(type === 'marble') updateStateAndRender({ scale:0.025, octaves:4, persistence:0.5, lacunarity:2.0, resolutionStep:1 });
+      else if(type === 'default') updateStateAndRender({ scale:0.012, octaves:4, persistence:0.55, lacunarity:2.0, resolutionStep:2 });
+    }
+
+    function exportImage() {
+      const link = document.createElement('a');
+      link.download = 'perlin_noise.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+
+    function handleKeyboard(e) {
+      const targetTag = e.target.tagName;
+      if(targetTag === 'INPUT' || targetTag === 'SELECT' || targetTag === 'BUTTON') return;
+      switch(e.key) {
+        case 'ArrowUp': updateStateAndRender({ scale: Math.min(0.045, state.scale + 0.0015) }); break;
+        case 'ArrowDown': updateStateAndRender({ scale: Math.max(0.002, state.scale - 0.0015) }); break;
+        case '+': case '=': updateStateAndRender({ scale: Math.min(0.045, state.scale * 1.12) }); break;
+        case '-': updateStateAndRender({ scale: Math.max(0.002, state.scale / 1.12) }); break;
+        case 'r': case 'R': randomSeed(); break;
+        case ' ': e.preventDefault(); toggleAnimation(); break;
+        default: break;
+      }
+    }
+
+    function attachEvents() {
+      document.getElementById('scaleSlider').addEventListener('input', (e) => updateStateAndRender({ scale: parseFloat(e.target.value) }));
+      document.getElementById('resolutionSlider').addEventListener('input', (e) => updateStateAndRender({ resolutionStep: parseInt(e.target.value) }));
+      document.getElementById('seedInput').addEventListener('change', (e) => updateStateAndRender({ seed: parseInt(e.target.value) || 1337 }));
+      document.getElementById('randomSeedBtn').addEventListener('click', randomSeed);
+      document.getElementById('octavesSlider').addEventListener('input', (e) => updateStateAndRender({ octaves: parseInt(e.target.value) }));
+      document.getElementById('persistenceSlider').addEventListener('input', (e) => updateStateAndRender({ persistence: parseFloat(e.target.value) }));
+      document.getElementById('lacunaritySlider').addEventListener('input', (e) => updateStateAndRender({ lacunarity: parseFloat(e.target.value) }));
+      document.getElementById('animSpeedSlider').addEventListener('input', (e) => updateStateAndRender({ animSpeed: parseFloat(e.target.value) }));
+      document.getElementById('toggleAnimBtn').addEventListener('click', toggleAnimation);
+      document.getElementById('colorModeBtn').addEventListener('click', () => updateStateAndRender({ colorMode: !state.colorMode }));
+      document.getElementById('exportBtn').addEventListener('click', exportImage);
+      document.getElementById('presetSelect').addEventListener('change', (e) => setPreset(e.target.value));
+      window.addEventListener('keydown', handleKeyboard);
+      window.addEventListener('resize', () => updateCanvasSize());
+    }
+
+    function start() {
+      initNoise();
+      attachEvents();
+      updateCanvasSize();
+      currentTimeOffset = 0;
+      animateLoop();
+    }
+    start();
+  })();
+</script>
 </body>
 </html>
