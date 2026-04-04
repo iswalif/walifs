@@ -3,886 +3,741 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Archivue · booking reports</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <title>Video Engagement Study | Attention Research Platform</title>
+  <!-- Chart.js & Font Awesome -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Inter', sans-serif;
     }
 
     body {
-      background: #0e0e0e;
-      color: #e5e5e5;
-      font-family: system-ui, -apple-system, 'Inter', 'Segoe UI', sans-serif;
-      line-height: 1.4;
-      overflow-x: hidden;
-    }
-
-    .app {
-      display: flex;
-      min-height: 100vh;
-      transition: all 0.2s ease;
-    }
-
-    .sidebar {
-      width: 280px;
-      background: #141414;
-      border-right: 1px solid #2a2a2a;
-      padding: 28px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-      transition: width 0.2s ease, padding 0.2s ease;
-      flex-shrink: 0;
-    }
-
-    .sidebar.collapsed {
-      width: 80px;
-      padding: 28px 12px;
-    }
-
-    .sidebar.collapsed .sidebar-content > *:not(.sidebar-toggle-wrapper) {
-      display: none;
-    }
-
-    .sidebar.collapsed .sidebar-toggle-wrapper {
-      justify-content: center;
-    }
-
-    .sidebar.collapsed .sidebar-toggle-wrapper .sidebar-toggle {
-      margin: 0;
-    }
-
-    .sidebar-toggle-wrapper {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 1rem;
-    }
-
-    .sidebar-toggle {
-      background: #2a2a2a;
-      border: none;
-      color: #e5e5e5;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #f4f7fc;
+      padding: 2rem 1.5rem;
       transition: background 0.2s;
     }
 
-    .sidebar-toggle:hover {
-      background: #3a3a3a;
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 2rem 2rem 2.5rem;
     }
 
-    .main {
-      flex: 1;
-      padding: 28px 32px;
-      transition: padding 0.2s;
-      min-width: 0;
-    }
-
-    .section-title {
-      font-size: 0.7rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: #a0a0a0;
-      margin-bottom: 1rem;
-    }
-
-    .upload-card, .filter-card {
-      background: #1a1a1a;
-      border-radius: 24px;
-      padding: 1.2rem 1rem;
-      border: 1px solid #2c2c2c;
-    }
-
-    .dropzone {
-      border: 1.5px dashed #3a3a3a;
-      border-radius: 18px;
-      padding: 1rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .dropzone.active {
-      border-color: #5a9eff;
-      background: rgba(90, 158, 255, 0.05);
-    }
-
-    .filter-group {
-      margin-bottom: 1.2rem;
-    }
-    .filter-group label {
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #bbb;
-      display: block;
-      margin-bottom: 6px;
-    }
-    select, input, .date-inputs {
-      width: 100%;
-      background: #0f0f0f;
-      border: 1px solid #2e2e2e;
-      border-radius: 40px;
-      padding: 8px 14px;
-      color: #e5e5e5;
-      font-size: 0.8rem;
-      font-family: inherit;
-    }
-    select:focus, input:focus {
-      outline: none;
-      border-color: #5a9eff;
-    }
-    .date-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .date-row input {
-      flex: 1;
-      min-width: 110px;
-    }
-    .preset-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .preset-btn {
-      background: #1f1f1f;
-      border: none;
-      padding: 5px 12px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: #ccc;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-    .preset-btn:hover {
-      background: #2e2e2e;
-    }
-    .toggle-row {
+    .progress-steps {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .toggle-row input {
-      width: auto;
-    }
-    .action-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
+      justify-content: space-between;
+      margin-bottom: 2rem;
       flex-wrap: wrap;
+      gap: 0.5rem;
     }
-    .action-btn {
-      background: #1f1f1f;
-      border: 1px solid #2e2e2e;
-      padding: 6px 12px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: #ccc;
-      cursor: pointer;
-      transition: 0.1s;
+    .step {
       flex: 1;
       text-align: center;
+      background: #e9ecef;
+      padding: 0.7rem 0.2rem;
+      border-radius: 60px;
+      font-weight: 600;
+      color: #2c3e4e;
+      font-size: 0.85rem;
+      transition: all 0.2s;
     }
-    .action-btn:hover {
-      background: #2e2e2e;
+    .step.active {
+      background: #1e466e;
+      color: white;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     }
-    .danger-btn {
-      border-color: #ff6b6b;
-      color: #ff6b6b;
-    }
-    .danger-btn:hover {
-      background: #ff6b6b;
-      color: #0e0e0e;
+    .step i {
+      margin-right: 8px;
     }
 
-    .summary-grid {
+    .section {
+      display: none;
+      animation: fade 0.25s ease;
+    }
+    .section.active-section {
+      display: block;
+    }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.4rem;
+      margin: 1.8rem 0;
+    }
+    .field {
       display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 32px;
+      flex-direction: column;
+      gap: 0.4rem;
     }
-    .stat-card {
-      background: #141414;
+    label {
+      font-weight: 600;
+      color: #1e2f3a;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+    }
+    input, select, textarea {
+      padding: 0.7rem 0.9rem;
+      border: 1px solid #cfdfe9;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      background: white;
+      transition: 0.2s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2c7da0;
+      box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
+    }
+    button {
+      background: #1e466e;
+      border: none;
+      padding: 0.8rem 1.8rem;
+      border-radius: 40px;
+      font-weight: 600;
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    button i { font-size: 1rem; }
+    button:hover {
+      background: #0f2f4f;
+      transform: scale(0.97);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #1e466e;
+      color: #1e466e;
+    }
+    .btn-outline:hover {
+      background: #eef2f7;
+      transform: none;
+    }
+
+    .video-container {
+      background: #000;
       border-radius: 24px;
-      border: 1px solid #2a2a2a;
-      padding: 1rem 1.4rem;
-      min-width: 140px;
-      flex: 1 0 auto;
+      overflow: hidden;
+      margin: 1.5rem 0;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
-    .stat-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      color: #8f8f8f;
-      letter-spacing: 0.1em;
+    video {
+      width: 100%;
+      display: block;
+      background: black;
     }
-    .stat-value {
-      font-size: 1.8rem;
-      font-weight: 500;
-      color: #e5e5e5;
+    .custom-controls {
+      background: #111217ee;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      backdrop-filter: blur(4px);
+    }
+    .ctrl-btn {
+      background: #2c3e50;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      gap: 8px;
+    }
+    .progress-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    input[type="range"] {
+      flex: 1;
+      height: 5px;
+      border-radius: 10px;
+    }
+    .time {
+      color: white;
+      font-family: monospace;
+      font-size: 0.85rem;
     }
 
     .charts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-      gap: 28px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
     }
     .chart-card {
-      background: #141414;
-      border-radius: 28px;
-      border: 1px solid #2a2a2a;
+      background: #ffffffdd;
+      backdrop-filter: blur(2px);
+      border-radius: 1.5rem;
+      padding: 1.2rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      border: 1px solid #e2edf2;
+    }
+    canvas { max-height: 280px; width: 100%; }
+    .insight-text {
+      background: #eef3fa;
       padding: 1rem;
-      transition: opacity 0.2s;
+      border-radius: 20px;
+      margin: 0.8rem 0;
     }
-    .chart-card.hidden {
-      display: none;
-    }
-    .chart-header {
+    .flex-btns {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .chart-title {
-      font-weight: 500;
-      font-size: 0.9rem;
-      letter-spacing: 0.05em;
-    }
-    .chart-actions {
-      display: flex;
-      gap: 8px;
-    }
-    .chart-btn {
-      background: transparent;
-      border: 1px solid #3a3a3a;
-      border-radius: 40px;
-      padding: 5px 10px;
-      font-size: 0.7rem;
-      color: #ccc;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-    .chart-btn:hover {
-      background: #2a2a2a;
-    }
-    canvas {
-      max-height: 260px;
-      width: 100%;
-    }
-    .top-customers {
-      background: #141414;
-      border-radius: 28px;
-      border: 1px solid #2a2a2a;
-      padding: 1rem;
-      margin-top: 12px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-    }
-    th, td {
-      text-align: left;
-      padding: 10px 6px;
-      border-bottom: 1px solid #2a2a2a;
-    }
-    th {
-      font-weight: 500;
-      color: #aaa;
-    }
-    .empty-state {
-      text-align: center;
-      padding: 2rem;
-      color: #7a7a7a;
-    }
-    .bulk-btn {
-      background: #1e1e2a;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 40px;
-      color: white;
-      font-weight: 500;
-      font-size: 0.8rem;
-      cursor: pointer;
-      margin-bottom: 24px;
-      transition: 0.1s;
-    }
-    .bulk-btn:hover {
-      background: #2c2c3a;
-    }
-    .footer-note {
-      font-size: 0.7rem;
-      color: #6a6a6a;
+      gap: 15px;
+      justify-content: flex-end;
       margin-top: 1rem;
     }
-    button, .dropzone {
-      user-select: none;
-    }
-    i {
-      margin-right: 6px;
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 260px;
-      }
-      .sidebar.collapsed {
-        width: 70px;
-      }
-      .main {
-        padding: 20px;
-      }
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-      .stat-card {
-        min-width: 120px;
-      }
-      .date-row {
-        flex-direction: column;
-      }
-      .date-row input {
-        width: 100%;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .sidebar {
-        width: 240px;
-      }
-      .sidebar.collapsed {
-        width: 60px;
-      }
-      .stat-value {
-        font-size: 1.4rem;
-      }
-      .chart-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+    h2 { font-size: 1.7rem; color: #0b2b3b; margin-bottom: 0.5rem;}
+    h3 { font-size: 1.2rem; margin: 0.8rem 0; color: #1e4a6e;}
+    hr { margin: 1rem 0; border-color: #cbdde6; }
+    @media (max-width: 680px) {
+      body { padding: 1rem; }
+      .container { padding: 1.2rem; }
+      .charts-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-toggle-wrapper">
-      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    </div>
-    <div class="sidebar-content">
-      <div style="font-weight: 500; font-size: 1.2rem; margin-bottom: 1rem;"><i class="fa-regular fa-file-lines"></i> archivue</div>
-      <div class="upload-card">
-        <div class="section-title"><i class="fa-regular fa-cloud-arrow-up"></i> import</div>
-        <div id="dropzone" class="dropzone">
-          <i class="fa-regular fa-folder-open"></i> drag & drop<br>
-          <span style="font-size: 0.7rem;">or click to select CSV</span>
-          <input type="file" id="csvUpload" multiple accept=".csv" style="display: none;">
-        </div>
-        <div class="toggle-row">
-          <label><i class="fa-regular fa-circle-xmark"></i> include cancelled</label>
-          <input type="checkbox" id="includeCancelledToggle" checked>
+<div class="container">
+  <div class="progress-steps" id="progressSteps">
+    <div class="step" data-step="0"><i class="fas fa-file-signature"></i> Consent</div>
+    <div class="step" data-step="1"><i class="fas fa-edit"></i> Pre-Survey</div>
+    <div class="step" data-step="2"><i class="fas fa-video"></i> Video Session</div>
+    <div class="step" data-step="3"><i class="fas fa-clipboard-list"></i> Post-Survey</div>
+    <div class="step" data-step="4"><i class="fas fa-chart-line"></i> Dashboard</div>
+  </div>
+
+  <!-- CONSENT -->
+  <div id="consentSection" class="section active-section">
+    <i class="fas fa-microphone-alt" style="font-size: 2rem; color:#1e466e;"></i>
+    <h2>Video Engagement Study</h2>
+    <p style="margin: 1rem 0 1.5rem 0; line-height: 1.5;">This scientific experiment analyzes attention patterns during controlled video consumption. Your interactions (play, pause, skips) are logged anonymously. Data stored locally for research simulation. By proceeding you agree to participate.</p>
+    <button id="startStudyBtn"><i class="fas fa-play"></i> Start Study</button>
+  </div>
+
+  <!-- PRE-SURVEY -->
+  <div id="preSurveySection" class="section">
+    <h2><i class="fas fa-user-friends"></i> Demographic & Behavior Survey</h2>
+    <form id="preSurveyForm">
+      <div class="form-grid">
+        <div class="field"><label>Name (optional)</label><input type="text" id="name" placeholder="e.g., A. Researcher"></div>
+        <div class="field"><label>Age *</label><input type="number" id="age" required></div>
+        <div class="field"><label>Gender</label><select id="gender"><option>Prefer not to say</option><option>Female</option><option>Male</option><option>Non-binary</option></select></div>
+        <div class="field"><label>Occupation</label><input id="occupation" placeholder="Student, Engineer, etc"></div>
+        <div class="field"><label>Education level</label><select id="education"><option>High School</option><option>Bachelor's</option><option>Master's</option><option>PhD</option><option>Other</option></select></div>
+        <div class="field"><label>Country</label><input id="country" placeholder="Country"></div>
+        <div class="field"><label>Daily screen time (hours)</label><select id="screenTime"><option>0-2</option><option>2-4</option><option>4-6</option><option>6-8</option><option>8+</option></select></div>
+        <div class="field"><label>Preferred content type</label><select id="contentType"><option>Short-form</option><option>Long-form</option><option>Gaming</option><option>Educational</option><option>Entertainment</option></select></div>
+        <div class="field"><label>Favorite platform</label><select id="platform"><option>TikTok</option><option>YouTube</option><option>Instagram</option><option>Netflix</option><option>Other</option></select></div>
+        <div class="field"><label>Usually skip videos?</label><select id="skipHabit"><option>Yes</option><option>No</option></select></div>
+        <div class="field"><label>Preferred video length</label><select id="prefLength"><option><1 min</option><option>1-3 min</option><option>3-10 min</option><option>>10 min</option></select></div>
+      </div>
+      <div class="flex-btns"><button type="submit" id="savePreSurvey"><i class="fas fa-arrow-right"></i> Continue to Video</button></div>
+    </form>
+  </div>
+
+  <!-- VIDEO PLAYER SECTION -->
+  <div id="videoSection" class="section">
+    <h2><i class="fas fa-play-circle"></i> Watch attentively (3 min study)</h2>
+    <div class="video-container">
+      <video id="studyVideo" src="https://www.radiantmediaplayer.com/media/bbb-360p.mp4" preload="metadata"></video>
+      <div class="custom-controls">
+        <button id="playPauseBtn" class="ctrl-btn"><i class="fas fa-play"></i> Play</button>
+        <button id="skipBackBtn" class="ctrl-btn"><i class="fas fa-backward"></i> -10s</button>
+        <button id="skipForwardBtn" class="ctrl-btn"><i class="fas fa-forward"></i> +10s</button>
+        <div class="progress-wrapper">
+          <span class="time" id="currentTimeLabel">0:00</span>
+          <input type="range" id="progressBar" value="0" step="0.01">
+          <span class="time" id="durationLabel">0:00</span>
         </div>
       </div>
+    </div>
+    <p class="insight-text"><i class="fas fa-info-circle"></i> Custom controls: Play/Pause, seek, progress bar. All interactions tracked for science.</p>
+    <div class="flex-btns"><button id="videoNextBtn" disabled><i class="fas fa-check-circle"></i> Finish & Continue</button></div>
+  </div>
 
-      <div class="filter-card">
-        <div class="section-title"><i class="fa-regular fa-sliders"></i> filters</div>
-        <div class="filter-group">
-          <label>date range</label>
-          <div class="date-row">
-            <input type="date" id="dateFrom">
-           
-            <input type="date" id="dateTo">
-          </div>
-          <div class="preset-buttons">
-            <button class="preset-btn" data-preset="today">today</button>
-            <button class="preset-btn" data-preset="yesterday">yesterday</button>
-            <button class="preset-btn" data-preset="last7">last 7 days</button>
-          </div>
-        </div>
-        <div class="filter-group">
-          <label><i class="fa-regular fa-gamepad"></i> game</label>
-          <select id="gameFilter"><option value="ALL">all games</option></select>
-        </div>
-        <div class="filter-group">
-          <label><i class="fa-regular fa-location-dot"></i> station</label>
-          <select id="stationFilter"><option value="ALL">all stations</option></select>
-        </div>
-        <div class="filter-group">
-          <label><i class="fa-regular fa-flag"></i> status</label>
-          <select id="statusFilter"><option value="ALL">all status</option></select>
-        </div>
-        <div class="filter-group">
-          <label><i class="fa-regular fa-user"></i> customer name</label>
-          <input type="text" id="customerNameFilter" placeholder="search">
-        </div>
-        <div class="action-buttons">
-          <button id="resetFiltersBtn" class="action-btn"><i class="fa-regular fa-rotate-left"></i> reset filters</button>
-          <button id="resetDataBtn" class="action-btn danger-btn"><i class="fa-regular fa-trash-can"></i> reset all data</button>
-        </div>
+  <!-- POST SURVEY -->
+  <div id="postSurveySection" class="section">
+    <h2><i class="fas fa-question-circle"></i> Reflection & Recall</h2>
+    <form id="postSurveyForm">
+      <div class="form-grid">
+        <div class="field"><label>Which segment was most engaging?</label><select id="engagingSeg"><option>A (Hook)</option><option>B (Boring)</option><option>C (High stimulation)</option><option>D (Information-heavy)</option><option>E (Silence)</option><option>F (Emotional)</option><option>G (Mixed)</option></select></div>
+        <div class="field"><label>Which segment was most boring?</label><select id="boringSeg"><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option></select></div>
+        <div class="field"><label>Did you feel distracted? (1-5)</label><input type="number" id="distracted" min="1" max="5" required></div>
+        <div class="field"><label>How much did you understand? (1-5)</label><input type="number" id="understanding" min="1" max="5" required></div>
+        <div class="field"><label>Recall: What color was the main object? (example recall)</label><input id="recallAnswer" placeholder="e.g., blue, red" required></div>
       </div>
-      <div class="footer-note"><i class="fa-regular fa-database"></i> data stored locally</div>
-    </div>
-  </aside>
+      <div class="flex-btns"><button type="submit" id="submitPostBtn"><i class="fas fa-chart-simple"></i> See Dashboard & Insights</button></div>
+    </form>
+  </div>
 
-  <main class="main">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
-      <button id="showAllChartsBtn" class="bulk-btn" style="margin-bottom: 0;"><i class="fa-regular fa-eye"></i> show all charts</button>
-      <button id="bulkExportBtn" class="bulk-btn" style="margin-bottom: 0;"><i class="fa-regular fa-camera"></i> export full report (ZIP)</button>
+  <!-- DASHBOARD -->
+  <div id="dashboardSection" class="section">
+    <h2><i class="fas fa-chart-pie"></i> Attention Analytics Dashboard</h2>
+    <div id="dashboardContent">
+      <div class="insight-text"><i class="fas fa-chart-line"></i> Loading insights based on your session & aggregated data...</div>
     </div>
-    <div id="summaryContainer" class="summary-grid"></div>
-    <div id="chartsGrid" class="charts-grid"></div>
-    <div class="top-customers" id="topCustomersContainer">
-      <div class="chart-header"><span class="chart-title"><i class="fa-regular fa-trophy"></i> top customers (by hours)</span></div>
-      <div id="topCustomersTableBody">—</div>
+    <div class="flex-btns">
+      <button id="exportCSVBtn" class="btn-outline"><i class="fas fa-download"></i> Export JSON (full data)</button>
+      <button id="adminResetBtn" class="btn-outline"><i class="fas fa-trash-alt"></i> Reset & New Session</button>
     </div>
-  </main>
+  </div>
 </div>
 
 <script>
-  let masterBookings = [];
-  let filteredBookings = [];
-  let chartInstances = {};
-
-  const filterState = {
-    dateFrom: '',
-    dateTo: '',
-    game: 'ALL',
-    station: 'ALL',
-    status: 'ALL',
-    customerName: '',
-    includeCancelled: true
-  };
-
-  function parseCSV(text) {
-    const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
-    if (!lines.length) return [];
-    const headers = lines[0].split(',').map(h => h.trim());
-    return lines.slice(1).map(line => {
-      const vals = line.split(',').map(v => v.trim());
-      if (vals.length !== headers.length) return null;
-      const obj = {};
-      headers.forEach((h, i) => obj[h] = vals[i]);
-      return obj;
-    }).filter(r => r);
-  }
-
-  function normalizePhone(phone) {
-    let p = phone.replace(/[^\d+]/g, '');
-    if (p.startsWith('+880')) return p.slice(0, 14);
-    if (p.startsWith('880')) return '+' + p.slice(0, 13);
-    if (p.startsWith('0')) return '+88' + p.slice(1, 11);
-    if (p.length === 10) return '+880' + p;
-    return p;
-  }
-
-  function cleanRow(row) {
-    const id = row.ID?.trim();
-    const date = row.Date?.trim();
-    const game = row.Game?.trim();
-    const station = row.Station?.trim();
-    const hours = parseFloat(row.Hours);
-    if (!id || !date || !game || !station || isNaN(hours)) return null;
-    let status = (row.Status || '').toLowerCase();
-    if (!['confirmed', 'cancelled', 'awaiting_payment'].includes(status)) status = 'awaiting_payment';
-    return {
-      ID: id,
-      Name: row.Name?.trim() || 'Anonymous',
-      Phone: normalizePhone(row.Phone || ''),
-      Station: station,
-      Game: game,
-      Date: date,
-      Hours: hours,
-      StartTime: row.StartTime || '00:00',
-      Status: status
+  // ---------------------------- SINGLE SCRIPT - FULL FUNCTIONALITY ----------------------------
+  (function(){
+    // ---------- STORAGE KEYS & HELPERS ----------
+    const STORAGE_KEYS = {
+      USERS: 'attention_users',
+      EVENTS: 'attention_events',
+      RESPONSES: 'attention_responses',
+      ANALYTICS: 'attention_analytics'
     };
-  }
+    function saveToStorage(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+    function getFromStorage(key) { return JSON.parse(localStorage.getItem(key) || 'null'); }
+    function generateUUID() { return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`; }
 
-  async function processFiles(files) {
-    const allRows = [];
-    for (const file of files) {
-      const text = await file.text();
-      const rows = parseCSV(text);
-      rows.forEach(r => { const cleaned = cleanRow(r); if (cleaned) allRows.push(cleaned); });
-    }
-    const merged = new Map();
-    allRows.forEach(r => { if (!merged.has(r.ID)) merged.set(r.ID, r); });
-    masterBookings = Array.from(merged.values());
-    saveToLocalStorage();
-    refreshFilterDropdowns();
-    applyFilters();
-    renderDashboard();
-  }
+    // ---------- GLOBAL STATE ----------
+    let currentStep = 0;
+    let activeUserId = null;
+    let videoTrackerInstance = null; // { videoElement, handlers, userId, cleanupFn }
+    const sections = ['consentSection', 'preSurveySection', 'videoSection', 'postSurveySection', 'dashboardSection'];
+    const stepElements = document.querySelectorAll('.step');
 
-  function refreshFilterDropdowns() {
-    const games = [...new Set(masterBookings.map(b => b.Game))];
-    const stations = [...new Set(masterBookings.map(b => b.Station))];
-    const statuses = [...new Set(masterBookings.map(b => b.Status))];
-    const gameSel = document.getElementById('gameFilter');
-    const stationSel = document.getElementById('stationFilter');
-    const statusSel = document.getElementById('statusFilter');
-    gameSel.innerHTML = '<option value="ALL">all games</option>';
-    stationSel.innerHTML = '<option value="ALL">all stations</option>';
-    statusSel.innerHTML = '<option value="ALL">all status</option>';
-    games.sort().forEach(g => gameSel.innerHTML += `<option value="${escapeHtml(g)}">${g}</option>`);
-    stations.sort().forEach(s => stationSel.innerHTML += `<option value="${escapeHtml(s)}">${s}</option>`);
-    statuses.forEach(s => statusSel.innerHTML += `<option value="${s}">${s}</option>`);
-    if (games.includes(filterState.game)) gameSel.value = filterState.game;
-    if (stations.includes(filterState.station)) stationSel.value = filterState.station;
-    if (statuses.includes(filterState.status)) statusSel.value = filterState.status;
-  }
-
-  function applyFilters() {
-    if (!masterBookings.length) { filteredBookings = []; return; }
-    let temp = [...masterBookings];
-    if (!filterState.includeCancelled) temp = temp.filter(b => b.Status !== 'cancelled');
-    if (filterState.dateFrom) temp = temp.filter(b => b.Date >= filterState.dateFrom);
-    if (filterState.dateTo) temp = temp.filter(b => b.Date <= filterState.dateTo);
-    if (filterState.game !== 'ALL') temp = temp.filter(b => b.Game === filterState.game);
-    if (filterState.station !== 'ALL') temp = temp.filter(b => b.Station === filterState.station);
-    if (filterState.status !== 'ALL') temp = temp.filter(b => b.Status === filterState.status);
-    if (filterState.customerName.trim()) {
-      const search = filterState.customerName.trim().toLowerCase();
-      temp = temp.filter(b => b.Name.toLowerCase().includes(search));
-    }
-    filteredBookings = temp;
-  }
-
-  function getSummary() {
-    if (!filteredBookings.length) return { totalBookings:0, totalHours:0, topCustomer:'-', topGame:'-', topStation:'-' };
-    const total = filteredBookings.length;
-    const hours = filteredBookings.reduce((s,b)=> s + b.Hours, 0);
-    const gameMap = new Map(), stationMap = new Map(), custMap = new Map();
-    filteredBookings.forEach(b => {
-      gameMap.set(b.Game, (gameMap.get(b.Game)||0)+1);
-      stationMap.set(b.Station, (stationMap.get(b.Station)||0)+1);
-      custMap.set(b.Name, (custMap.get(b.Name)||0)+b.Hours);
-    });
-    const topGame = [...gameMap.entries()].sort((a,b)=>b[1]-a[1])[0]?.[0] || '-';
-    const topStation = [...stationMap.entries()].sort((a,b)=>b[1]-a[1])[0]?.[0] || '-';
-    const topCust = [...custMap.entries()].sort((a,b)=>b[1]-a[1])[0]?.[0] || '-';
-    return { totalBookings: total, totalHours: hours, topCustomer: topCust, topGame, topStation };
-  }
-
-  function bookingsOverTime() {
-    const map = new Map();
-    filteredBookings.forEach(b => map.set(b.Date, (map.get(b.Date)||0)+1));
-    return [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
-  }
-
-  function gamesCount() {
-    const map = new Map();
-    filteredBookings.forEach(b => map.set(b.Game, (map.get(b.Game)||0)+1));
-    return [...map.entries()].sort((a,b)=>b[1]-a[1]);
-  }
-
-  function stationsCount() {
-    const map = new Map();
-    filteredBookings.forEach(b => map.set(b.Station, (map.get(b.Station)||0)+1));
-    return [...map.entries()].sort((a,b)=>b[1]-a[1]);
-  }
-
-  function statusBreakdown() {
-    const confirmed = filteredBookings.filter(b=>b.Status==='confirmed').length;
-    const cancelled = filteredBookings.filter(b=>b.Status==='cancelled').length;
-    const awaiting = filteredBookings.filter(b=>b.Status==='awaiting_payment').length;
-    return { confirmed, cancelled, awaiting };
-  }
-
-  function peakHoursData() {
-    const hourCount = new Array(24).fill(0);
-    filteredBookings.forEach(b => {
-      const hour = parseInt(b.StartTime.split(':')[0]);
-      if (!isNaN(hour) && hour>=0 && hour<=23) hourCount[hour]++;
-    });
-    return hourCount;
-  }
-
-  function topCustomers() {
-    const map = new Map();
-    filteredBookings.forEach(b => map.set(b.Name, (map.get(b.Name)||0)+b.Hours));
-    return [...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10);
-  }
-
-  function destroyCharts() {
-    Object.values(chartInstances).forEach(chart => chart.destroy());
-    chartInstances = {};
-  }
-
-  function renderCharts() {
-    const grid = document.getElementById('chartsGrid');
-    const chartConfigs = [
-      { id: 'lineChart', title: 'bookings over time', icon: 'fa-chart-line' },
-      { id: 'gamesChart', title: 'most popular games', icon: 'fa-chart-bar' },
-      { id: 'stationsChart', title: 'most used stations', icon: 'fa-chart-bar' },
-      { id: 'pieChart', title: 'payment status', icon: 'fa-chart-pie' },
-      { id: 'heatmapChart', title: 'peak hours (heatmap)', icon: 'fa-clock' }
-    ];
-    grid.innerHTML = chartConfigs.map(cfg => `
-      <div class="chart-card" data-chart-id="${cfg.id}">
-        <div class="chart-header">
-          <span class="chart-title"><i class="fa-regular ${cfg.icon}"></i> ${cfg.title}</span>
-          <div class="chart-actions">
-            <button class="chart-btn hide-chart-btn" data-chart-id="${cfg.id}"><i class="fa-regular fa-eye-slash"></i> hide</button>
-            <button class="chart-btn export-btn" data-chart="${cfg.id}">export PNG</button>
-          </div>
-        </div>
-        <canvas id="${cfg.id}"></canvas>
-      </div>
-    `).join('');
-
-    const lineData = bookingsOverTime();
-    const lineCtx = document.getElementById('lineChart').getContext('2d');
-    chartInstances.line = new Chart(lineCtx, {
-      type: 'line',
-      data: { labels: lineData.map(d=>d[0]), datasets: [{ label: 'bookings', data: lineData.map(d=>d[1]), borderColor: '#5a9eff', backgroundColor: 'rgba(90,158,255,0.1)', tension: 0.3, pointBackgroundColor: '#5a9eff', pointBorderColor: '#fff', borderWidth: 2 }] },
-      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#ccc' } } }, scales: { y: { grid: { color: '#2a2a2a' }, ticks: { color: '#aaa' } }, x: { ticks: { color: '#aaa' } } } }
-    });
-    const gamesData = gamesCount();
-    chartInstances.games = new Chart(document.getElementById('gamesChart'), { type: 'bar', data: { labels: gamesData.map(d=>d[0]), datasets: [{ label: 'count', data: gamesData.map(d=>d[1]), backgroundColor: '#4caf50', borderRadius: 6 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#ccc' } } }, scales: { y: { grid: { color: '#2a2a2a' } }, x: { ticks: { color: '#aaa' } } } } });
-    const stationsData = stationsCount();
-    chartInstances.stations = new Chart(document.getElementById('stationsChart'), { type: 'bar', data: { labels: stationsData.map(d=>d[0]), datasets: [{ label: 'usage', data: stationsData.map(d=>d[1]), backgroundColor: '#ff9f4a', borderRadius: 6 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#ccc' } } }, scales: { y: { grid: { color: '#2a2a2a' } }, x: { ticks: { color: '#aaa' } } } } });
-    const status = statusBreakdown();
-    chartInstances.pie = new Chart(document.getElementById('pieChart'), { type: 'pie', data: { labels: ['confirmed', 'cancelled', 'awaiting_payment'], datasets: [{ data: [status.confirmed, status.cancelled, status.awaiting], backgroundColor: ['#5a9eff', '#ff6b6b', '#ffb347'], borderWidth: 0 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#ccc' } } } } });
-    const peak = peakHoursData();
-    const peakLabels = Array.from({length:24}, (_,i)=> i+':00');
-    const heatColors = peak.map(v => `hsl(${30 + v*8}, 80%, 60%)`);
-    chartInstances.heat = new Chart(document.getElementById('heatmapChart'), { type: 'bar', data: { labels: peakLabels, datasets: [{ label: 'frequency', data: peak, backgroundColor: heatColors, borderRadius: 4 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#ccc' } } }, scales: { y: { grid: { color: '#2a2a2a' } }, x: { ticks: { color: '#aaa', maxRotation: 45, minRotation: 45 } } } } });
-
-    document.querySelectorAll('.export-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const chartId = btn.getAttribute('data-chart');
-        const canvas = document.getElementById(chartId);
-        if (canvas) downloadCanvas(canvas, `report_${chartId}_${Date.now()}.png`);
+    function updateStepUI() {
+      sections.forEach((id, idx) => {
+        const section = document.getElementById(id);
+        if (idx === currentStep) section.classList.add('active-section');
+        else section.classList.remove('active-section');
       });
-    });
-    document.querySelectorAll('.hide-chart-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const chartId = btn.getAttribute('data-chart-id');
-        const card = document.querySelector(`.chart-card[data-chart-id="${chartId}"]`);
-        if (card) card.classList.add('hidden');
+      stepElements.forEach((step, idx) => {
+        if (idx === currentStep) step.classList.add('active');
+        else step.classList.remove('active');
       });
-    });
-  }
+    }
+    function goToStep(step) {
+      if (step < 0 || step >= sections.length) return;
+      currentStep = step;
+      updateStepUI();
+    }
 
-  function downloadCanvas(canvas, filename) {
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = canvas.toDataURL();
-    link.click();
-  }
-
-  function showAllCharts() {
-    document.querySelectorAll('.chart-card').forEach(card => card.classList.remove('hidden'));
-  }
-
-  async function bulkExportZip() {
-    const zip = new JSZip();
-    const visibleCards = document.querySelectorAll('.chart-card:not(.hidden)');
-    for (let card of visibleCards) {
-      const canvas = card.querySelector('canvas');
-      if (canvas) {
-        const dataURL = canvas.toDataURL();
-        const base64Data = dataURL.split(',')[1];
-        const filename = `report_${canvas.id}_${Date.now()}.png`;
-        zip.file(filename, base64Data, { base64: true });
+    // ---------- VIDEO TRACKER (Logs play/pause/seek/timeupdate/ended) ----------
+    function initVideoTracker(userId, videoEl, onEndCallback) {
+      // Clean previous if any
+      if (videoTrackerInstance) destroyVideoTracker();
+      
+      const events = getFromStorage(STORAGE_KEYS.EVENTS) || [];
+      const logEvent = (type, videoTime) => {
+        events.push({ user_id: userId, event_type: type, video_timestamp: Math.floor(videoTime * 10) / 10, real_timestamp: Date.now() });
+        saveToStorage(STORAGE_KEYS.EVENTS, events);
+      };
+      
+      let lastLoggedSecond = -1;
+      const handlePlay = () => logEvent('play', videoEl.currentTime);
+      const handlePause = () => logEvent('pause', videoEl.currentTime);
+      const handleSeek = () => logEvent('seek', videoEl.currentTime);
+      const handleEnded = () => { 
+        logEvent('ended', videoEl.currentTime);
+        if (onEndCallback) onEndCallback();
+      };
+      const handleTimeUpdate = () => {
+        const ct = videoEl.currentTime;
+        const secondFloor = Math.floor(ct);
+        if (secondFloor !== lastLoggedSecond) {
+          lastLoggedSecond = secondFloor;
+          logEvent('timeupdate', ct);
+        }
+      };
+      
+      videoEl.addEventListener('play', handlePlay);
+      videoEl.addEventListener('pause', handlePause);
+      videoEl.addEventListener('seeked', handleSeek);
+      videoEl.addEventListener('ended', handleEnded);
+      videoEl.addEventListener('timeupdate', handleTimeUpdate);
+      
+      const tracker = { userId, videoElement: videoEl, handlers: { handlePlay, handlePause, handleSeek, handleEnded, handleTimeUpdate } };
+      videoTrackerInstance = tracker;
+      return tracker;
+    }
+    
+    function destroyVideoTracker() {
+      if (videoTrackerInstance) {
+        const { videoElement, handlers } = videoTrackerInstance;
+        videoElement.removeEventListener('play', handlers.handlePlay);
+        videoElement.removeEventListener('pause', handlers.handlePause);
+        videoElement.removeEventListener('seeked', handlers.handleSeek);
+        videoElement.removeEventListener('ended', handlers.handleEnded);
+        videoElement.removeEventListener('timeupdate', handlers.handleTimeUpdate);
+        videoTrackerInstance = null;
       }
     }
-    const stats = getSummary();
-    const meta = {
-      totalBookings: stats.totalBookings,
-      totalHours: stats.totalHours,
-      dateRange: `${filterState.dateFrom || 'any'} → ${filterState.dateTo || 'any'}`,
-      topCustomer: stats.topCustomer,
-      mostPopularGame: stats.topGame,
-      mostUsedStation: stats.topStation
-    };
-    zip.file(`report_summary_${Date.now()}.json`, JSON.stringify(meta, null, 2));
-    const content = await zip.generateAsync({ type: 'blob' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(content);
-    link.download = `archivue_report_${Date.now()}.zip`;
-    link.click();
-    URL.revokeObjectURL(link.href);
-  }
-
-  function renderSummaryCards() {
-    const stats = getSummary();
-    const container = document.getElementById('summaryContainer');
-    container.innerHTML = `
-      <div class="stat-card"><div class="stat-label"><i class="fa-regular fa-calendar"></i> bookings</div><div class="stat-value">${stats.totalBookings}</div></div>
-      <div class="stat-card"><div class="stat-label"><i class="fa-regular fa-hourglass-half"></i> total hours</div><div class="stat-value">${stats.totalHours.toFixed(1)}</div></div>
-      <div class="stat-card"><div class="stat-label"><i class="fa-regular fa-crown"></i> top customer</div><div class="stat-value">${escapeHtml(stats.topCustomer)}</div></div>
-      <div class="stat-card"><div class="stat-label"><i class="fa-regular fa-gamepad"></i> top game</div><div class="stat-value">${escapeHtml(stats.topGame)}</div></div>
-      <div class="stat-card"><div class="stat-label"><i class="fa-regular fa-location-dot"></i> top station</div><div class="stat-value">${escapeHtml(stats.topStation)}</div></div>
-    `;
-  }
-
-  function renderTopCustomers() {
-    const top = topCustomers();
-    const tbody = document.getElementById('topCustomersTableBody');
-    if (!top.length) { tbody.innerHTML = '<div class="empty-state">no data</div>'; return; }
-    let html = '<table><thead><tr><th>customer</th><th>hours</th></tr></thead><tbody>';
-    top.forEach(([name, hrs]) => html += `<tr><td>${escapeHtml(name)}</td><td>${hrs.toFixed(1)}h</td></tr>`);
-    html += '</tbody></table>';
-    tbody.innerHTML = html;
-  }
-
-  function renderEmptyState() {
-    document.getElementById('summaryContainer').innerHTML = '<div class="empty-state"><i class="fa-regular fa-folder-open"></i> upload CSV to start</div>';
-    document.getElementById('chartsGrid').innerHTML = '<div class="empty-state">📁 no data — import bookings</div>';
-    document.getElementById('topCustomersTableBody').innerHTML = '<div class="empty-state">—</div>';
-  }
-
-  function renderDashboard() {
-    if (!masterBookings.length) { renderEmptyState(); return; }
-    renderSummaryCards();
-    destroyCharts();
-    renderCharts();
-    renderTopCustomers();
-  }
-
-  function syncFiltersAndRender() {
-    filterState.dateFrom = document.getElementById('dateFrom').value;
-    filterState.dateTo = document.getElementById('dateTo').value;
-    filterState.game = document.getElementById('gameFilter').value;
-    filterState.station = document.getElementById('stationFilter').value;
-    filterState.status = document.getElementById('statusFilter').value;
-    filterState.customerName = document.getElementById('customerNameFilter').value;
-    filterState.includeCancelled = document.getElementById('includeCancelledToggle').checked;
-    saveToLocalStorage();
-    applyFilters();
-    renderDashboard();
-  }
-
-  function resetFilters() {
-    document.getElementById('dateFrom').value = '';
-    document.getElementById('dateTo').value = '';
-    document.getElementById('gameFilter').value = 'ALL';
-    document.getElementById('stationFilter').value = 'ALL';
-    document.getElementById('statusFilter').value = 'ALL';
-    document.getElementById('customerNameFilter').value = '';
-    document.getElementById('includeCancelledToggle').checked = true;
-    filterState.dateFrom = '';
-    filterState.dateTo = '';
-    filterState.game = 'ALL';
-    filterState.station = 'ALL';
-    filterState.status = 'ALL';
-    filterState.customerName = '';
-    filterState.includeCancelled = true;
-    saveToLocalStorage();
-    applyFilters();
-    renderDashboard();
-  }
-
-  function resetAllData() {
-    if (confirm('Delete all uploaded data and saved settings? This cannot be undone.')) {
-      localStorage.removeItem('archivueData');
-      localStorage.removeItem('archivueFilters');
-      masterBookings = [];
-      filteredBookings = [];
-      Object.assign(filterState, {
-        dateFrom: '', dateTo: '', game: 'ALL', station: 'ALL', status: 'ALL', customerName: '', includeCancelled: true
-      });
-      refreshFilterDropdowns();
-      renderDashboard();
-      document.getElementById('dateFrom').value = '';
-      document.getElementById('dateTo').value = '';
-      document.getElementById('gameFilter').value = 'ALL';
-      document.getElementById('stationFilter').value = 'ALL';
-      document.getElementById('statusFilter').value = 'ALL';
-      document.getElementById('customerNameFilter').value = '';
-      document.getElementById('includeCancelledToggle').checked = true;
+    
+    function getCurrentUserId() { return activeUserId || (videoTrackerInstance ? videoTrackerInstance.userId : null); }
+    
+    // ---------- ANALYTICS HELPERS ----------
+    function mapToSegment(timestampSec) {
+      if (timestampSec < 20) return 'A';
+      if (timestampSec < 50) return 'B';
+      if (timestampSec < 80) return 'C';
+      if (timestampSec < 110) return 'D';
+      if (timestampSec < 130) return 'E';
+      if (timestampSec < 160) return 'F';
+      return 'G';
     }
-  }
-
-  function saveToLocalStorage() {
-    localStorage.setItem('archivueData', JSON.stringify(masterBookings));
-    localStorage.setItem('archivueFilters', JSON.stringify(filterState));
-  }
-
-  function loadFromStorage() {
-    const saved = localStorage.getItem('archivueData');
-    if (saved) masterBookings = JSON.parse(saved);
-    const savedFilters = localStorage.getItem('archivueFilters');
-    if (savedFilters) Object.assign(filterState, JSON.parse(savedFilters));
-    refreshFilterDropdowns();
-    applyFilters();
-    renderDashboard();
-    document.getElementById('dateFrom').value = filterState.dateFrom;
-    document.getElementById('dateTo').value = filterState.dateTo;
-    document.getElementById('gameFilter').value = filterState.game;
-    document.getElementById('stationFilter').value = filterState.station;
-    document.getElementById('statusFilter').value = filterState.status;
-    document.getElementById('customerNameFilter').value = filterState.customerName;
-    document.getElementById('includeCancelledToggle').checked = filterState.includeCancelled;
-  }
-
-  function initEventListeners() {
-    const dropzone = document.getElementById('dropzone');
-    const fileInput = document.getElementById('csvUpload');
-    dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('active'); });
-    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('active'));
-    dropzone.addEventListener('drop', e => {
-      e.preventDefault(); dropzone.classList.remove('active');
-      const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.csv'));
-      if (files.length) processFiles(files);
-    });
-    fileInput.addEventListener('change', e => { if (e.target.files.length) processFiles(e.target.files); });
-
-    document.getElementById('dateFrom').addEventListener('change', syncFiltersAndRender);
-    document.getElementById('dateTo').addEventListener('change', syncFiltersAndRender);
-    document.getElementById('gameFilter').addEventListener('change', syncFiltersAndRender);
-    document.getElementById('stationFilter').addEventListener('change', syncFiltersAndRender);
-    document.getElementById('statusFilter').addEventListener('change', syncFiltersAndRender);
-    document.getElementById('customerNameFilter').addEventListener('input', syncFiltersAndRender);
-    document.getElementById('includeCancelledToggle').addEventListener('change', syncFiltersAndRender);
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const preset = btn.dataset.preset;
-        const today = new Date().toISOString().slice(0,10);
-        if (preset === 'today') { document.getElementById('dateFrom').value = today; document.getElementById('dateTo').value = today; }
-        else if (preset === 'yesterday') { const y = new Date(Date.now()-86400000).toISOString().slice(0,10); document.getElementById('dateFrom').value = y; document.getElementById('dateTo').value = y; }
-        else if (preset === 'last7') { const week = new Date(Date.now()-6*86400000).toISOString().slice(0,10); document.getElementById('dateFrom').value = week; document.getElementById('dateTo').value = today; }
-        syncFiltersAndRender();
+    
+    function computeUserAttentionMetrics(userId, events) {
+      const userEvents = events.filter(ev => ev.user_id === userId);
+      let maxTimestamp = 0;
+      let skipCount = 0;
+      let pauseCount = 0;
+      let replayCount = 0;
+      const segmentSkips = { A:0, B:0, C:0, D:0, E:0, F:0, G:0 };
+      
+      for (let ev of userEvents) {
+        if (ev.event_type === 'timeupdate' && ev.video_timestamp > maxTimestamp) maxTimestamp = ev.video_timestamp;
+        if (ev.event_type === 'seek') {
+          skipCount++;
+          const seg = mapToSegment(ev.video_timestamp);
+          segmentSkips[seg] = (segmentSkips[seg] || 0) + 1;
+        }
+        if (ev.event_type === 'pause') pauseCount++;
+        if (ev.event_type === 'play' && ev.video_timestamp < 2) replayCount++;
+      }
+      const durationTarget = 180;
+      const completionPercent = Math.min(100, (maxTimestamp / durationTarget) * 100);
+      let attentionScore = completionPercent - (skipCount * 3) + (replayCount * 2);
+      attentionScore = Math.min(100, Math.max(0, attentionScore));
+      
+      return {
+        user_id: userId,
+        totalWatchTimeSec: maxTimestamp,
+        completionPercent: completionPercent,
+        pauseCount: pauseCount,
+        skipCount: skipCount,
+        replayCount: replayCount,
+        attentionScore: attentionScore,
+        segmentSkips: segmentSkips,
+        maxTimestampReached: maxTimestamp
+      };
+    }
+    
+    function computeAggregatedAnalytics(users, events, analyticsArr) {
+      let totalAttention = 0;
+      let segmentSkipAgg = { A:0, B:0, C:0, D:0, E:0, F:0, G:0 };
+      analyticsArr.forEach(anal => {
+        totalAttention += anal.attentionScore;
+        for (let s in anal.segmentSkips) {
+          segmentSkipAgg[s] = (segmentSkipAgg[s] || 0) + (anal.segmentSkips[s] || 0);
+        }
       });
-    });
-    document.getElementById('bulkExportBtn').addEventListener('click', bulkExportZip);
-    document.getElementById('resetFiltersBtn').addEventListener('click', resetFilters);
-    document.getElementById('resetDataBtn').addEventListener('click', resetAllData);
-    document.getElementById('showAllChartsBtn').addEventListener('click', showAllCharts);
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebar = document.getElementById('sidebar');
-    sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
-  }
-
-  function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-
-  initEventListeners();
-  loadFromStorage();
+      const avgAttentionScore = analyticsArr.length ? totalAttention / analyticsArr.length : 50;
+      let mostSkipped = 'A';
+      let maxSkip = 0;
+      for (let s in segmentSkipAgg) {
+        if (segmentSkipAgg[s] > maxSkip) { maxSkip = segmentSkipAgg[s]; mostSkipped = s; }
+      }
+      return { avgAttentionScore, mostSkippedSegment: mostSkipped, segmentSkipAgg, totalParticipants: users.length };
+    }
+    
+    // ---------- CHARTS RENDERING ----------
+    function createCard(title, canvasElem) {
+      const div = document.createElement('div');
+      div.className = 'chart-card';
+      const h4 = document.createElement('h3');
+      h4.innerHTML = `<i class="fas fa-chart-simple"></i> ${title}`;
+      div.appendChild(h4);
+      div.appendChild(canvasElem);
+      return div;
+    }
+    
+    function renderAllCharts(containerId, aggregated, users, events, analyticsData) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+      
+      // Helper to compute segment engagement (timeupdate count per segment)
+      function getSegmentEngagement() {
+        const segCount = { A:0, B:0, C:0, D:0, E:0, F:0, G:0 };
+        events.forEach(ev => {
+          if (ev.event_type === 'timeupdate') {
+            const seg = mapToSegment(ev.video_timestamp);
+            segCount[seg] = (segCount[seg] || 0) + 1;
+          }
+        });
+        return segCount;
+      }
+      
+      // 1. Retention curve: % of users who reached each timestamp
+      const retentionCtx = document.createElement('canvas');
+      const retentionPoints = [];
+      for (let t = 0; t <= 180; t += 20) {
+        let viewers = users.filter(u => {
+          return events.some(e => e.user_id === u.id && e.event_type === 'timeupdate' && e.video_timestamp >= t);
+        }).length;
+        retentionPoints.push({ x: t, y: users.length ? (viewers / users.length) * 100 : 0 });
+      }
+      new Chart(retentionCtx, { type: 'line', data: { labels: retentionPoints.map(p => p.x + 's'), datasets: [{ label: '% Viewers Remaining', data: retentionPoints.map(p => p.y), borderColor: '#1e466e', tension: 0.2 }] } });
+      container.appendChild(createCard("Retention Curve", retentionCtx));
+      
+      // 2. Segment Engagement (interaction density)
+      const segEngage = getSegmentEngagement();
+      const segBarCtx = document.createElement('canvas');
+      new Chart(segBarCtx, { type: 'bar', data: { labels: ['A','B','C','D','E','F','G'], datasets: [{ label: 'Interaction Count (time updates)', data: ['A','B','C','D','E','F','G'].map(s => segEngage[s]), backgroundColor: '#2c7da0' }] } });
+      container.appendChild(createCard("Segment Engagement (views density)", segBarCtx));
+      
+      // 3. Skip Heatmap by Segment
+      const skipHeatCtx = document.createElement('canvas');
+      const skipData = ['A','B','C','D','E','F','G'].map(s => aggregated.segmentSkipAgg[s] || 0);
+      new Chart(skipHeatCtx, { type: 'bar', data: { labels: ['A','B','C','D','E','F','G'], datasets: [{ label: 'Number of Skips', data: skipData, backgroundColor: '#c44536' }] } });
+      container.appendChild(createCard("Skip Heatmap by Segment", skipHeatCtx));
+      
+      // 4. Attention Score Distribution
+      const attDistCtx = document.createElement('canvas');
+      const scores = analyticsData.map(a => a.attentionScore);
+      const bins = [0,20,40,60,80,100];
+      const dist = [0,0,0,0,0];
+      scores.forEach(s => { if (s<=20) dist[0]++; else if (s<=40) dist[1]++; else if (s<=60) dist[2]++; else if (s<=80) dist[3]++; else dist[4]++; });
+      new Chart(attDistCtx, { type: 'bar', data: { labels: ['0-20','21-40','41-60','61-80','81-100'], datasets: [{ label: 'Users', data: dist, backgroundColor: '#3a6ea5' }] } });
+      container.appendChild(createCard("Attention Score Distribution", attDistCtx));
+      
+      // 5. Age vs Attention Score
+      const ageCorrCtx = document.createElement('canvas');
+      const agePoints = users.map(u => {
+        const anal = analyticsData.find(a => a.user_id === u.id);
+        return { age: u.age, score: anal ? anal.attentionScore : 0 };
+      }).filter(p => p.age);
+      new Chart(ageCorrCtx, { type: 'scatter', data: { datasets: [{ label: 'Participants', data: agePoints, backgroundColor: '#1f7a5a' }] }, options: { scales: { x: { title: { display: true, text: 'Age' } }, y: { title: { display: true, text: 'Attention Score' } } } } });
+      container.appendChild(createCard("Age vs Attention Score", ageCorrCtx));
+      
+      // 6. Screen time vs Avg Skips
+      const screenCorrCtx = document.createElement('canvas');
+      const screenMap = { '0-2':0, '2-4':1, '4-6':2, '6-8':3, '8+':4 };
+      const screenSkips = users.map(u => {
+        const anal = analyticsData.find(a => a.user_id === u.id);
+        return { screen: screenMap[u.screenTime] !== undefined ? screenMap[u.screenTime] : 0, skips: anal ? anal.skipCount : 0 };
+      });
+      const avgSkips = [0,1,2,3,4].map(lev => {
+        const filtered = screenSkips.filter(s => s.screen === lev);
+        return filtered.length ? filtered.reduce((a,b) => a + b.skips, 0) / filtered.length : 0;
+      });
+      new Chart(screenCorrCtx, { type: 'bar', data: { labels: ['0-2h','2-4h','4-6h','6-8h','8+h'], datasets: [{ label: 'Avg Skips', data: avgSkips, backgroundColor: '#e09d32' }] } });
+      container.appendChild(createCard("Daily Screen Time vs Skips", screenCorrCtx));
+    }
+    
+    // ---------- DASHBOARD REFRESH ----------
+    async function refreshDashboard() {
+      const dashboardDiv = document.getElementById('dashboardContent');
+      dashboardDiv.innerHTML = `<div class="insight-text"><i class="fas fa-spinner fa-pulse"></i> Generating charts & insights...</div>`;
+      const users = getFromStorage(STORAGE_KEYS.USERS) || [];
+      const events = getFromStorage(STORAGE_KEYS.EVENTS) || [];
+      const analyticsData = getFromStorage(STORAGE_KEYS.ANALYTICS) || [];
+      const aggregated = computeAggregatedAnalytics(users, events, analyticsData);
+      const container = document.createElement('div');
+      container.className = 'charts-grid';
+      container.id = 'chartsContainer';
+      dashboardDiv.innerHTML = '';
+      dashboardDiv.appendChild(container);
+      renderAllCharts('chartsContainer', aggregated, users, events, analyticsData);
+      const insightBox = document.createElement('div');
+      insightBox.className = 'insight-text';
+      insightBox.innerHTML = `<i class="fas fa-brain"></i> <strong>Attention Score Index:</strong> Average attention score: ${aggregated.avgAttentionScore.toFixed(1)} / 100. Segments with most skips: ${aggregated.mostSkippedSegment || 'none'}. Total participants: ${aggregated.totalParticipants}`;
+      dashboardDiv.appendChild(insightBox);
+    }
+    
+    // ---------- PRE SURVEY ----------
+    function handlePreSurvey(e) {
+      e.preventDefault();
+      const ageInput = document.getElementById('age');
+      if (!ageInput.value) return alert('Age is required');
+      const userId = generateUUID();
+      const userData = {
+        id: userId,
+        name: document.getElementById('name').value,
+        age: parseInt(ageInput.value),
+        gender: document.getElementById('gender').value,
+        occupation: document.getElementById('occupation').value,
+        education: document.getElementById('education').value,
+        country: document.getElementById('country').value,
+        screenTime: document.getElementById('screenTime').value,
+        contentType: document.getElementById('contentType').value,
+        platform: document.getElementById('platform').value,
+        skipHabit: document.getElementById('skipHabit').value,
+        prefLength: document.getElementById('prefLength').value,
+        createdAt: Date.now()
+      };
+      const users = getFromStorage(STORAGE_KEYS.USERS) || [];
+      users.push(userData);
+      saveToStorage(STORAGE_KEYS.USERS, users);
+      activeUserId = userId;
+      goToStep(2);
+      initVideoPlayerForUser();
+    }
+    
+    // Video session setup
+    function initVideoPlayerForUser() {
+      const videoEl = document.getElementById('studyVideo');
+      if (videoTrackerInstance) destroyVideoTracker();
+      const nextBtn = document.getElementById('videoNextBtn');
+      // onEnd callback: enable next button
+      const onEnd = () => {
+        if (nextBtn) nextBtn.disabled = false;
+      };
+      initVideoTracker(activeUserId, videoEl, onEnd);
+      
+      // Bind custom controls
+      const playPause = document.getElementById('playPauseBtn');
+      const skipBack = document.getElementById('skipBackBtn');
+      const skipForward = document.getElementById('skipForwardBtn');
+      const progress = document.getElementById('progressBar');
+      const currentLabel = document.getElementById('currentTimeLabel');
+      const durationLabel = document.getElementById('durationLabel');
+      
+      function updateUI() {
+        if (!videoEl) return;
+        const percent = (videoEl.currentTime / videoEl.duration) * 100;
+        progress.value = percent || 0;
+        currentLabel.innerText = formatTime(videoEl.currentTime);
+        durationLabel.innerText = formatTime(videoEl.duration);
+      }
+      function formatTime(sec) {
+        if (isNaN(sec)) return "0:00";
+        const mins = Math.floor(sec / 60);
+        const seconds = Math.floor(sec % 60);
+        return `${mins}:${seconds.toString().padStart(2,'0')}`;
+      }
+      videoEl.addEventListener('timeupdate', updateUI);
+      videoEl.addEventListener('loadedmetadata', updateUI);
+      const playPauseHandler = () => { if (videoEl.paused) videoEl.play(); else videoEl.pause(); };
+      const skipBackHandler = () => { videoEl.currentTime = Math.max(0, videoEl.currentTime - 10); };
+      const skipForwardHandler = () => { videoEl.currentTime = Math.min(videoEl.duration, videoEl.currentTime + 10); };
+      const progressHandler = (e) => { const seekTo = (e.target.value / 100) * videoEl.duration; videoEl.currentTime = seekTo; };
+      playPause.onclick = playPauseHandler;
+      skipBack.onclick = skipBackHandler;
+      skipForward.onclick = skipForwardHandler;
+      progress.oninput = progressHandler;
+      
+      // Store cleanup for video controls to avoid duplicates, but it's fine as we rebind each time before video section. We'll just override.
+      // Also handle next button action
+      document.getElementById('videoNextBtn').onclick = () => {
+        if (!videoEl.ended) {
+          if (confirm("Video not finished. Continue anyway? Data will be partial.")) {
+            destroyVideoTracker();
+            goToStep(3);
+          }
+        } else {
+          destroyVideoTracker();
+          goToStep(3);
+        }
+      };
+    }
+    
+    // Post survey handler
+    function handlePostSurvey(e) {
+      e.preventDefault();
+      const userId = activeUserId || getCurrentUserId();
+      if (!userId) return alert('Error: user not found');
+      const distracted = parseInt(document.getElementById('distracted').value);
+      const understanding = parseInt(document.getElementById('understanding').value);
+      const recallAnswer = document.getElementById('recallAnswer').value.trim();
+      if (!distracted || !understanding || !recallAnswer) return alert('Please complete all fields');
+      
+      const responseObj = {
+        user_id: userId,
+        engagingSegment: document.getElementById('engagingSeg').value,
+        boringSegment: document.getElementById('boringSeg').value,
+        distractedScale: distracted,
+        understandingScale: understanding,
+        recallText: recallAnswer,
+        submittedAt: Date.now()
+      };
+      let responses = getFromStorage(STORAGE_KEYS.RESPONSES) || [];
+      responses.push(responseObj);
+      saveToStorage(STORAGE_KEYS.RESPONSES, responses);
+      
+      const events = getFromStorage(STORAGE_KEYS.EVENTS) || [];
+      const metrics = computeUserAttentionMetrics(userId, events);
+      let analyticsArr = getFromStorage(STORAGE_KEYS.ANALYTICS) || [];
+      analyticsArr = analyticsArr.filter(a => a.user_id !== userId);
+      analyticsArr.push(metrics);
+      saveToStorage(STORAGE_KEYS.ANALYTICS, analyticsArr);
+      
+      goToStep(4);
+      refreshDashboard();
+    }
+    
+    // Export all data as JSON
+    function exportAllData() {
+      const data = {
+        users: getFromStorage(STORAGE_KEYS.USERS) || [],
+        events: getFromStorage(STORAGE_KEYS.EVENTS) || [],
+        responses: getFromStorage(STORAGE_KEYS.RESPONSES) || [],
+        analytics: getFromStorage(STORAGE_KEYS.ANALYTICS) || []
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `attention_study_export_${Date.now()}.json`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+    
+    function resetApp() {
+      if (confirm('Delete ALL stored study data? This will reset all participants.')) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+    
+    // Seed demo data if no users exist
+    function seedDemoDataIfEmpty() {
+      const users = getFromStorage(STORAGE_KEYS.USERS);
+      if (!users || users.length === 0) {
+        const demoUser = { id: "demo_001", name: "Demo Participant", age: 28, gender: "Female", occupation: "Researcher", education: "Master's", country: "USA", screenTime: "4-6", contentType: "Long-form", platform: "YouTube", skipHabit: "No", prefLength: "3-10 min", createdAt: Date.now() };
+        saveToStorage(STORAGE_KEYS.USERS, [demoUser]);
+        const demoEvents = [];
+        for (let i=0; i<40; i++) demoEvents.push({ user_id: "demo_001", event_type: "timeupdate", video_timestamp: Math.random()*180, real_timestamp: Date.now() - 50000 + i*1000 });
+        demoEvents.push({ user_id: "demo_001", event_type: "play", video_timestamp: 0, real_timestamp: Date.now() - 70000 });
+        demoEvents.push({ user_id: "demo_001", event_type: "seek", video_timestamp: 45, real_timestamp: Date.now() - 65000 });
+        demoEvents.push({ user_id: "demo_001", event_type: "pause", video_timestamp: 90, real_timestamp: Date.now() - 60000 });
+        demoEvents.push({ user_id: "demo_001", event_type: "ended", video_timestamp: 179, real_timestamp: Date.now() - 10000 });
+        saveToStorage(STORAGE_KEYS.EVENTS, demoEvents);
+        const demoResponses = [{ user_id: "demo_001", engagingSegment: "C (High stimulation)", boringSegment: "B (Boring)", distractedScale: 2, understandingScale: 4, recallText: "blue car", submittedAt: Date.now() }];
+        saveToStorage(STORAGE_KEYS.RESPONSES, demoResponses);
+        const demoMetrics = computeUserAttentionMetrics("demo_001", demoEvents);
+        saveToStorage(STORAGE_KEYS.ANALYTICS, [demoMetrics]);
+      }
+    }
+    
+    // Attach event listeners
+    document.getElementById('startStudyBtn').onclick = () => goToStep(1);
+    document.getElementById('savePreSurvey').addEventListener('click', handlePreSurvey);
+    document.getElementById('submitPostBtn').addEventListener('click', handlePostSurvey);
+    document.getElementById('exportCSVBtn').addEventListener('click', exportAllData);
+    document.getElementById('adminResetBtn').addEventListener('click', resetApp);
+    
+    // Initialize demo data and preload
+    seedDemoDataIfEmpty();
+    // If dashboard gets accessed via direct step, ensure we can still render, but we start at consent
+    window.refreshDashboard = refreshDashboard;
+  })();
 </script>
 </body>
 </html>
