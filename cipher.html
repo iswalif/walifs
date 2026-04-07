@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>cipher · by h1m</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      background: #0e0e0e;
+      color: #eaeaea;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(229, 229, 229, 0.15);
+      background: #0e0e0e;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      text-transform: lowercase;
+      opacity: 0.7;
+    }
+
+    .mode-tabs {
+      display: flex;
+      gap: 28px;
+      background: transparent;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #eaeaea;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: lowercase;
+      padding: 6px 0;
+      cursor: pointer;
+      transition: 0.2s ease;
+      opacity: 0.6;
+      border-bottom: 1px solid transparent;
+    }
+
+    .tab-btn.active {
+      opacity: 1;
+      border-bottom: 1px solid #eaeaea;
+      letter-spacing: 0.25em;
+    }
+
+    .tab-btn:hover {
+      opacity: 1;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+
+    .panel {
+      width: 100%;
+      max-width: 560px;
+      background: transparent;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .panel.hidden {
+      display: none;
+    }
+
+    textarea, input[type="password"], input[type="text"] {
+      background: rgba(20, 20, 20, 0.8);
+      border: 1px solid rgba(229, 229, 229, 0.2);
+      border-radius: 24px;
+      color: #eaeaea;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 14px 18px;
+      width: 100%;
+      resize: vertical;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    textarea:focus, input:focus {
+      border-color: rgba(229, 229, 229, 0.7);
+      box-shadow: 0 0 0 2px rgba(229, 229, 229, 0.1);
+      background: #121212;
+    }
+
+    textarea {
+      min-height: 130px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: lowercase;
+      margin-bottom: 8px;
+      opacity: 0.6;
+      margin-left: 6px;
+    }
+
+    .action-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin: 24px 0 20px;
+      align-items: center;
+    }
+
+    .btn {
+      background: transparent;
+      border: 1px solid rgba(229, 229, 229, 0.4);
+      color: #eaeaea;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      background: #eaeaea;
+      color: #0e0e0e;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: #ffffff;
+      transform: scale(0.98);
+    }
+
+    .btn-outline:hover {
+      background: rgba(229, 229, 229, 0.1);
+      border-color: #eaeaea;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      color: #ccc;
+      transition: 0.1s;
+      padding: 8px 14px;
+      border-radius: 30px;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: white;
+    }
+
+    .output-box {
+      background: rgba(10, 10, 10, 0.7);
+      border: 1px solid rgba(229, 229, 229, 0.2);
+      border-radius: 20px;
+      padding: 18px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      word-break: break-all;
+      white-space: pre-wrap;
+      margin-top: 8px;
+      letter-spacing: 0.02em;
+      line-height: 1.45;
+      color: #cdcdcd;
+    }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+      font-size: 11px;
+      opacity: 0.5;
+      letter-spacing: 0.2em;
+    }
+
+    .error-message {
+      font-size: 12px;
+      color: #ff9e8f;
+      background: rgba(255,80,60,0.08);
+      border-radius: 30px;
+      padding: 8px 14px;
+      margin-top: 12px;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    .feedback {
+      font-size: 11px;
+      opacity: 0.6;
+      text-align: right;
+      margin-top: 6px;
+    }
+
+    hr {
+      border-color: rgba(229, 229, 229, 0.1);
+      margin: 12px 0;
+    }
+
+    @media (max-width: 580px) {
+      .top-nav {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+      }
+      .mode-tabs {
+        gap: 32px;
+      }
+      .container {
+        padding: 20px 16px;
+      }
+      .btn {
+        padding: 8px 16px;
+      }
+    }
+
+    @keyframes glowPulse {
+      0% { border-color: rgba(229,229,229,0.2); box-shadow: 0 0 0 0 rgba(229,229,229,0);}
+      50% { border-color: rgba(229,229,229,0.9); box-shadow: 0 0 6px rgba(229,229,229,0.4);}
+      100% { border-color: rgba(229,229,229,0.2); box-shadow: 0 0 0 0 rgba(229,229,229,0);}
+    }
+    .glow-effect {
+      animation: glowPulse 0.5s ease-out;
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="brand">cipher · vault</div>
+  <div class="mode-tabs">
+    <button class="tab-btn active" data-mode="encrypt">encrypt</button>
+    <button class="tab-btn" data-mode="decrypt">decrypt</button>
+  </div>
+</div>
+
+<div class="container">
+  <div id="encryptPanel" class="panel">
+    <div class="input-group">
+      <div class="input-label"><i class="fa-regular fa-keyboard"></i> plaintext</div>
+      <textarea id="plainText" placeholder="your secret message ..."></textarea>
+    </div>
+    <div class="input-group">
+      <div class="input-label"><i class="fa-regular fa-lock-keyhole"></i> encryption pin</div>
+      <input type="password" id="encryptPin" placeholder="••••••" autocomplete="off">
+    </div>
+    <div class="action-group">
+      <button class="btn btn-primary" id="doEncryptBtn"><i class="fa-solid fa-encrypt"></i> encrypt →</button>
+    </div>
+    <div class="input-group">
+      <div class="output-header">
+        <span><i class="fa-regular fa-cipher"></i> ciphertext (encrypted)</span>
+        <button class="copy-btn" id="copyEncryptedBtn" title="copy to clipboard"><i class="fa-regular fa-copy"></i> copy</button>
+      </div>
+      <div id="encryptedOutput" class="output-box">—</div>
+    </div>
+    <div id="encryptError" class="error-message" style="display: none;"></div>
+  </div>
+
+  <div id="decryptPanel" class="panel hidden">
+    <div class="input-group">
+      <div class="input-label"><i class="fa-regular fa-file-lines"></i> encrypted string</div>
+      <textarea id="cipherText" placeholder="paste encrypted block here ..."></textarea>
+    </div>
+    <div class="input-group">
+      <div class="input-label"><i class="fa-regular fa-lock-keyhole"></i> decryption pin</div>
+      <input type="password" id="decryptPin" placeholder="same pin used for encryption" autocomplete="off">
+    </div>
+    <div class="action-group">
+      <button class="btn btn-primary" id="doDecryptBtn"><i class="fa-solid fa-decrypt"></i> decrypt →</button>
+    </div>
+    <div class="input-group">
+      <div class="output-header">
+        <span><i class="fa-regular fa-message"></i> original text</span>
+        <button class="copy-btn" id="copyDecryptedBtn" title="copy to clipboard"><i class="fa-regular fa-copy"></i> copy</button>
+      </div>
+      <div id="decryptedOutput" class="output-box">—</div>
+    </div>
+    <div id="decryptError" class="error-message" style="display: none;"></div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    function strToBuffer(str) {
+      return new TextEncoder().encode(str);
+    }
+    function bufferToStr(buf) {
+      return new TextDecoder().decode(buf);
+    }
+
+    async function deriveKey(password, salt) {
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(password),
+        { name: "PBKDF2" },
+        false,
+        ["deriveKey"]
+      );
+      return crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: salt,
+          iterations: 210000,
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    async function encryptAES(plainText, password) {
+      if (!plainText || !password) throw new Error("Missing text or PIN");
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const key = await deriveKey(password, salt);
+      const encodedPlain = strToBuffer(plainText);
+      const encrypted = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv: iv },
+        key,
+        encodedPlain
+      );
+      const cipherBuffer = new Uint8Array(encrypted);
+      const saltB64 = btoa(String.fromCharCode(...salt));
+      const ivB64 = btoa(String.fromCharCode(...iv));
+      const cipherB64 = btoa(String.fromCharCode(...cipherBuffer));
+      return `${saltB64}:${ivB64}:${cipherB64}`;
+    }
+
+    async function decryptAES(encryptedPackage, password) {
+      if (!encryptedPackage || !password) throw new Error("Missing data or PIN");
+      const parts = encryptedPackage.split(':');
+      if (parts.length !== 3) throw new Error("Invalid ciphertext format");
+      const [saltB64, ivB64, cipherB64] = parts;
+      const salt = Uint8Array.from(atob(saltB64), c => c.charCodeAt(0));
+      const iv = Uint8Array.from(atob(ivB64), c => c.charCodeAt(0));
+      const cipherData = Uint8Array.from(atob(cipherB64), c => c.charCodeAt(0));
+      if (salt.length !== 16 || iv.length !== 12) throw new Error("Malformed header");
+      const key = await deriveKey(password, salt);
+      try {
+        const decrypted = await crypto.subtle.decrypt(
+          { name: "AES-GCM", iv: iv },
+          key,
+          cipherData
+        );
+        return bufferToStr(decrypted);
+      } catch (err) {
+        throw new Error("Invalid PIN or corrupted data");
+      }
+    }
+
+    const encryptPanel = document.getElementById('encryptPanel');
+    const decryptPanel = document.getElementById('decryptPanel');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    
+    const plainTextarea = document.getElementById('plainText');
+    const encryptPinInput = document.getElementById('encryptPin');
+    const doEncryptBtn = document.getElementById('doEncryptBtn');
+    const encryptedOutputDiv = document.getElementById('encryptedOutput');
+    const copyEncryptedBtn = document.getElementById('copyEncryptedBtn');
+    const encryptErrorDiv = document.getElementById('encryptError');
+    
+    const cipherTextarea = document.getElementById('cipherText');
+    const decryptPinInput = document.getElementById('decryptPin');
+    const doDecryptBtn = document.getElementById('doDecryptBtn');
+    const decryptedOutputDiv = document.getElementById('decryptedOutput');
+    const copyDecryptedBtn = document.getElementById('copyDecryptedBtn');
+    const decryptErrorDiv = document.getElementById('decryptError');
+
+    let encryptErrTimeout, decryptErrTimeout;
+    function showError(div, msg, timeout = 3500) {
+      if (div === encryptErrorDiv && encryptErrTimeout) clearTimeout(encryptErrTimeout);
+      if (div === decryptErrorDiv && decryptErrTimeout) clearTimeout(decryptErrTimeout);
+      div.textContent = msg;
+      div.style.display = 'block';
+      const t = setTimeout(() => {
+        div.style.display = 'none';
+      }, timeout);
+      if (div === encryptErrorDiv) encryptErrTimeout = t;
+      else decryptErrTimeout = t;
+    }
+
+    function hideErrors() {
+      encryptErrorDiv.style.display = 'none';
+      decryptErrorDiv.style.display = 'none';
+    }
+
+    doEncryptBtn.addEventListener('click', async () => {
+      hideErrors();
+      const plain = plainTextarea.value;
+      const pin = encryptPinInput.value;
+      if (!plain.trim()) {
+        showError(encryptErrorDiv, '⚠️ enter text to encrypt', 2500);
+        return;
+      }
+      if (!pin) {
+        showError(encryptErrorDiv, '🔐 PIN required for encryption', 2500);
+        return;
+      }
+      try {
+        doEncryptBtn.disabled = true;
+        doEncryptBtn.innerHTML = '<i class="fa-solid fa-spinner fa-pulse"></i> encrypting';
+        const cipherText = await encryptAES(plain, pin);
+        encryptedOutputDiv.innerText = cipherText;
+        doEncryptBtn.innerHTML = '<i class="fa-solid fa-encrypt"></i> encrypt →';
+        doEncryptBtn.disabled = false;
+        encryptedOutputDiv.classList.add('glow-effect');
+        setTimeout(() => encryptedOutputDiv.classList.remove('glow-effect'), 500);
+      } catch (err) {
+        doEncryptBtn.disabled = false;
+        doEncryptBtn.innerHTML = '<i class="fa-solid fa-encrypt"></i> encrypt →';
+        showError(encryptErrorDiv, `❌ encryption failed: ${err.message}`, 3000);
+      }
+    });
+
+    doDecryptBtn.addEventListener('click', async () => {
+      hideErrors();
+      const cipher = cipherTextarea.value.trim();
+      const pin = decryptPinInput.value;
+      if (!cipher) {
+        showError(decryptErrorDiv, '📦 paste encrypted string first', 2500);
+        return;
+      }
+      if (!pin) {
+        showError(decryptErrorDiv, '🔑 PIN required for decryption', 2500);
+        return;
+      }
+      try {
+        doDecryptBtn.disabled = true;
+        doDecryptBtn.innerHTML = '<i class="fa-solid fa-spinner fa-pulse"></i> decrypting';
+        const original = await decryptAES(cipher, pin);
+        decryptedOutputDiv.innerText = original;
+        doDecryptBtn.disabled = false;
+        doDecryptBtn.innerHTML = '<i class="fa-solid fa-decrypt"></i> decrypt →';
+        decryptedOutputDiv.classList.add('glow-effect');
+        setTimeout(() => decryptedOutputDiv.classList.remove('glow-effect'), 500);
+      } catch (err) {
+        doDecryptBtn.disabled = false;
+        doDecryptBtn.innerHTML = '<i class="fa-solid fa-decrypt"></i> decrypt →';
+        let friendlyMsg = '❌ invalid key or corrupted ciphertext';
+        if (err.message.includes("Invalid PIN") || err.message.includes("corrupted")) friendlyMsg = '❌ decryption failed: wrong PIN or data tampered';
+        else friendlyMsg = `❌ ${err.message}`;
+        showError(decryptErrorDiv, friendlyMsg, 3500);
+      }
+    });
+
+    async function copyToClipboard(text, elementToGlow, successMsg) {
+      if (!text || text === '—') {
+        return false;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        if (elementToGlow) {
+          elementToGlow.classList.add('glow-effect');
+          setTimeout(() => elementToGlow.classList.remove('glow-effect'), 400);
+        }
+        const feedbackSpan = document.createElement('span');
+        feedbackSpan.className = 'feedback';
+        feedbackSpan.innerText = successMsg || '✓ copied';
+        const parent = elementToGlow?.parentNode;
+        if (parent && !parent.querySelector('.temp-feedback')) {
+          feedbackSpan.classList.add('temp-feedback');
+          parent.appendChild(feedbackSpan);
+          setTimeout(() => feedbackSpan.remove(), 1200);
+        }
+        return true;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    copyEncryptedBtn.addEventListener('click', () => {
+      const cipherTextContent = encryptedOutputDiv.innerText;
+      if (!cipherTextContent || cipherTextContent === '—') {
+        showError(encryptErrorDiv, 'nothing to copy — encrypt something first', 1500);
+        return;
+      }
+      copyToClipboard(cipherTextContent, encryptedOutputDiv, 'ciphertext copied');
+    });
+
+    copyDecryptedBtn.addEventListener('click', () => {
+      const plainResult = decryptedOutputDiv.innerText;
+      if (!plainResult || plainResult === '—') {
+        showError(decryptErrorDiv, 'nothing to copy — decrypt first', 1500);
+        return;
+      }
+      copyToClipboard(plainResult, decryptedOutputDiv, 'original text copied');
+    });
+
+    function switchMode(mode) {
+      if (mode === 'encrypt') {
+        encryptPanel.classList.remove('hidden');
+        decryptPanel.classList.add('hidden');
+        encryptPanel.style.opacity = '0';
+        setTimeout(() => encryptPanel.style.opacity = '1', 10);
+        decryptPanel.style.opacity = '0';
+      } else {
+        decryptPanel.classList.remove('hidden');
+        encryptPanel.classList.add('hidden');
+        decryptPanel.style.opacity = '0';
+        setTimeout(() => decryptPanel.style.opacity = '1', 10);
+        encryptPanel.style.opacity = '0';
+      }
+      tabBtns.forEach(btn => {
+        const btnMode = btn.getAttribute('data-mode');
+        if (btnMode === mode) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      hideErrors();
+    }
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const mode = btn.getAttribute('data-mode');
+        if (mode === 'encrypt') switchMode('encrypt');
+        else switchMode('decrypt');
+      });
+    });
+
+    plainTextarea.addEventListener('focus', () => { encryptErrorDiv.style.display = 'none'; });
+    encryptPinInput.addEventListener('focus', () => { encryptErrorDiv.style.display = 'none'; });
+    cipherTextarea.addEventListener('focus', () => { decryptErrorDiv.style.display = 'none'; });
+    decryptPinInput.addEventListener('focus', () => { decryptErrorDiv.style.display = 'none'; });
+
+    plainTextarea.value = 'hello, this is a secret. only my pin unlocks.';
+    encryptPinInput.value = '';
+    cipherTextarea.value = '';
+    decryptPinInput.value = '';
+    encryptedOutputDiv.innerText = '—';
+    decryptedOutputDiv.innerText = '—';
+    
+    if (!window.crypto || !window.crypto.subtle) {
+      const globalError = document.createElement('div');
+      globalError.className = 'error-message';
+      globalError.style.margin = '20px auto';
+      globalError.innerText = '⚠️ Your browser does not support Web Crypto API. Please use modern Chrome/Firefox/Edge/Safari.';
+      document.querySelector('.container').prepend(globalError);
+    }
+  })();
+</script>
+</body>
+</html>
