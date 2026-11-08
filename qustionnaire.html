@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>restaurant questionnaire</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -648,67 +647,6 @@
       text-transform: lowercase;
     }
 
-    .upload-area {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .upload-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .upload-skipped {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding: 20px;
-      background: rgba(229, 229, 229, 0.03);
-      border-radius: 16px;
-      text-align: center;
-    }
-
-    .upload-skipped p {
-      font-size: 13px;
-      line-height: 1.6;
-      opacity: 0.7;
-    }
-
-    .file-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .file-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 16px;
-      background: rgba(229, 229, 229, 0.04);
-      border-radius: 40px;
-      font-size: 12px;
-      letter-spacing: 0.04em;
-    }
-
-    .file-row .file-name {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      opacity: 0.85;
-    }
-
-    .file-row .file-size {
-      flex-shrink: 0;
-      opacity: 0.45;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-    }
-
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -1133,6 +1071,7 @@
         questions: [
           { id: 'q1', n: 1, type: 'text', label: 'Restaurant name:' },
           { id: 'q2', n: 2, type: 'textarea', label: 'Short description of the restaurant:', helper: 'What type of restaurant is it? What food or experience do you specialize in?', rows: 3 },
+          { id: 'q3', n: 3, type: 'text', label: 'Restaurant logo:', helper: 'Please send the original logo file separately along with your responses.' },
           { id: 'q4', n: 4, type: 'text', label: 'Established year:', helper: 'Optional', placeholder: 'e.g. 2015' }
         ]
       },
@@ -1157,71 +1096,78 @@
         ]
       },
       {
+        title: 'Restaurant Photos',
+        questions: [
+          { id: 'q15', n: 15, type: 'checklist', label: 'Please attach any available photographs:', options: ['Restaurant exterior / entrance', 'Interior and seating area', 'Food and signature dishes', 'Any other photos you’d like displayed'], helper: 'Original, high-quality images are preferred. Send these files separately along with your responses.' }
+        ]
+      },
+      {
         title: 'Menu',
         questions: [
-          { id: 'q18', n: 18, type: 'checklist', label: 'Please make sure the menu includes:', options: ['Food and drink names', 'Categories', 'Current prices', 'Short descriptions, if available'] },
-          { id: 'q19', n: 19, type: 'textarea', label: 'Are any items particularly popular or signature dishes you’d like highlighted?', rows: 3 }
+          { id: 'q17', n: 16, type: 'text', label: 'Latest menu file:', helper: 'Send your latest menu in PDF, image or document format separately along with your responses. If no digital menu is available, send clear photographs of the printed menu.' },
+          { id: 'q18', n: 17, type: 'checklist', label: 'Please make sure the menu includes:', options: ['Food and drink names', 'Categories', 'Current prices', 'Short descriptions, if available'] },
+          { id: 'q19', n: 18, type: 'textarea', label: 'Are any items particularly popular or signature dishes you’d like highlighted?', rows: 3 }
         ]
       },
       {
         title: 'Reservation Preferences',
         questions: [
-          { id: 'q20', n: 20, type: 'radio', label: 'Do you currently accept table reservations?', options: ['Yes', 'No'] },
-          { id: 'q21', n: 21, type: 'checkbox', label: 'How do customers currently make reservations?', options: ['Phone', 'WhatsApp', 'Facebook', 'In person'], allowOther: true },
-          { id: 'q22', n: 22, type: 'radio', label: 'Would you like customers to submit reservation requests through the website?', options: ['Yes', 'No'] },
-          { id: 'q23', n: 23, type: 'radio', label: 'Should reservations be confirmed manually by your staff before becoming official?', options: ['Yes', 'No', 'Not sure'] },
-          { id: 'q24', n: 24, type: 'text', label: 'Approximately how many tables does the restaurant have?' },
-          { id: 'q25', n: 25, type: 'textarea', label: 'Please provide the table numbers and seating capacities, if available.', helper: 'Example: Table 1 — 2 people, Table 2 — 4 people.', rows: 3 },
-          { id: 'q26', n: 26, type: 'textarea', label: 'Are there separate seating areas?', helper: 'Example: Indoor, outdoor, rooftop, upstairs.', rows: 2 }
+          { id: 'q20', n: 19, type: 'radio', label: 'Do you currently accept table reservations?', options: ['Yes', 'No'] },
+          { id: 'q21', n: 20, type: 'checkbox', label: 'How do customers currently make reservations?', options: ['Phone', 'WhatsApp', 'Facebook', 'In person'], allowOther: true },
+          { id: 'q22', n: 21, type: 'radio', label: 'Would you like customers to submit reservation requests through the website?', options: ['Yes', 'No'] },
+          { id: 'q23', n: 22, type: 'radio', label: 'Should reservations be confirmed manually by your staff before becoming official?', options: ['Yes', 'No', 'Not sure'] },
+          { id: 'q24', n: 23, type: 'text', label: 'Approximately how many tables does the restaurant have?' },
+          { id: 'q25', n: 24, type: 'textarea', label: 'Please provide the table numbers and seating capacities, if available.', helper: 'Example: Table 1 — 2 people, Table 2 — 4 people.', rows: 3 },
+          { id: 'q26', n: 25, type: 'textarea', label: 'Are there separate seating areas?', helper: 'Example: Indoor, outdoor, rooftop, upstairs.', rows: 2 }
         ]
       },
       {
         title: 'Restaurant Introduction',
         questions: [
-          { id: 'q27', n: 27, type: 'textarea', label: 'Please provide a short introduction about the restaurant.', helper: 'You can mention: how the restaurant started, what makes it different, its specialties or dining experience. If you don’t have a written introduction, a few sentences or bullet points are perfectly fine.', rows: 4 }
+          { id: 'q27', n: 26, type: 'textarea', label: 'Please provide a short introduction about the restaurant.', helper: 'You can mention: how the restaurant started, what makes it different, its specialties or dining experience. If you don’t have a written introduction, a few sentences or bullet points are perfectly fine.', rows: 4 }
         ]
       },
       {
         title: 'Website Preferences',
         questions: [
-          { id: 'q28', n: 28, type: 'radio', label: 'Which languages should the website support?', options: ['English', 'Bengali', 'Both'] },
-          { id: 'q29', n: 29, type: 'textarea', label: 'Are there any particular colours, themes or design styles you prefer?', rows: 2 },
-          { id: 'q30', n: 30, type: 'textarea', label: 'Are there any restaurant websites you like?', helper: 'Optional — share links if available.', rows: 2 }
+          { id: 'q28', n: 27, type: 'radio', label: 'Which languages should the website support?', options: ['English', 'Bengali', 'Both'] },
+          { id: 'q29', n: 28, type: 'textarea', label: 'Are there any particular colours, themes or design styles you prefer?', rows: 2 },
+          { id: 'q30', n: 29, type: 'textarea', label: 'Are there any restaurant websites you like?', helper: 'Optional — share links if available.', rows: 2 }
         ]
       },
       {
         title: 'Customer Management (optional)',
         questions: [
-          { id: 'q31', n: 31, type: 'radio', label: 'Would you like the admin dashboard to maintain basic customer records?', helper: 'For example: customer name and phone number, previous visits, reservation history, frequent customer identification.', options: ['Yes', 'No', 'Maybe later'] }
+          { id: 'q31', n: 30, type: 'radio', label: 'Would you like the admin dashboard to maintain basic customer records?', helper: 'For example: customer name and phone number, previous visits, reservation history, frequent customer identification.', options: ['Yes', 'No', 'Maybe later'] }
         ]
       },
       {
         title: 'Loyalty Programme (optional)',
         questions: [
-          { id: 'q32', n: 32, type: 'radio', label: 'Would you like a digital loyalty or membership programme?', helper: 'For example, customers earn points from purchases and redeem them for rewards.', options: ['Yes', 'No', 'Maybe later'] },
-          { id: 'q33', n: 33, type: 'textarea', label: 'If yes, do you already have a rewards or membership system? Briefly describe it.', rows: 2 }
+          { id: 'q32', n: 31, type: 'radio', label: 'Would you like a digital loyalty or membership programme?', helper: 'For example, customers earn points from purchases and redeem them for rewards.', options: ['Yes', 'No', 'Maybe later'] },
+          { id: 'q33', n: 32, type: 'textarea', label: 'If yes, do you already have a rewards or membership system? Briefly describe it.', rows: 2 }
         ]
       },
       {
         title: 'Sales and Expense Management (optional)',
         questions: [
-          { id: 'q34', n: 34, type: 'radio', label: 'Would you like the admin dashboard to record daily sales and business expenses?', options: ['Yes', 'No', 'Maybe later'] },
-          { id: 'q35', n: 35, type: 'radio', label: 'Do you currently use a POS or billing system?', options: ['Yes', 'No'] },
-          { id: 'q36', n: 36, type: 'text', label: 'If yes, please mention its name.' }
+          { id: 'q34', n: 33, type: 'radio', label: 'Would you like the admin dashboard to record daily sales and business expenses?', options: ['Yes', 'No', 'Maybe later'] },
+          { id: 'q35', n: 34, type: 'radio', label: 'Do you currently use a POS or billing system?', options: ['Yes', 'No'] },
+          { id: 'q36', n: 35, type: 'text', label: 'If yes, please mention its name.' }
         ]
       },
       {
         title: 'Final Details',
         questions: [
-          { id: 'q37', n: 37, type: 'textarea', label: 'Who will be responsible for providing and approving website information, menu updates and prices?', rows: 2 },
-          { id: 'q38', n: 38, type: 'textarea', label: 'Is there anything else you’d like included on the website that hasn’t been mentioned above?', rows: 3 }
+          { id: 'q37', n: 36, type: 'textarea', label: 'Who will be responsible for providing and approving website information, menu updates and prices?', rows: 2 },
+          { id: 'q38', n: 37, type: 'textarea', label: 'Is there anything else you’d like included on the website that hasn’t been mentioned above?', rows: 3 }
         ]
       },
       {
-        title: 'Upload Documents',
-        intro: 'Upload all available logos, menus, photographs and other relevant materials. You can upload as many files as needed. If you don’t have them ready, skip this section and send them separately.',
+        title: 'Documents to Send',
+        intro: 'Please attach all available logos, menus, photographs and other relevant materials when returning this questionnaire. If something isn’t available yet, simply mention that.',
         questions: [
-          { id: 'q39', n: null, type: 'upload', label: 'Upload documents' }
+          { id: 'q39', n: null, type: 'documentList', label: 'Documents to send' }
         ]
       }
     ];
@@ -1260,8 +1206,6 @@
     var currentSection = 0;
     var saveTimer = null;
     var toastTimer = null;
-    var uploadedFiles = [];
-    var skipUpload = false;
 
     function escapeHtml(s) {
       return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -1281,13 +1225,6 @@
       el.classList.add('show');
       clearTimeout(toastTimer);
       toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2500);
-    }
-
-    function formatSize(bytes) {
-      if (!bytes && bytes !== 0) return '';
-      if (bytes < 1024) return bytes + ' B';
-      if (bytes < 1048576) return (bytes / 1024).toFixed(0) + ' KB';
-      return (bytes / 1048576).toFixed(1) + ' MB';
     }
 
     function setSaveStatus(status) {
@@ -1350,9 +1287,6 @@
 
     function isQuestionAnswered(q) {
       var val = state.answers[q.id];
-      if (q.type === 'upload') {
-        return skipUpload || uploadedFiles.length > 0;
-      }
       if (q.type === 'menuRepeater') {
         return Array.isArray(val) && val.some(function (item) {
           return item && item.name && String(item.name).trim();
@@ -1367,6 +1301,7 @@
           return val[d] && (val[d].open || val[d].close);
         });
       }
+      if (q.type === 'documentList') return false;
       if (typeof val === 'string') return val.trim().length > 0;
       return val != null && val !== '';
     }
@@ -1375,6 +1310,7 @@
       var total = 0, done = 0;
       SECTIONS.forEach(function (sec) {
         sec.questions.forEach(function (q) {
+          if (q.type === 'documentList') return;
           total++;
           if (isQuestionAnswered(q)) done++;
         });
@@ -1417,7 +1353,7 @@
               '<li>You can leave and return later using the same browser and device.</li>' +
               '<li>Answer what you can \u2014 write N/A if a question does not apply, or TBD if you are unsure.</li>' +
               '<li>At the end, download or copy your responses as a TXT file to send back.</li>' +
-              '<li>Upload logos, menus and photographs at the end; they will be bundled into a ZIP together with the TXT.</li>' +
+              '<li>Logos, menus and photographs must be sent separately along with the exported TXT.</li>' +
             '</ul>' +
           '</div>' +
           '<div class="instructions">' +
@@ -1458,25 +1394,15 @@
       var num = q.n ? '<span class="q-num">' + q.n + '.</span>' : '';
       var helper = q.helper ? '<span class="q-helper">' + escapeHtml(q.helper) + '</span>' : '';
 
-      if (q.type === 'upload') {
+      if (q.type === 'documentList') {
         return '<div class="question" data-qid="' + q.id + '">' +
+          '<span class="q-label">' + escapeHtml(q.label) + '</span>' +
+          helper +
           '<div class="instructions">' +
             '<strong>documents to send</strong>' +
             '<ul>' + DOCUMENTS.map(function (d) { return '<li>' + escapeHtml(d) + '</li>'; }).join('') + '</ul>' +
-            '<div style="margin-top:10px"><button type="button" class="mini-btn" data-copy-docs>copy list</button></div>' +
           '</div>' +
-          '<div class="upload-area" id="uploadArea">' +
-            '<div class="upload-actions">' +
-              '<button type="button" class="btn-secondary" data-upload-trigger>+ choose files</button>' +
-              '<button type="button" class="btn-ghost" data-skip-upload>skip this section</button>' +
-            '</div>' +
-            '<input type="file" id="uploadInput" multiple style="display:none">' +
-            '<div class="file-list" id="uploadList"></div>' +
-          '</div>' +
-          '<div class="upload-skipped" id="uploadSkipped" style="display:none">' +
-            '<p id="skipMessage">Section skipped. Only the TXT will be exported. Send your documents separately.</p>' +
-            '<button type="button" class="btn-ghost" data-unskip-upload>unskip</button>' +
-          '</div>' +
+          '<div style="margin-top:10px"><button type="button" class="mini-btn" data-copy-docs>copy list</button></div>' +
         '</div>';
       }
 
@@ -1612,40 +1538,6 @@
       '</div>';
     }
 
-    function renderUploadList() {
-      var el = document.getElementById('uploadList');
-      if (!el) return;
-      if (!uploadedFiles.length) { el.innerHTML = ''; return; }
-      el.innerHTML = uploadedFiles.map(function (f, i) {
-        return '<div class="file-row">' +
-          '<span class="file-name">' + escapeHtml(f.name) + '</span>' +
-          '<span class="file-size">' + formatSize(f.size) + '</span>' +
-          '<button type="button" class="mini-btn" data-remove-upload="' + i + '">remove</button>' +
-        '</div>';
-      }).join('');
-    }
-
-    function updateUploadUI() {
-      var area = document.getElementById('uploadArea');
-      var skipped = document.getElementById('uploadSkipped');
-      var msg = document.getElementById('skipMessage');
-      if (!area || !skipped) return;
-      if (skipUpload) {
-        area.style.display = 'none';
-        skipped.style.display = 'flex';
-        if (msg) {
-          if (uploadedFiles.length > 0) {
-            msg.textContent = 'Section skipped. ' + uploadedFiles.length + ' file' + (uploadedFiles.length > 1 ? 's' : '') + ' uploaded but will not be included in the export. Send your documents separately.';
-          } else {
-            msg.textContent = 'Section skipped. Only the TXT will be exported. Send your documents separately.';
-          }
-        }
-      } else {
-        area.style.display = 'flex';
-        skipped.style.display = 'none';
-      }
-    }
-
     function applyStateToDOM() {
       SECTIONS.forEach(function (sec) {
         sec.questions.forEach(function (q) {
@@ -1728,7 +1620,6 @@
 
       if (name === 'review') renderReview();
       if (name === 'questionnaire') updateProgressHeader();
-      if (name === 'complete') renderComplete();
 
       document.getElementById('main').scrollTop = 0;
       queueSave();
@@ -1751,8 +1642,6 @@
 
       applyScreen('questionnaire');
       updateProgressHeader();
-      renderUploadList();
-      updateUploadUI();
 
       document.getElementById('main').scrollTop = 0;
       queueSave();
@@ -1819,20 +1708,6 @@
 
     document.addEventListener('change', function (e) {
       var t = e.target;
-
-      if (t.id === 'uploadInput') {
-        var files = Array.prototype.slice.call(t.files || []);
-        if (files.length) {
-          files.forEach(function (f) { uploadedFiles.push(f); });
-          renderUploadList();
-          updateUploadUI();
-          updateProgress();
-          showToast(files.length + ' file' + (files.length > 1 ? 's' : '') + ' added');
-        }
-        t.value = '';
-        return;
-      }
-
       var qid = t.dataset && t.dataset.qid;
       if (!qid) return;
 
@@ -1852,40 +1727,6 @@
     document.addEventListener('click', function (e) {
       var copyBtn = e.target.closest ? e.target.closest('[data-copy-docs]') : null;
       if (copyBtn) { copyDocuments(); return; }
-
-      var uploadTrigger = e.target.closest ? e.target.closest('[data-upload-trigger]') : null;
-      if (uploadTrigger) {
-        var inp = document.getElementById('uploadInput');
-        if (inp) inp.click();
-        return;
-      }
-
-      var skipBtn = e.target.closest ? e.target.closest('[data-skip-upload]') : null;
-      if (skipBtn) {
-        skipUpload = true;
-        updateUploadUI();
-        updateProgress();
-        showToast('section skipped');
-        return;
-      }
-
-      var unskipBtn = e.target.closest ? e.target.closest('[data-unskip-upload]') : null;
-      if (unskipBtn) {
-        skipUpload = false;
-        updateUploadUI();
-        updateProgress();
-        return;
-      }
-
-      var removeUpload = e.target.closest ? e.target.closest('[data-remove-upload]') : null;
-      if (removeUpload) {
-        var idx = parseInt(removeUpload.dataset.removeUpload, 10);
-        uploadedFiles.splice(idx, 1);
-        renderUploadList();
-        updateUploadUI();
-        updateProgress();
-        return;
-      }
 
       if (e.target.closest && e.target.closest('#addMenuItem')) {
         addMenuItem();
@@ -1961,8 +1802,9 @@
 
       var list = document.getElementById('reviewList');
       SECTIONS.forEach(function (sec, i) {
-        var sDone = sec.questions.filter(isQuestionAnswered).length;
-        var sTotal = sec.questions.length;
+        var qs = sec.questions.filter(function (q) { return q.type !== 'documentList'; });
+        var sDone = qs.filter(isQuestionAnswered).length;
+        var sTotal = qs.length;
         var item = document.createElement('div');
         item.className = 'review-item';
         item.innerHTML =
@@ -1985,37 +1827,23 @@
 
     function renderComplete() {
       var c = document.getElementById('completeScreen');
-      var hasFiles = !skipUpload && uploadedFiles.length > 0;
-      var desc;
-      if (hasFiles) {
-        desc = 'Your responses and ' + uploadedFiles.length + ' document' + (uploadedFiles.length > 1 ? 's' : '') + ' will be packaged into a ZIP file.';
-      } else if (skipUpload) {
-        desc = 'You skipped document uploads. Your responses will be exported as a TXT file. Send your documents separately.';
-      } else {
-        desc = 'No documents uploaded. Your responses will be exported as a TXT file.';
-      }
-
       c.innerHTML =
         '<div class="complete">' +
           '<div class="big-icon"><i class="fa-solid fa-circle-check"></i></div>' +
           '<h2>Thank you</h2>' +
-          '<p>' + escapeHtml(desc) + '</p>' +
+          '<p>Your responses have been saved in this browser. Download or copy the TXT file below and send it along with your logo, menu, photos and other materials.</p>' +
           '<div class="actions">' +
-            '<button class="btn-primary" id="downloadBtn" type="button">' + (hasFiles ? 'download zip' : 'download txt') + '</button>' +
+            '<button class="btn-primary" id="downloadBtn" type="button">download txt</button>' +
             '<button class="btn-secondary" id="copyBtn" type="button">copy all responses</button>' +
           '</div>' +
-          (hasFiles ? '<div class="actions"><button class="btn-ghost" id="downloadTxtOnlyBtn" type="button">download txt only</button></div>' : '') +
           '<div class="actions">' +
             '<button class="btn-ghost" id="reviewAgainBtn" type="button">review answers</button>' +
             '<button class="btn-ghost" id="backToQBtn" type="button">back to questionnaire</button>' +
           '</div>' +
         '</div>';
 
-      document.getElementById('downloadBtn').onclick = downloadPackage;
+      document.getElementById('downloadBtn').onclick = downloadTxt;
       document.getElementById('copyBtn').onclick = copyResponses;
-      if (hasFiles) {
-        document.getElementById('downloadTxtOnlyBtn').onclick = downloadTxt;
-      }
       document.getElementById('reviewAgainBtn').onclick = function () { showScreen('review'); };
       document.getElementById('backToQBtn').onclick = function () { goToSection(currentSection); };
     }
@@ -2068,21 +1896,7 @@
         lines.push('');
 
         sec.questions.forEach(function (q) {
-          if (q.type === 'upload') {
-            lines.push('UPLOADED DOCUMENTS');
-            lines.push('');
-            if (skipUpload) {
-              lines.push('[Skipped - documents will be sent separately]');
-            } else if (uploadedFiles.length === 0) {
-              lines.push('[No files uploaded]');
-            } else {
-              uploadedFiles.forEach(function (f) {
-                lines.push('- ' + f.name + ' (' + formatSize(f.size) + ')');
-              });
-            }
-            lines.push('');
-            return;
-          }
+          if (q.type === 'documentList') return;
           if (q.type === 'menuRepeater') {
             lines.push('INDIVIDUAL MENU ITEMS');
             lines.push('');
@@ -2134,38 +1948,6 @@
       } catch (e) {
         showToast('download failed');
       }
-    }
-
-    function downloadPackage() {
-      if (skipUpload || uploadedFiles.length === 0) {
-        downloadTxt();
-        return;
-      }
-      if (typeof JSZip === 'undefined') {
-        showToast('zip unavailable, downloading txt');
-        downloadTxt();
-        return;
-      }
-      var zip = new JSZip();
-      zip.file('responses.txt', buildExportText());
-      var folder = zip.folder('documents');
-      uploadedFiles.forEach(function (f) {
-        folder.file(f.name, f);
-      });
-      zip.generateAsync({ type: 'blob' }).then(function (blob) {
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'restaurant_questionnaire.zip';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
-        showToast('zip file downloaded');
-      }).catch(function () {
-        showToast('zip failed, downloading txt');
-        downloadTxt();
-      });
     }
 
     function copyText(text, okMsg, failMsg) {
@@ -2240,8 +2022,6 @@
 
       applyStateToDOM();
       renderMenuItems();
-      renderUploadList();
-      updateUploadUI();
 
       document.getElementById('prevBtn').onclick = function () { goToSection(currentSection - 1); };
       document.getElementById('nextBtn').onclick = function () {
