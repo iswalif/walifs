@@ -1133,6 +1133,7 @@
         questions: [
           { id: 'q1', n: 1, type: 'text', label: 'Restaurant name:' },
           { id: 'q2', n: 2, type: 'textarea', label: 'Short description of the restaurant:', helper: 'What type of restaurant is it? What food or experience do you specialize in?', rows: 3 },
+          { id: 'q3', n: 3, type: 'text', label: 'Type of cuisine:', helper: 'e.g. Bengali, Italian, Chinese, fusion', placeholder: 'e.g. Bengali' },
           { id: 'q4', n: 4, type: 'text', label: 'Established year:', helper: 'Optional', placeholder: 'e.g. 2015' }
         ]
       },
@@ -1159,6 +1160,9 @@
       {
         title: 'Menu',
         questions: [
+          { id: 'q15', n: 15, type: 'radio', label: 'Do you have an existing menu we can use for the website?', options: ['Yes', 'No', 'In progress'] },
+          { id: 'q16', n: 16, type: 'checkbox', label: 'In what format is your menu available?', options: ['Digital (PDF)', 'Printed', 'Photographs', 'None'], allowOther: true },
+          { id: 'q17', n: 17, type: 'radio', label: 'How often do you update the menu or prices?', options: ['Rarely', 'Seasonally', 'Monthly', 'Frequently'] },
           { id: 'q18', n: 18, type: 'checklist', label: 'Please make sure the menu includes:', options: ['Food and drink names', 'Categories', 'Current prices', 'Short descriptions, if available'] },
           { id: 'q19', n: 19, type: 'textarea', label: 'Are any items particularly popular or signature dishes you’d like highlighted?', rows: 3 }
         ]
