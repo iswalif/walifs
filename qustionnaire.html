@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>restaurant questionnaire</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      height: 100%;
+      color-scheme: dark;
+    }
+
+    body {
+      height: 100vh;
+      height: 100dvh;
+      background: #0e0e0e;
+      color: #e5e5e5;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      font-size: 13px;
+      letter-spacing: 0.25em;
+      text-transform: lowercase;
+      opacity: 0.75;
+      flex-shrink: 0;
+    }
+
+    nav .nav-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    nav button {
+      background: transparent;
+      border: none;
+      color: #e5e5e5;
+      font: inherit;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: all 0.2s ease;
+      padding: 6px 12px;
+      border-radius: 40px;
+    }
+
+    nav button:hover {
+      opacity: 1;
+      background: rgba(229, 229, 229, 0.08);
+    }
+
+    .progress-header {
+      padding: 0 24px 16px;
+      flex-shrink: 0;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: lowercase;
+      opacity: 0.75;
+      margin-bottom: 10px;
+    }
+
+    .progress-top .pt-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .progress-top .pt-pct {
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .progress-bar-wrap {
+      height: 2px;
+      background: rgba(229, 229, 229, 0.12);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #e5e5e5;
+      width: 0;
+      transition: width 0.4s ease;
+      border-radius: 2px;
+    }
+
+    main {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0 20px 100px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .screen {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px 0 40px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 22px;
+      padding: 40px 0;
+      min-height: 55vh;
+      justify-content: center;
+    }
+
+    .welcome h1 {
+      font-size: 28px;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      line-height: 1.3;
+      max-width: 500px;
+    }
+
+    .welcome .lead {
+      font-size: 14px;
+      line-height: 1.65;
+      opacity: 0.75;
+      max-width: 480px;
+    }
+
+    .welcome .meta {
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: lowercase;
+      opacity: 0.55;
+    }
+
+    .welcome .instructions {
+      font-size: 13px;
+      line-height: 1.7;
+      opacity: 0.72;
+      max-width: 520px;
+      text-align: left;
+      padding: 20px 24px;
+      background: rgba(229, 229, 229, 0.04);
+      border-radius: 18px;
+      width: 100%;
+    }
+
+    .welcome .instructions strong {
+      font-weight: 500;
+      color: #e5e5e5;
+      letter-spacing: 0.15em;
+      text-transform: lowercase;
+      font-size: 11px;
+      display: block;
+      margin-bottom: 8px;
+      opacity: 0.8;
+    }
+
+    .welcome .instructions ul {
+      list-style: none;
+      margin-top: 2px;
+    }
+
+    .welcome .instructions li {
+      padding-left: 16px;
+      position: relative;
+      margin-top: 6px;
+    }
+
+    .welcome .instructions li::before {
+      content: '·';
+      position: absolute;
+      left: 4px;
+      opacity: 0.5;
+    }
+
+    .btn-primary {
+      background: rgba(229, 229, 229, 0.08);
+      border: none;
+      color: #e5e5e5;
+      padding: 14px 32px;
+      border-radius: 40px;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: lowercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: #e5e5e5;
+      color: #0e0e0e;
+      outline: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: none;
+      color: #e5e5e5;
+      padding: 14px 24px;
+      border-radius: 40px;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: lowercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      opacity: 0.75;
+      white-space: nowrap;
+    }
+
+    .btn-secondary:hover,
+    .btn-secondary:focus-visible {
+      opacity: 1;
+      background: rgba(229, 229, 229, 0.08);
+      outline: none;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: none;
+      color: #e5e5e5;
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: lowercase;
+      cursor: pointer;
+      font-family: inherit;
+      opacity: 0.55;
+      transition: all 0.2s ease;
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      opacity: 1;
+      background: rgba(229, 229, 229, 0.08);
+      outline: none;
+    }
+
+    .section {
+      animation: fadeIn 0.3s ease;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+
+    .section-meta {
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: lowercase;
+      opacity: 0.5;
+      margin-bottom: 26px;
+    }
+
+    .section-intro {
+      font-size: 13px;
+      line-height: 1.65;
+      opacity: 0.72;
+      margin-bottom: 26px;
+      padding: 16px 20px;
+      background: rgba(229, 229, 229, 0.04);
+      border-radius: 14px;
+    }
+
+    .question {
+      margin: 0 0 28px;
+      padding: 0;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .q-label {
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      line-height: 1.55;
+      opacity: 0.92;
+      display: block;
+    }
+
+    .q-num {
+      opacity: 0.45;
+      margin-right: 7px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .q-helper {
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      opacity: 0.48;
+      line-height: 1.55;
+      display: block;
+      margin-top: -4px;
+    }
+
+    .field-input,
+    .field-textarea,
+    .field-select {
+      width: 100%;
+      background: rgba(229, 229, 229, 0.04);
+      border: none;
+      color: #e5e5e5;
+      padding: 12px 18px;
+      border-radius: 40px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      font-family: inherit;
+      transition: background 0.2s ease;
+    }
+
+    .field-textarea {
+      border-radius: 16px;
+      resize: vertical;
+      min-height: 52px;
+      line-height: 1.55;
+      padding: 14px 18px;
+    }
+
+    .field-input:focus,
+    .field-textarea:focus,
+    .field-select:focus {
+      outline: none;
+      background: rgba(229, 229, 229, 0.1);
+    }
+
+    .field-input::placeholder,
+    .field-textarea::placeholder {
+      color: #e5e5e5;
+      opacity: 0.32;
+    }
+
+    .field-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e5e5e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 14px;
+      padding-right: 44px;
+      cursor: pointer;
+    }
+
+    .field-select option {
+      background: #1a1a1a;
+      color: #e5e5e5;
+    }
+
+    .opt-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .opt {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 40px;
+      background: rgba(229, 229, 229, 0.05);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      position: relative;
+      color: #e5e5e5;
+      min-height: 40px;
+    }
+
+    .opt:hover {
+      background: rgba(229, 229, 229, 0.12);
+    }
+
+    .opt input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .opt:has(input:checked) {
+      background: #e5e5e5;
+      color: #0e0e0e;
+    }
+
+    .opt:focus-within {
+      box-shadow: 0 0 0 2px rgba(229, 229, 229, 0.35);
+    }
+
+    .custom-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 6px 4px 16px;
+      border-radius: 40px;
+      background: rgba(229, 229, 229, 0.04);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+      color: #e5e5e5;
+      min-height: 40px;
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .custom-option .custom-label {
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+
+    .custom-option .custom-text {
+      background: transparent;
+      border: none;
+      color: #e5e5e5;
+      font: inherit;
+      padding: 6px 10px;
+      min-width: 60px;
+      width: 100%;
+      border-radius: 40px;
+    }
+
+    .custom-option .custom-text:focus {
+      outline: none;
+      background: rgba(229, 229, 229, 0.08);
+    }
+
+    .custom-option .custom-text::placeholder {
+      color: #e5e5e5;
+      opacity: 0.3;
+    }
+
+    .hours-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hours-row {
+      display: grid;
+      grid-template-columns: 96px 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .hours-day {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+      opacity: 0.7;
+      padding-left: 10px;
+    }
+
+    .hours-row input[type="time"] {
+      background: rgba(229, 229, 229, 0.04);
+      border: none;
+      color: #e5e5e5;
+      padding: 10px 14px;
+      border-radius: 40px;
+      font-size: 12px;
+      font-family: inherit;
+      width: 100%;
+      transition: background 0.2s ease;
+    }
+
+    .hours-row input[type="time"]:focus {
+      outline: none;
+      background: rgba(229, 229, 229, 0.1);
+    }
+
+    .menu-repeater {
+      margin-bottom: 8px;
+    }
+
+    .menu-repeater-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .menu-repeater-hint {
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      opacity: 0.6;
+      line-height: 1.55;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .menu-item {
+      background: rgba(229, 229, 229, 0.03);
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .menu-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .menu-item-title {
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: lowercase;
+      opacity: 0.75;
+    }
+
+    .menu-item-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .mini-btn {
+      background: transparent;
+      border: none;
+      color: #e5e5e5;
+      font: inherit;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+      padding: 6px 12px;
+      border-radius: 40px;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: all 0.2s ease;
+    }
+
+    .mini-btn:hover,
+    .mini-btn:focus-visible {
+      opacity: 1;
+      background: rgba(229, 229, 229, 0.08);
+      outline: none;
+    }
+
+    .mini-btn[data-action="remove"]:hover {
+      color: #ff8a8a;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .menu-grid .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .menu-grid .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .field-label {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+      opacity: 0.55;
+      padding-left: 14px;
+    }
+
+    .menu-grid input,
+    .menu-grid textarea {
+      background: rgba(229, 229, 229, 0.04);
+      border: none;
+      color: #e5e5e5;
+      padding: 9px 14px;
+      border-radius: 40px;
+      font-size: 12px;
+      font-family: inherit;
+      width: 100%;
+      transition: background 0.2s ease;
+    }
+
+    .menu-grid textarea {
+      border-radius: 14px;
+      resize: vertical;
+      line-height: 1.45;
+      min-height: 44px;
+      padding: 10px 14px;
+    }
+
+    .menu-grid input:focus,
+    .menu-grid textarea:focus {
+      outline: none;
+      background: rgba(229, 229, 229, 0.1);
+    }
+
+    .empty-hint {
+      font-size: 12px;
+      opacity: 0.45;
+      padding: 20px;
+      text-align: center;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: rgba(14, 14, 14, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(229, 229, 229, 0.06);
+      z-index: 50;
+      gap: 12px;
+    }
+
+    .bottom-nav .section-indicator {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: lowercase;
+      opacity: 0.55;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: #e5e5e5;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: lowercase;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+      opacity: 0.8;
+      min-width: 96px;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #e5e5e5;
+      color: #0e0e0e;
+      opacity: 1;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+    }
+
+    .save-status {
+      position: fixed;
+      bottom: 84px;
+      right: 16px;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: lowercase;
+      opacity: 0;
+      background: rgba(14, 14, 14, 0.9);
+      padding: 8px 14px;
+      border-radius: 40px;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .save-status.visible {
+      opacity: 0.75;
+    }
+
+    .save-status .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .save-status.saving .dot {
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      50% { opacity: 0.25; }
+    }
+
+    .review-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .review-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: rgba(229, 229, 229, 0.03);
+      border-radius: 40px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .review-item .ri-main {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .review-item .ri-title {
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+    }
+
+    .review-item .ri-status {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: lowercase;
+      opacity: 0.55;
+      margin-top: 2px;
+    }
+
+    .ri-btn {
+      background: transparent;
+      border: none;
+      color: #e5e5e5;
+      font: inherit;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 40px;
+      opacity: 0.6;
+      transition: all 0.2s ease;
+    }
+
+    .ri-btn:hover,
+    .ri-btn:focus-visible {
+      opacity: 1;
+      background: rgba(229, 229, 229, 0.08);
+      outline: none;
+    }
+
+    .review-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 20px 12px;
+      background: rgba(229, 229, 229, 0.03);
+      border-radius: 20px;
+    }
+
+    .stat .stat-num {
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      display: block;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat .stat-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: lowercase;
+      opacity: 0.55;
+    }
+
+    .review-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .complete {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 18px;
+      padding: 60px 0;
+      min-height: 55vh;
+      justify-content: center;
+    }
+
+    .complete .big-icon {
+      font-size: 42px;
+      opacity: 0.85;
+      margin-bottom: 4px;
+    }
+
+    .complete h2 {
+      font-size: 24px;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+
+    .complete p {
+      font-size: 14px;
+      line-height: 1.65;
+      opacity: 0.7;
+      max-width: 460px;
+    }
+
+    .complete .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      background: #161616;
+      border-radius: 24px;
+      padding: 28px;
+      max-width: 400px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      animation: modalIn 0.25s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal h3 {
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+
+    .modal p {
+      font-size: 13px;
+      line-height: 1.65;
+      opacity: 0.72;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .modal-actions .btn-primary {
+      padding: 10px 22px;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: #e5e5e5;
+      color: #0e0e0e;
+      padding: 10px 22px;
+      border-radius: 40px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      max-width: calc(100vw - 40px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(229, 229, 229, 0.3);
+      border-radius: 50%;
+      border-top-color: #e5e5e5;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .file-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: rgba(229, 229, 229, 0.04);
+      border-radius: 40px;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    .file-row .file-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: 0.85;
+    }
+
+    .file-row .file-size {
+      flex-shrink: 0;
+      opacity: 0.45;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 14px 18px; }
+      .progress-header { padding: 0 18px 14px; }
+      main { padding: 0 16px 100px; }
+      .welcome h1 { font-size: 22px; }
+      .welcome { gap: 18px; padding: 30px 0; }
+      .welcome .instructions { padding: 16px 18px; font-size: 12px; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .hours-row { grid-template-columns: 80px 1fr 1fr; }
+      .review-stats { grid-template-columns: 1fr; }
+      .bottom-nav { padding: 10px 14px; }
+      .nav-btn { min-width: 72px; padding: 10px 14px; font-size: 11px; }
+      .section-title { font-size: 18px; }
+      .save-status { bottom: 76px; right: 12px; }
+      .btn-primary { padding: 13px 26px; }
+      .btn-secondary { padding: 13px 20px; }
+    }
+
+    @media (max-width: 380px) {
+      .hours-row { grid-template-columns: 64px 1fr 1fr; gap: 4px; }
+      .hours-row input[type="time"] { padding: 8px 8px; font-size: 11px; }
+      .hours-day { padding-left: 4px; font-size: 11px; }
+      .opt { padding: 9px 14px; font-size: 11px; }
+      .bottom-nav .section-indicator { display: none; }
+      .nav-btn { min-width: 64px; }
+      .review-item { padding: 12px 16px; }
+    }
+
+    @media (min-width: 1200px) {
+      .screen { padding-top: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div>questionnaire</div>
+    <div class="nav-actions">
+      <button id="resetBtn" style="display:none" aria-label="reset questionnaire">reset</button>
+      <span>by h1m</span>
+    </div>
+  </nav>
+
+  <div id="progressHeader" class="progress-header" style="display:none">
+    <div class="progress-top">
+      <span class="pt-title" id="progressSection">—</span>
+      <span class="pt-pct" id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </div>
+
+  <main id="main">
+    <div id="welcomeScreen" class="screen"></div>
+    <div id="questionnaireScreen" class="screen" style="display:none"></div>
+    <div id="reviewScreen" class="screen" style="display:none"></div>
+    <div id="completeScreen" class="screen" style="display:none"></div>
+  </main>
+
+  <div id="bottomNav" class="bottom-nav" style="display:none">
+    <button id="prevBtn" class="nav-btn" type="button">← previous</button>
+    <span id="sectionIndicator" class="section-indicator"></span>
+    <button id="nextBtn" class="nav-btn" type="button">next →</button>
+  </div>
+
+  <div id="saveStatus" class="save-status" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="modalOverlay" class="modal-overlay" style="display:none" role="dialog" aria-modal="true"></div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var DOCUMENTS = [
+      'Restaurant logo (original file)',
+      'Latest menu (PDF, image or document)',
+      'Photographs of the printed menu (if no digital menu)',
+      'Photos of the restaurant exterior / entrance',
+      'Photos of the interior and seating area',
+      'Photos of food and signature dishes',
+      'Any other photos you’d like displayed',
+      'Existing rewards or membership system details (if applicable)',
+      'POS or billing system name (if applicable)',
+      'Written restaurant introduction (if available)',
+      'Links to restaurant websites you like (optional)'
+    ];
+
+    var SECTIONS = [
+      {
+        title: 'Restaurant Information',
+        questions: [
+          { id: 'q1', n: 1, type: 'text', label: 'Restaurant name:' },
+          { id: 'q2', n: 2, type: 'textarea', label: 'Short description of the restaurant:', helper: 'What type of restaurant is it? What food or experience do you specialize in?', rows: 3 },
+          { id: 'q3', n: 3, type: 'file', label: 'Restaurant logo:', helper: 'Please attach the original logo file if available.', multiple: false },
+          { id: 'q4', n: 4, type: 'text', label: 'Established year:', helper: 'Optional', placeholder: 'e.g. 2015' }
+        ]
+      },
+      {
+        title: 'Location & Contact',
+        questions: [
+          { id: 'q5', n: 5, type: 'textarea', label: 'Full restaurant address:', rows: 2 },
+          { id: 'q6', n: 6, type: 'url', label: 'Google Maps location link:', placeholder: 'https://maps.google.com/...' },
+          { id: 'q7', n: 7, type: 'tel', label: 'Contact phone number:', placeholder: '+880...' },
+          { id: 'q8', n: 8, type: 'tel', label: 'WhatsApp number:', helper: 'If different' },
+          { id: 'q9', n: 9, type: 'email', label: 'Email address:', helper: 'If available' },
+          { id: 'q10', n: 10, type: 'url', label: 'Facebook:' },
+          { id: 'q11', n: 11, type: 'url', label: 'Instagram:' },
+          { id: 'q12', n: 12, type: 'textarea', label: 'Other social media links:', rows: 2 }
+        ]
+      },
+      {
+        title: 'Opening Hours',
+        questions: [
+          { id: 'q13', n: 13, type: 'hours', label: 'Please provide your regular opening hours.' },
+          { id: 'q14', n: 14, type: 'textarea', label: 'Weekly closing day(s), if any:', rows: 2 }
+        ]
+      },
+      {
+        title: 'Restaurant Photos',
+        questions: [
+          { id: 'q15', n: 15, type: 'checklist', label: 'Please attach any available photographs:', options: ['Restaurant exterior / entrance', 'Interior and seating area', 'Food and signature dishes', 'Any other photos you’d like displayed'], helper: 'Original, high-quality images are preferred.' },
+          { id: 'q16', n: 16, type: 'file', label: 'Upload photographs:', helper: 'Attach as many as you like. Original, high-quality images are preferred.', multiple: true }
+        ]
+      },
+      {
+        title: 'Menu',
+        questions: [
+          { id: 'q17', n: 17, type: 'file', label: 'Latest menu file:', helper: 'Please provide your latest menu in PDF, image or document format. If no digital menu is available, provide clear photographs of the printed menu.', multiple: false },
+          { id: 'q18', n: 18, type: 'checklist', label: 'Please make sure the menu includes:', options: ['Food and drink names', 'Categories', 'Current prices', 'Short descriptions, if available'] },
+          { id: 'q19', n: 19, type: 'textarea', label: 'Are any items particularly popular or signature dishes you’d like highlighted?', rows: 3 }
+        ]
+      },
+      {
+        title: 'Reservation Preferences',
+        questions: [
+          { id: 'q20', n: 20, type: 'radio', label: 'Do you currently accept table reservations?', options: ['Yes', 'No'] },
+          { id: 'q21', n: 21, type: 'checkbox', label: 'How do customers currently make reservations?', options: ['Phone', 'WhatsApp', 'Facebook', 'In person'], allowOther: true },
+          { id: 'q22', n: 22, type: 'radio', label: 'Would you like customers to submit reservation requests through the website?', options: ['Yes', 'No'] },
+          { id: 'q23', n: 23, type: 'radio', label: 'Should reservations be confirmed manually by your staff before becoming official?', options: ['Yes', 'No', 'Not sure'] },
+          { id: 'q24', n: 24, type: 'text', label: 'Approximately how many tables does the restaurant have?' },
+          { id: 'q25', n: 25, type: 'textarea', label: 'Please provide the table numbers and seating capacities, if available.', helper: 'Example: Table 1 — 2 people, Table 2 — 4 people.', rows: 3 },
+          { id: 'q26', n: 26, type: 'textarea', label: 'Are there separate seating areas?', helper: 'Example: Indoor, outdoor, rooftop, upstairs.', rows: 2 }
+        ]
+      },
+      {
+        title: 'Restaurant Introduction',
+        questions: [
+          { id: 'q27', n: 27, type: 'textarea', label: 'Please provide a short introduction about the restaurant.', helper: 'You can mention: how the restaurant started, what makes it different, its specialties or dining experience. If you don’t have a written introduction, a few sentences or bullet points are perfectly fine.', rows: 4 }
+        ]
+      },
+      {
+        title: 'Website Preferences',
+        questions: [
+          { id: 'q28', n: 28, type: 'radio', label: 'Which languages should the website support?', options: ['English', 'Bengali', 'Both'] },
+          { id: 'q29', n: 29, type: 'textarea', label: 'Are there any particular colours, themes or design styles you prefer?', rows: 2 },
+          { id: 'q30', n: 30, type: 'textarea', label: 'Are there any restaurant websites you like?', helper: 'Optional — share links if available.', rows: 2 }
+        ]
+      },
+      {
+        title: 'Customer Management (optional)',
+        questions: [
+          { id: 'q31', n: 31, type: 'radio', label: 'Would you like the admin dashboard to maintain basic customer records?', helper: 'For example: customer name and phone number, previous visits, reservation history, frequent customer identification.', options: ['Yes', 'No', 'Maybe later'] }
+        ]
+      },
+      {
+        title: 'Loyalty Programme (optional)',
+        questions: [
+          { id: 'q32', n: 32, type: 'radio', label: 'Would you like a digital loyalty or membership programme?', helper: 'For example, customers earn points from purchases and redeem them for rewards.', options: ['Yes', 'No', 'Maybe later'] },
+          { id: 'q33', n: 33, type: 'textarea', label: 'If yes, do you already have a rewards or membership system? Briefly describe it.', rows: 2 }
+        ]
+      },
+      {
+        title: 'Sales and Expense Management (optional)',
+        questions: [
+          { id: 'q34', n: 34, type: 'radio', label: 'Would you like the admin dashboard to record daily sales and business expenses?', options: ['Yes', 'No', 'Maybe later'] },
+          { id: 'q35', n: 35, type: 'radio', label: 'Do you currently use a POS or billing system?', options: ['Yes', 'No'] },
+          { id: 'q36', n: 36, type: 'text', label: 'If yes, please mention its name.' }
+        ]
+      },
+      {
+        title: 'Final Details',
+        questions: [
+          { id: 'q37', n: 37, type: 'textarea', label: 'Who will be responsible for providing and approving website information, menu updates and prices?', rows: 2 },
+          { id: 'q38', n: 38, type: 'textarea', label: 'Is there anything else you’d like included on the website that hasn’t been mentioned above?', rows: 3 }
+        ]
+      },
+      {
+        title: 'Documents to Send',
+        intro: 'Please attach all available logos, menus, photographs and other relevant materials when returning this questionnaire. If something isn’t available yet, simply mention that.',
+        questions: [
+          { id: 'q39', n: null, type: 'documentList', label: 'Documents to send' }
+        ]
+      }
+    ];
+
+    var MENU_FIELDS = [
+      { key: 'category', label: 'Menu category', type: 'text' },
+      { key: 'name', label: 'Exact dish name', type: 'text' },
+      { key: 'description', label: 'Short description', type: 'textarea' },
+      { key: 'price', label: 'Price', type: 'text' },
+      { key: 'currency', label: 'Currency', type: 'text' },
+      { key: 'portion', label: 'Portion/serving size', type: 'text' },
+      { key: 'options', label: 'Available options or sizes', type: 'text' },
+      { key: 'variations', label: 'Variations/customizations', type: 'text' },
+      { key: 'ingredients', label: 'Main ingredients', type: 'textarea' },
+      { key: 'dietary', label: 'Dietary labels (vegetarian, vegan, gluten-free, etc.)', type: 'text' },
+      { key: 'allergens', label: 'Allergens (nuts, dairy, eggs, seafood, etc.)', type: 'text' },
+      { key: 'spice', label: 'Spice level (if relevant)', type: 'text' },
+      { key: 'bestseller', label: 'Bestseller/signature dish', type: 'text' },
+      { key: 'labels', label: "Special labels (Popular, New, Chef's Special)", type: 'text' },
+      { key: 'availability', label: 'Available all day or certain times', type: 'text' },
+      { key: 'current', label: 'Currently available', type: 'text' },
+      { key: 'photo', label: 'Dish photograph filename or link', type: 'text' },
+      { key: 'notes', label: 'Additional notes', type: 'textarea' }
+    ];
+
+    var DAYS = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+
+    var STORAGE_KEY = 'restaurant_questionnaire_v1';
+
+    var state = {
+      answers: { menuItems: [] },
+      currentSection: 0,
+      screen: 'welcome'
+    };
+
+    var currentSection = 0;
+    var saveTimer = null;
+    var toastTimer = null;
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    function escapeAttr(s) { return escapeHtml(s); }
+
+    function genId() {
+      return 'mi_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+    }
+
+    function showToast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2500);
+    }
+
+    function formatSize(bytes) {
+      if (!bytes && bytes !== 0) return '';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(0) + ' KB';
+      return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    function setSaveStatus(status) {
+      var el = document.getElementById('saveStatus');
+      if (!el) return;
+      if (status === 'saving') {
+        el.innerHTML = '<span class="dot"></span><span>saving\u2026</span>';
+        el.className = 'save-status visible saving';
+      } else if (status === 'saved') {
+        el.innerHTML = '<span class="dot"></span><span>all changes saved</span>';
+        el.className = 'save-status visible';
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(function () { el.classList.remove('visible'); }, 2000);
+      } else if (status === 'error') {
+        el.innerHTML = '<span class="dot"></span><span>unable to save</span>';
+        el.className = 'save-status visible';
+      }
+    }
+
+    function flushSave() {
+      try {
+        state.currentSection = currentSection;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        setSaveStatus('saved');
+      } catch (e) {
+        setSaveStatus('error');
+      }
+    }
+
+    function queueSave() {
+      setSaveStatus('saving');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(flushSave, 400);
+    }
+
+    function loadState() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        var parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return false;
+        state.answers = parsed.answers || {};
+        if (!Array.isArray(state.answers.menuItems)) state.answers.menuItems = [];
+        state.currentSection = typeof parsed.currentSection === 'number' ? parsed.currentSection : 0;
+        state.screen = parsed.screen || 'welcome';
+        currentSection = state.currentSection;
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function hasSavedData() {
+      try {
+        return !!localStorage.getItem(STORAGE_KEY);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function findQuestion(qid) {
+      for (var i = 0; i < SECTIONS.length; i++) {
+        for (var j = 0; j < SECTIONS[i].questions.length; j++) {
+          if (SECTIONS[i].questions[j].id === qid) return SECTIONS[i].questions[j];
+        }
+      }
+      return null;
+    }
+
+    function isQuestionAnswered(q) {
+      var val = state.answers[q.id];
+      if (q.type === 'file') {
+        return Array.isArray(val) && val.length > 0;
+      }
+      if (q.type === 'menuRepeater') {
+        return Array.isArray(val) && val.some(function (item) {
+          return item && item.name && String(item.name).trim();
+        });
+      }
+      if (q.type === 'checkbox' || q.type === 'checklist') {
+        return Array.isArray(val) && val.length > 0;
+      }
+      if (q.type === 'hours') {
+        if (!val || typeof val !== 'object') return false;
+        return Object.keys(val).some(function (d) {
+          return val[d] && (val[d].open || val[d].close);
+        });
+      }
+      if (q.type === 'documentList') return false;
+      if (typeof val === 'string') return val.trim().length > 0;
+      return val != null && val !== '';
+    }
+
+    function calcProgress() {
+      var total = 0, done = 0;
+      SECTIONS.forEach(function (sec) {
+        sec.questions.forEach(function (q) {
+          if (q.type === 'documentList') return;
+          total++;
+          if (isQuestionAnswered(q)) done++;
+        });
+      });
+      return {
+        total: total,
+        done: done,
+        pct: total ? Math.round((done / total) * 100) : 0
+      };
+    }
+
+    function updateProgress() {
+      var p = calcProgress();
+      var bar = document.getElementById('progressBar');
+      if (bar) bar.style.width = p.pct + '%';
+      var pctEl = document.getElementById('progressPct');
+      if (pctEl) pctEl.textContent = p.pct + '%';
+      var ind = document.getElementById('sectionIndicator');
+      if (ind) ind.textContent = (currentSection + 1) + ' / ' + SECTIONS.length;
+    }
+
+    function updateProgressHeader() {
+      var sec = SECTIONS[currentSection];
+      if (!sec) return;
+      var el = document.getElementById('progressSection');
+      if (el) el.textContent = 'section ' + (currentSection + 1) + ' of ' + SECTIONS.length + ' \u00b7 ' + sec.title.toLowerCase();
+      updateProgress();
+    }
+
+    function renderWelcome(hasSaved) {
+      var c = document.getElementById('welcomeScreen');
+      c.innerHTML =
+        '<div class="welcome">' +
+          '<h1>Restaurant Website Information Form</h1>' +
+          '<p class="lead">Please provide the following information so we can build your restaurant\u2019s website accurately. You can write short answers and attach existing documents or photos wherever possible.</p>' +
+          '<div class="instructions">' +
+            '<strong>how it works</strong>' +
+            '<ul>' +
+              '<li>Your answers are saved automatically in this browser as you type.</li>' +
+              '<li>You can leave and return later using the same browser and device.</li>' +
+              '<li>Answer what you can \u2014 write N/A if a question does not apply, or TBD if you are unsure.</li>' +
+              '<li>Attach logos, menus and photos where prompted; the actual files must be sent along with the exported TXT.</li>' +
+              '<li>At the end, download or copy your responses as a TXT file to send back.</li>' +
+            '</ul>' +
+          '</div>' +
+          '<div class="instructions">' +
+            '<strong>documents to send</strong>' +
+            '<ul>' + DOCUMENTS.map(function (d) { return '<li>' + escapeHtml(d) + '</li>'; }).join('') + '</ul>' +
+            '<div style="margin-top:10px"><button type="button" class="mini-btn" data-copy-docs>copy list</button></div>' +
+          '</div>' +
+          '<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">' +
+            '<button class="btn-primary" id="startBtn" type="button">' + (hasSaved ? 'continue questionnaire' : 'start questionnaire') + '</button>' +
+            (hasSaved ? '<button class="btn-ghost" id="startOverBtn" type="button">start over</button>' : '') +
+          '</div>' +
+        '</div>';
+
+      document.getElementById('startBtn').onclick = function () {
+        goToSection(hasSaved ? (state.currentSection || 0) : 0);
+      };
+      var so = document.getElementById('startOverBtn');
+      if (so) so.onclick = showResetModal;
+    }
+
+    function renderQuestionnaire() {
+      var c = document.getElementById('questionnaireScreen');
+      var html = '';
+      SECTIONS.forEach(function (sec, i) {
+        html += '<section class="section" data-section="' + i + '" style="display:none">';
+        html += '<h2 class="section-title">' + escapeHtml(sec.title) + '</h2>';
+        html += '<p class="section-meta">section ' + (i + 1) + ' of ' + SECTIONS.length + '</p>';
+        if (sec.intro) html += '<p class="section-intro">' + escapeHtml(sec.intro) + '</p>';
+        sec.questions.forEach(function (q) {
+          html += renderQuestion(q);
+        });
+        html += '</section>';
+      });
+      c.innerHTML = html;
+    }
+
+    function renderQuestion(q) {
+      var num = q.n ? '<span class="q-num">' + q.n + '.</span>' : '';
+      var helper = q.helper ? '<span class="q-helper">' + escapeHtml(q.helper) + '</span>' : '';
+
+      if (q.type === 'file') {
+        return '<div class="question" data-qid="' + q.id + '">' +
+          '<span class="q-label">' + num + escapeHtml(q.label) + '</span>' +
+          helper +
+          '<div class="file-upload">' +
+            '<button type="button" class="btn-secondary" data-file-trigger="' + q.id + '">+ choose ' + (q.multiple ? 'files' : 'file') + '</button>' +
+            '<input type="file" id="' + q.id + '-file" data-file-input="' + q.id + '" ' + (q.multiple ? 'multiple' : '') + ' style="display:none">' +
+            '<div class="file-list" id="' + q.id + '-files"></div>' +
+          '</div>' +
+        '</div>';
+      }
+
+      if (q.type === 'documentList') {
+        return '<div class="question" data-qid="' + q.id + '">' +
+          '<span class="q-label">' + escapeHtml(q.label) + '</span>' +
+          helper +
+          '<div class="instructions">' +
+            '<strong>documents to send</strong>' +
+            '<ul>' + DOCUMENTS.map(function (d) { return '<li>' + escapeHtml(d) + '</li>'; }).join('') + '</ul>' +
+          '</div>' +
+          '<div style="margin-top:10px"><button type="button" class="mini-btn" data-copy-docs>copy list</button></div>' +
+        '</div>';
+      }
+
+      if (q.type === 'menuRepeater') {
+        return '<div class="question" data-qtype="menuRepeater" data-qid="' + q.id + '">' +
+          '<div class="menu-repeater">' +
+            '<div class="menu-repeater-header">' +
+              '<p class="menu-repeater-hint">Add every dish, drink, dessert, or other menu item. Use the buttons to duplicate or remove items.</p>' +
+              '<button type="button" class="btn-secondary" id="addMenuItem">+ add menu item</button>' +
+            '</div>' +
+            '<div id="menuItemsList"></div>' +
+          '</div>' +
+        '</div>';
+      }
+
+      var field = '';
+
+      switch (q.type) {
+        case 'text':
+        case 'tel':
+        case 'email':
+        case 'url':
+        case 'number':
+        case 'date':
+          field = '<input type="' + q.type + '" id="' + q.id + '-input" class="field-input" data-qid="' + q.id + '" placeholder="' + escapeAttr(q.placeholder || '') + '" autocomplete="off">';
+          break;
+
+        case 'textarea':
+          field = '<textarea id="' + q.id + '-input" class="field-textarea" data-qid="' + q.id + '" rows="' + (q.rows || 3) + '" placeholder="' + escapeAttr(q.placeholder || '') + '"></textarea>';
+          break;
+
+        case 'select':
+          field = '<select id="' + q.id + '-input" class="field-select" data-qid="' + q.id + '">' +
+            '<option value="">\u2014 select \u2014</option>' +
+            (q.options || []).filter(function (o) { return o; }).map(function (o) {
+              return '<option value="' + escapeAttr(o) + '">' + escapeHtml(o) + '</option>';
+            }).join('') +
+          '</select>';
+          break;
+
+        case 'radio':
+          field = '<div class="opt-group" role="radiogroup">' +
+            (q.options || []).map(function (o) {
+              return '<label class="opt">' +
+                '<input type="radio" name="' + q.id + '" value="' + escapeAttr(o) + '" data-qid="' + q.id + '">' +
+                '<span>' + escapeHtml(o.toLowerCase()) + '</span>' +
+              '</label>';
+            }).join('') +
+          '</div>';
+          break;
+
+        case 'checkbox':
+        case 'checklist':
+          field = '<div class="opt-group" role="group">' +
+            (q.options || []).map(function (o) {
+              return '<label class="opt">' +
+                '<input type="checkbox" value="' + escapeAttr(o) + '" data-qid="' + q.id + '">' +
+                '<span>' + escapeHtml(o.toLowerCase()) + '</span>' +
+              '</label>';
+            }).join('') +
+            (q.allowOther ? '<div class="custom-option"><span class="custom-label">other:</span><input type="text" class="custom-text" data-custom-for="' + q.id + '" placeholder="specify" aria-label="other option"></div>' : '') +
+          '</div>';
+          break;
+
+        case 'hours':
+          field = '<div class="hours-grid">' +
+            DAYS.map(function (day) {
+              return '<div class="hours-row">' +
+                '<span class="hours-day">' + day + '</span>' +
+                '<input type="time" data-qid="' + q.id + '" data-day="' + day + '" data-part="open" aria-label="' + day + ' opening time">' +
+                '<input type="time" data-qid="' + q.id + '" data-day="' + day + '" data-part="close" aria-label="' + day + ' closing time">' +
+              '</div>';
+            }).join('') +
+          '</div>';
+          break;
+
+        default:
+          field = '<input type="text" class="field-input" data-qid="' + q.id + '">';
+      }
+
+      if (q.type === 'radio' || q.type === 'checkbox' || q.type === 'checklist' || q.type === 'hours') {
+        return '<fieldset class="question">' +
+          '<legend class="q-label">' + num + escapeHtml(q.label) + '</legend>' +
+          helper +
+          field +
+        '</fieldset>';
+      }
+
+      return '<div class="question">' +
+        '<label class="q-label" for="' + q.id + '-input">' + num + escapeHtml(q.label) + '</label>' +
+        helper +
+        field +
+      '</div>';
+    }
+
+    function renderMenuItems() {
+      var list = document.getElementById('menuItemsList');
+      if (!list) return;
+      var items = state.answers.menuItems || [];
+      if (items.length === 0) {
+        list.innerHTML = '<p class="empty-hint">no menu items added yet</p>';
+        return;
+      }
+      list.innerHTML = items.map(function (item, idx) {
+        return renderMenuItem(item, idx);
+      }).join('');
+    }
+
+    function renderMenuItem(item, idx) {
+      var fieldsHtml = MENU_FIELDS.map(function (f) {
+        var full = f.type === 'textarea' ? ' field-full' : '';
+        if (f.type === 'textarea') {
+          return '<label class="field' + full + '">' +
+            '<span class="field-label">' + escapeHtml(f.label) + '</span>' +
+            '<textarea rows="2" data-field="' + f.key + '">' + escapeHtml(item[f.key] || '') + '</textarea>' +
+          '</label>';
+        }
+        return '<label class="field' + full + '">' +
+          '<span class="field-label">' + escapeHtml(f.label) + '</span>' +
+          '<input type="text" data-field="' + f.key + '" value="' + escapeAttr(item[f.key] || '') + '">' +
+        '</label>';
+      }).join('');
+
+      return '<div class="menu-item" data-item-id="' + item.id + '">' +
+        '<div class="menu-item-header">' +
+          '<span class="menu-item-title">item ' + (idx + 1) + '</span>' +
+          '<div class="menu-item-actions">' +
+            '<button type="button" class="mini-btn" data-action="duplicate">duplicate</button>' +
+            '<button type="button" class="mini-btn" data-action="remove">remove</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="menu-grid">' + fieldsHtml + '</div>' +
+      '</div>';
+    }
+
+    function renderFileList(qid) {
+      var el = document.getElementById(qid + '-files');
+      if (!el) return;
+      var files = state.answers[qid] || [];
+      if (!files.length) { el.innerHTML = ''; return; }
+      el.innerHTML = files.map(function (f, i) {
+        return '<div class="file-row">' +
+          '<span class="file-name">' + escapeHtml(f.name) + '</span>' +
+          '<span class="file-size">' + formatSize(f.size) + '</span>' +
+          '<button type="button" class="mini-btn" data-remove-file="' + qid + '" data-file-index="' + i + '">remove</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    function renderAllFileLists() {
+      SECTIONS.forEach(function (sec) {
+        sec.questions.forEach(function (q) {
+          if (q.type === 'file') renderFileList(q.id);
+        });
+      });
+    }
+
+    function applyStateToDOM() {
+      SECTIONS.forEach(function (sec) {
+        sec.questions.forEach(function (q) {
+          var val = state.answers[q.id];
+
+          switch (q.type) {
+            case 'text':
+            case 'tel':
+            case 'email':
+            case 'url':
+            case 'number':
+            case 'date':
+            case 'textarea':
+              var input = document.getElementById(q.id + '-input');
+              if (input) input.value = val || '';
+              break;
+
+            case 'select':
+              var sel = document.getElementById(q.id + '-input');
+              if (sel) sel.value = val || '';
+              break;
+
+            case 'radio':
+              if (val) {
+                var radios = document.querySelectorAll('input[type="radio"][name="' + q.id + '"]');
+                for (var i = 0; i < radios.length; i++) {
+                  radios[i].checked = (radios[i].value === val);
+                }
+              }
+              break;
+
+            case 'checkbox':
+            case 'checklist':
+              if (Array.isArray(val)) {
+                var boxes = document.querySelectorAll('input[type="checkbox"][data-qid="' + q.id + '"]');
+                for (var j = 0; j < boxes.length; j++) {
+                  boxes[j].checked = val.indexOf(boxes[j].value) !== -1;
+                }
+                var custom = document.querySelector('input.custom-text[data-custom-for="' + q.id + '"]');
+                if (custom) {
+                  for (var k = 0; k < val.length; k++) {
+                    if (typeof val[k] === 'string' && val[k].indexOf('Other: ') === 0) {
+                      custom.value = val[k].slice(7);
+                      break;
+                    }
+                  }
+                }
+              }
+              break;
+
+            case 'hours':
+              if (val && typeof val === 'object') {
+                DAYS.forEach(function (day) {
+                  var d = val[day];
+                  if (!d) return;
+                  var openEl = document.querySelector('input[type="time"][data-qid="' + q.id + '"][data-day="' + day + '"][data-part="open"]');
+                  var closeEl = document.querySelector('input[type="time"][data-qid="' + q.id + '"][data-day="' + day + '"][data-part="close"]');
+                  if (openEl) openEl.value = d.open || '';
+                  if (closeEl) closeEl.value = d.close || '';
+                });
+              }
+              break;
+          }
+        });
+      });
+      renderAllFileLists();
+    }
+
+    function applyScreen(name) {
+      document.getElementById('welcomeScreen').style.display = name === 'welcome' ? 'block' : 'none';
+      document.getElementById('questionnaireScreen').style.display = name === 'questionnaire' ? 'block' : 'none';
+      document.getElementById('reviewScreen').style.display = name === 'review' ? 'block' : 'none';
+      document.getElementById('completeScreen').style.display = name === 'complete' ? 'block' : 'none';
+      document.getElementById('progressHeader').style.display = name === 'questionnaire' ? 'block' : 'none';
+      document.getElementById('bottomNav').style.display = name === 'questionnaire' ? 'flex' : 'none';
+    }
+
+    function showScreen(name) {
+      state.screen = name;
+      applyScreen(name);
+
+      if (name === 'review') renderReview();
+      if (name === 'questionnaire') updateProgressHeader();
+
+      document.getElementById('main').scrollTop = 0;
+      queueSave();
+    }
+
+    function goToSection(idx) {
+      currentSection = Math.max(0, Math.min(SECTIONS.length - 1, idx));
+      state.currentSection = currentSection;
+      state.screen = 'questionnaire';
+
+      var sections = document.querySelectorAll('.section');
+      for (var i = 0; i < sections.length; i++) {
+        sections[i].style.display = (i === currentSection) ? 'block' : 'none';
+      }
+
+      var prev = document.getElementById('prevBtn');
+      var next = document.getElementById('nextBtn');
+      if (prev) prev.disabled = (currentSection === 0);
+      if (next) next.textContent = (currentSection === SECTIONS.length - 1) ? 'review →' : 'next →';
+
+      applyScreen('questionnaire');
+      updateProgressHeader();
+
+      document.getElementById('main').scrollTop = 0;
+      queueSave();
+    }
+
+    function updateCheckboxGroup(qid) {
+      var boxes = document.querySelectorAll('input[type="checkbox"][data-qid="' + qid + '"]');
+      var vals = [];
+      for (var i = 0; i < boxes.length; i++) {
+        if (boxes[i].checked) vals.push(boxes[i].value);
+      }
+      var custom = document.querySelector('input.custom-text[data-custom-for="' + qid + '"]');
+      if (custom && custom.value.trim()) {
+        vals.push('Other: ' + custom.value.trim());
+      }
+      state.answers[qid] = vals;
+      queueSave();
+      updateProgress();
+    }
+
+    document.addEventListener('input', function (e) {
+      var t = e.target;
+
+      if (t.classList && t.classList.contains('custom-text') && t.dataset.customFor) {
+        updateCheckboxGroup(t.dataset.customFor);
+        return;
+      }
+
+      if (t.dataset && t.dataset.field && t.closest && t.closest('.menu-item')) {
+        var itemEl = t.closest('.menu-item');
+        var itemId = itemEl.dataset.itemId;
+        var items = state.answers.menuItems || [];
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].id === itemId) {
+            items[i][t.dataset.field] = t.value;
+            break;
+          }
+        }
+        queueSave();
+        updateProgress();
+        return;
+      }
+
+      var qid = t.dataset && t.dataset.qid;
+      if (!qid) return;
+
+      if (t.type === 'time' && t.dataset.day) {
+        var cur = (state.answers[qid] && typeof state.answers[qid] === 'object') ? state.answers[qid] : {};
+        var day = t.dataset.day;
+        if (!cur[day]) cur[day] = { open: '', close: '' };
+        cur[day][t.dataset.part] = t.value;
+        state.answers[qid] = cur;
+        queueSave();
+        updateProgress();
+        return;
+      }
+
+      if (t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && ['text', 'tel', 'email', 'url', 'number', 'date'].indexOf(t.type) !== -1)) {
+        state.answers[qid] = t.value;
+        queueSave();
+        updateProgress();
+      }
+    });
+
+    document.addEventListener('change', function (e) {
+      var t = e.target;
+
+      if (t.dataset && t.dataset.fileInput) {
+        var qid = t.dataset.fileInput;
+        var q = findQuestion(qid);
+        var files = Array.prototype.slice.call(t.files || []);
+        if (files.length && q) {
+          if (!q.multiple || !Array.isArray(state.answers[qid])) state.answers[qid] = [];
+          files.forEach(function (file) {
+            state.answers[qid].push({ name: file.name, size: file.size, type: file.type });
+          });
+          renderFileList(qid);
+          queueSave();
+          updateProgress();
+          showToast(files.length + ' file' + (files.length > 1 ? 's' : '') + ' selected');
+        }
+        t.value = '';
+        return;
+      }
+
+      var qid = t.dataset && t.dataset.qid;
+      if (!qid) return;
+
+      if (t.type === 'radio') {
+        state.answers[qid] = t.value;
+        queueSave();
+        updateProgress();
+      } else if (t.type === 'checkbox') {
+        updateCheckboxGroup(qid);
+      } else if (t.tagName === 'SELECT') {
+        state.answers[qid] = t.value;
+        queueSave();
+        updateProgress();
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      var copyBtn = e.target.closest ? e.target.closest('[data-copy-docs]') : null;
+      if (copyBtn) { copyDocuments(); return; }
+
+      var fileTrigger = e.target.closest ? e.target.closest('[data-file-trigger]') : null;
+      if (fileTrigger) {
+        var fid = fileTrigger.dataset.fileTrigger;
+        var inp = document.getElementById(fid + '-file');
+        if (inp) inp.click();
+        return;
+      }
+
+      var removeFileBtn = e.target.closest ? e.target.closest('[data-remove-file]') : null;
+      if (removeFileBtn) {
+        var rqid = removeFileBtn.dataset.removeFile;
+        var rindex = parseInt(removeFileBtn.dataset.fileIndex, 10);
+        if (Array.isArray(state.answers[rqid])) {
+          state.answers[rqid].splice(rindex, 1);
+          renderFileList(rqid);
+          queueSave();
+          updateProgress();
+        }
+        return;
+      }
+
+      if (e.target.closest && e.target.closest('#addMenuItem')) {
+        addMenuItem();
+        return;
+      }
+
+      var actionBtn = e.target.closest ? e.target.closest('[data-action]') : null;
+      if (actionBtn && actionBtn.closest('.menu-item')) {
+        var itemEl = actionBtn.closest('.menu-item');
+        var itemId = itemEl.dataset.itemId;
+        var action = actionBtn.dataset.action;
+        if (action === 'remove') removeMenuItem(itemId);
+        else if (action === 'duplicate') duplicateMenuItem(itemId);
+      }
+    });
+
+    function addMenuItem() {
+      if (!Array.isArray(state.answers.menuItems)) state.answers.menuItems = [];
+      var newItem = { id: genId() };
+      MENU_FIELDS.forEach(function (f) { newItem[f.key] = ''; });
+      state.answers.menuItems.push(newItem);
+      renderMenuItems();
+      queueSave();
+      updateProgress();
+      var items = document.querySelectorAll('.menu-item');
+      if (items.length) {
+        setTimeout(function () {
+          items[items.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
+      }
+    }
+
+    function removeMenuItem(id) {
+      state.answers.menuItems = (state.answers.menuItems || []).filter(function (x) { return x.id !== id; });
+      renderMenuItems();
+      queueSave();
+      updateProgress();
+    }
+
+    function duplicateMenuItem(id) {
+      var items = state.answers.menuItems || [];
+      var idx = -1;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].id === id) { idx = i; break; }
+      }
+      if (idx === -1) return;
+      var copy = JSON.parse(JSON.stringify(items[idx]));
+      copy.id = genId();
+      items.splice(idx + 1, 0, copy);
+      renderMenuItems();
+      queueSave();
+      updateProgress();
+    }
+
+    function renderReview() {
+      var p = calcProgress();
+      var c = document.getElementById('reviewScreen');
+
+      var html = '<h2 class="section-title">Review your answers</h2>' +
+        '<p class="section-meta">' + p.done + ' of ' + p.total + ' answered \u00b7 ' + p.pct + '% complete</p>' +
+        '<div class="review-stats">' +
+          '<div class="stat"><span class="stat-num">' + SECTIONS.length + '</span><span class="stat-label">sections</span></div>' +
+          '<div class="stat"><span class="stat-num">' + p.done + '</span><span class="stat-label">answered</span></div>' +
+          '<div class="stat"><span class="stat-num">' + (p.total - p.done) + '</span><span class="stat-label">left blank</span></div>' +
+        '</div>' +
+        '<div class="review-list" id="reviewList"></div>' +
+        '<div class="review-actions">' +
+          '<button class="btn-primary" id="reviewExportBtn" type="button">finish &amp; export</button>' +
+          '<button class="btn-secondary" id="reviewBackBtn" type="button">back to questionnaire</button>' +
+        '</div>';
+
+      c.innerHTML = html;
+
+      var list = document.getElementById('reviewList');
+      SECTIONS.forEach(function (sec, i) {
+        var qs = sec.questions.filter(function (q) { return q.type !== 'documentList'; });
+        var sDone = qs.filter(isQuestionAnswered).length;
+        var sTotal = qs.length;
+        var item = document.createElement('div');
+        item.className = 'review-item';
+        item.innerHTML =
+          '<div class="ri-main">' +
+            '<div class="ri-title">' + (i + 1) + '. ' + escapeHtml(sec.title) + '</div>' +
+            '<div class="ri-status">' + sDone + ' of ' + sTotal + ' answered</div>' +
+          '</div>' +
+          '<button class="ri-btn" type="button" data-jump="' + i + '">edit</button>';
+        list.appendChild(item);
+      });
+
+      list.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('[data-jump]') : null;
+        if (btn) goToSection(parseInt(btn.dataset.jump, 10));
+      });
+
+      document.getElementById('reviewExportBtn').onclick = function () { showScreen('complete'); };
+      document.getElementById('reviewBackBtn').onclick = function () { goToSection(currentSection); };
+    }
+
+    function renderComplete() {
+      var c = document.getElementById('completeScreen');
+      c.innerHTML =
+        '<div class="complete">' +
+          '<div class="big-icon"><i class="fa-solid fa-circle-check"></i></div>' +
+          '<h2>Thank you</h2>' +
+          '<p>Your responses have been saved in this browser. Download or copy the TXT file below and send it along with your logo, menu, photos and other materials.</p>' +
+          '<div class="actions">' +
+            '<button class="btn-primary" id="downloadBtn" type="button">download txt</button>' +
+            '<button class="btn-secondary" id="copyBtn" type="button">copy all responses</button>' +
+          '</div>' +
+          '<div class="actions">' +
+            '<button class="btn-ghost" id="reviewAgainBtn" type="button">review answers</button>' +
+            '<button class="btn-ghost" id="backToQBtn" type="button">back to questionnaire</button>' +
+          '</div>' +
+        '</div>';
+
+      document.getElementById('downloadBtn').onclick = downloadTxt;
+      document.getElementById('copyBtn').onclick = copyResponses;
+      document.getElementById('reviewAgainBtn').onclick = function () { showScreen('review'); };
+      document.getElementById('backToQBtn').onclick = function () { goToSection(currentSection); };
+    }
+
+    function formatAnswer(q) {
+      var val = state.answers[q.id];
+
+      if (q.type === 'file') {
+        if (!Array.isArray(val) || val.length === 0) return '[No files selected]';
+        return val.map(function (f) { return f.name + ' (' + formatSize(f.size) + ')'; }).join('\n');
+      }
+
+      if (q.type === 'hours') {
+        if (!val || typeof val !== 'object') return '[Not answered]';
+        return DAYS.map(function (day) {
+          var d = val[day];
+          var cap = day.charAt(0).toUpperCase() + day.slice(1);
+          if (d && (d.open || d.close)) {
+            return '  ' + cap + ': ' + (d.open || '\u2014') + ' \u2013 ' + (d.close || '\u2014');
+          }
+          return '  ' + cap + ': [Not answered]';
+        }).join('\n');
+      }
+
+      if (q.type === 'checkbox' || q.type === 'checklist') {
+        if (!Array.isArray(val) || val.length === 0) return '[Not answered]';
+        return val.join(', ');
+      }
+
+      if (typeof val === 'string') {
+        return val.trim() ? val : '[Not answered]';
+      }
+
+      return (val != null && val !== '') ? String(val) : '[Not answered]';
+    }
+
+    function buildExportText() {
+      var lines = [];
+      var sep = '==================================================';
+      var sep2 = '--------------------------------------------------';
+
+      lines.push(sep);
+      lines.push('RESTAURANT WEBSITE \u2014 INFORMATION FORM');
+      lines.push('COMPLETED RESPONSES');
+      lines.push(sep);
+      lines.push('');
+      lines.push('Exported: ' + new Date().toLocaleString());
+      lines.push('');
+
+      SECTIONS.forEach(function (sec, i) {
+        lines.push('');
+        lines.push(sep2);
+        lines.push('PART ' + (i + 1) + ' \u2014 ' + sec.title.toUpperCase());
+        lines.push(sep2);
+        lines.push('');
+
+        sec.questions.forEach(function (q) {
+          if (q.type === 'documentList') return;
+          if (q.type === 'menuRepeater') {
+            lines.push('INDIVIDUAL MENU ITEMS');
+            lines.push('');
+            var items = state.answers.menuItems || [];
+            if (items.length === 0) {
+              lines.push('[No menu items added]');
+              lines.push('');
+            } else {
+              items.forEach(function (item, idx) {
+                lines.push('--- Menu Item ' + (idx + 1) + ' ---');
+                MENU_FIELDS.forEach(function (f) {
+                  var v = item[f.key];
+                  lines.push(f.label + ': ' + ((v != null && String(v).trim()) ? v : '[Not answered]'));
+                });
+                lines.push('');
+              });
+            }
+            return;
+          }
+
+          var label = q.n ? (q.n + '. ' + q.label) : q.label;
+          lines.push(label);
+          lines.push(formatAnswer(q));
+          lines.push('');
+        });
+      });
+
+      lines.push('');
+      lines.push(sep);
+      lines.push('END OF RESPONSES');
+      lines.push(sep);
+
+      return lines.join('\n');
+    }
+
+    function downloadTxt() {
+      try {
+        var text = buildExportText();
+        var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'restaurant_questionnaire_responses.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+        showToast('txt file downloaded');
+      } catch (e) {
+        showToast('download failed');
+      }
+    }
+
+    function copyText(text, okMsg, failMsg) {
+      function fallbackCopy() {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.top = '0';
+          ta.style.left = '0';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          showToast(ok ? okMsg : failMsg);
+        } catch (e) {
+          showToast(failMsg);
+        }
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function () {
+          showToast(okMsg);
+        }).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
+    }
+
+    function copyResponses() {
+      copyText(buildExportText(), 'all responses copied', 'copy failed');
+    }
+
+    function copyDocuments() {
+      var text = DOCUMENTS.map(function (d) { return '\u2022 ' + d; }).join('\n');
+      copyText(text, 'document list copied', 'copy failed');
+    }
+
+    function showResetModal() {
+      var overlay = document.getElementById('modalOverlay');
+      overlay.innerHTML =
+        '<div class="modal">' +
+          '<h3>Reset questionnaire?</h3>' +
+          '<p>This will permanently remove all locally saved answers from this browser. This cannot be undone.</p>' +
+          '<div class="modal-actions">' +
+            '<button class="btn-ghost" id="modalCancel" type="button">cancel</button>' +
+            '<button class="btn-primary" id="modalConfirm" type="button">reset</button>' +
+          '</div>' +
+        '</div>';
+      overlay.style.display = 'flex';
+
+      document.getElementById('modalCancel').onclick = function () {
+        overlay.style.display = 'none';
+      };
+      document.getElementById('modalConfirm').onclick = function () {
+        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+        overlay.style.display = 'none';
+        location.reload();
+      };
+      overlay.onclick = function (e) {
+        if (e.target === overlay) overlay.style.display = 'none';
+      };
+    }
+
+    function init() {
+      var hasSaved = loadState();
+
+      renderWelcome(hasSaved);
+      renderQuestionnaire();
+      renderComplete();
+
+      applyStateToDOM();
+      renderMenuItems();
+
+      document.getElementById('prevBtn').onclick = function () { goToSection(currentSection - 1); };
+      document.getElementById('nextBtn').onclick = function () {
+        if (currentSection === SECTIONS.length - 1) {
+          showScreen('review');
+        } else {
+          goToSection(currentSection + 1);
+        }
+      };
+      document.getElementById('resetBtn').onclick = showResetModal;
+
+      var resetBtn = document.getElementById('resetBtn');
+      resetBtn.style.display = hasSaved ? 'block' : 'none';
+
+      if (hasSaved && state.screen && state.screen !== 'welcome') {
+        if (state.screen === 'review') {
+          showScreen('review');
+        } else if (state.screen === 'complete') {
+          showScreen('complete');
+        } else {
+          goToSection(state.currentSection || 0);
+        }
+      } else {
+        applyScreen('welcome');
+      }
+
+      updateProgress();
+      window.addEventListener('beforeunload', flushSave);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+  </script>
+</body>
+</html>
