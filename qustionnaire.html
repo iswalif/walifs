@@ -978,39 +978,6 @@
       border: 0;
     }
 
-    .file-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .file-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 16px;
-      background: rgba(229, 229, 229, 0.04);
-      border-radius: 40px;
-      font-size: 12px;
-      letter-spacing: 0.04em;
-    }
-
-    .file-row .file-name {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      opacity: 0.85;
-    }
-
-    .file-row .file-size {
-      flex-shrink: 0;
-      opacity: 0.45;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-    }
-
     @media (max-width: 600px) {
       nav { padding: 14px 18px; }
       .progress-header { padding: 0 18px 14px; }
@@ -1104,7 +1071,7 @@
         questions: [
           { id: 'q1', n: 1, type: 'text', label: 'Restaurant name:' },
           { id: 'q2', n: 2, type: 'textarea', label: 'Short description of the restaurant:', helper: 'What type of restaurant is it? What food or experience do you specialize in?', rows: 3 },
-          { id: 'q3', n: 3, type: 'file', label: 'Restaurant logo:', helper: 'Please attach the original logo file if available.', multiple: false },
+          { id: 'q3', n: 3, type: 'text', label: 'Restaurant logo:', helper: 'Please send the original logo file separately along with your responses.' },
           { id: 'q4', n: 4, type: 'text', label: 'Established year:', helper: 'Optional', placeholder: 'e.g. 2015' }
         ]
       },
@@ -1131,14 +1098,13 @@
       {
         title: 'Restaurant Photos',
         questions: [
-          { id: 'q15', n: 15, type: 'checklist', label: 'Please attach any available photographs:', options: ['Restaurant exterior / entrance', 'Interior and seating area', 'Food and signature dishes', 'Any other photos you’d like displayed'], helper: 'Original, high-quality images are preferred.' },
-          { id: 'q16', n: 16, type: 'file', label: 'Upload photographs:', helper: 'Attach as many as you like. Original, high-quality images are preferred.', multiple: true }
+          { id: 'q15', n: 15, type: 'checklist', label: 'Please attach any available photographs:', options: ['Restaurant exterior / entrance', 'Interior and seating area', 'Food and signature dishes', 'Any other photos you’d like displayed'], helper: 'Original, high-quality images are preferred. Send these files separately along with your responses.' }
         ]
       },
       {
         title: 'Menu',
         questions: [
-          { id: 'q17', n: 17, type: 'file', label: 'Latest menu file:', helper: 'Please provide your latest menu in PDF, image or document format. If no digital menu is available, provide clear photographs of the printed menu.', multiple: false },
+          { id: 'q17', n: 17, type: 'text', label: 'Latest menu file:', helper: 'Send your latest menu in PDF, image or document format separately along with your responses. If no digital menu is available, send clear photographs of the printed menu.' },
           { id: 'q18', n: 18, type: 'checklist', label: 'Please make sure the menu includes:', options: ['Food and drink names', 'Categories', 'Current prices', 'Short descriptions, if available'] },
           { id: 'q19', n: 19, type: 'textarea', label: 'Are any items particularly popular or signature dishes you’d like highlighted?', rows: 3 }
         ]
@@ -1261,13 +1227,6 @@
       toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2500);
     }
 
-    function formatSize(bytes) {
-      if (!bytes && bytes !== 0) return '';
-      if (bytes < 1024) return bytes + ' B';
-      if (bytes < 1048576) return (bytes / 1024).toFixed(0) + ' KB';
-      return (bytes / 1048576).toFixed(1) + ' MB';
-    }
-
     function setSaveStatus(status) {
       var el = document.getElementById('saveStatus');
       if (!el) return;
@@ -1326,20 +1285,8 @@
       }
     }
 
-    function findQuestion(qid) {
-      for (var i = 0; i < SECTIONS.length; i++) {
-        for (var j = 0; j < SECTIONS[i].questions.length; j++) {
-          if (SECTIONS[i].questions[j].id === qid) return SECTIONS[i].questions[j];
-        }
-      }
-      return null;
-    }
-
     function isQuestionAnswered(q) {
       var val = state.answers[q.id];
-      if (q.type === 'file') {
-        return Array.isArray(val) && val.length > 0;
-      }
       if (q.type === 'menuRepeater') {
         return Array.isArray(val) && val.some(function (item) {
           return item && item.name && String(item.name).trim();
@@ -1405,8 +1352,8 @@
               '<li>Your answers are saved automatically in this browser as you type.</li>' +
               '<li>You can leave and return later using the same browser and device.</li>' +
               '<li>Answer what you can \u2014 write N/A if a question does not apply, or TBD if you are unsure.</li>' +
-              '<li>Attach logos, menus and photos where prompted; the actual files must be sent along with the exported TXT.</li>' +
               '<li>At the end, download or copy your responses as a TXT file to send back.</li>' +
+              '<li>Logos, menus and photographs must be sent separately along with the exported TXT.</li>' +
             '</ul>' +
           '</div>' +
           '<div class="instructions">' +
@@ -1446,18 +1393,6 @@
     function renderQuestion(q) {
       var num = q.n ? '<span class="q-num">' + q.n + '.</span>' : '';
       var helper = q.helper ? '<span class="q-helper">' + escapeHtml(q.helper) + '</span>' : '';
-
-      if (q.type === 'file') {
-        return '<div class="question" data-qid="' + q.id + '">' +
-          '<span class="q-label">' + num + escapeHtml(q.label) + '</span>' +
-          helper +
-          '<div class="file-upload">' +
-            '<button type="button" class="btn-secondary" data-file-trigger="' + q.id + '">+ choose ' + (q.multiple ? 'files' : 'file') + '</button>' +
-            '<input type="file" id="' + q.id + '-file" data-file-input="' + q.id + '" ' + (q.multiple ? 'multiple' : '') + ' style="display:none">' +
-            '<div class="file-list" id="' + q.id + '-files"></div>' +
-          '</div>' +
-        '</div>';
-      }
 
       if (q.type === 'documentList') {
         return '<div class="question" data-qid="' + q.id + '">' +
@@ -1603,28 +1538,6 @@
       '</div>';
     }
 
-    function renderFileList(qid) {
-      var el = document.getElementById(qid + '-files');
-      if (!el) return;
-      var files = state.answers[qid] || [];
-      if (!files.length) { el.innerHTML = ''; return; }
-      el.innerHTML = files.map(function (f, i) {
-        return '<div class="file-row">' +
-          '<span class="file-name">' + escapeHtml(f.name) + '</span>' +
-          '<span class="file-size">' + formatSize(f.size) + '</span>' +
-          '<button type="button" class="mini-btn" data-remove-file="' + qid + '" data-file-index="' + i + '">remove</button>' +
-        '</div>';
-      }).join('');
-    }
-
-    function renderAllFileLists() {
-      SECTIONS.forEach(function (sec) {
-        sec.questions.forEach(function (q) {
-          if (q.type === 'file') renderFileList(q.id);
-        });
-      });
-    }
-
     function applyStateToDOM() {
       SECTIONS.forEach(function (sec) {
         sec.questions.forEach(function (q) {
@@ -1690,7 +1603,6 @@
           }
         });
       });
-      renderAllFileLists();
     }
 
     function applyScreen(name) {
@@ -1796,25 +1708,6 @@
 
     document.addEventListener('change', function (e) {
       var t = e.target;
-
-      if (t.dataset && t.dataset.fileInput) {
-        var qid = t.dataset.fileInput;
-        var q = findQuestion(qid);
-        var files = Array.prototype.slice.call(t.files || []);
-        if (files.length && q) {
-          if (!q.multiple || !Array.isArray(state.answers[qid])) state.answers[qid] = [];
-          files.forEach(function (file) {
-            state.answers[qid].push({ name: file.name, size: file.size, type: file.type });
-          });
-          renderFileList(qid);
-          queueSave();
-          updateProgress();
-          showToast(files.length + ' file' + (files.length > 1 ? 's' : '') + ' selected');
-        }
-        t.value = '';
-        return;
-      }
-
       var qid = t.dataset && t.dataset.qid;
       if (!qid) return;
 
@@ -1834,27 +1727,6 @@
     document.addEventListener('click', function (e) {
       var copyBtn = e.target.closest ? e.target.closest('[data-copy-docs]') : null;
       if (copyBtn) { copyDocuments(); return; }
-
-      var fileTrigger = e.target.closest ? e.target.closest('[data-file-trigger]') : null;
-      if (fileTrigger) {
-        var fid = fileTrigger.dataset.fileTrigger;
-        var inp = document.getElementById(fid + '-file');
-        if (inp) inp.click();
-        return;
-      }
-
-      var removeFileBtn = e.target.closest ? e.target.closest('[data-remove-file]') : null;
-      if (removeFileBtn) {
-        var rqid = removeFileBtn.dataset.removeFile;
-        var rindex = parseInt(removeFileBtn.dataset.fileIndex, 10);
-        if (Array.isArray(state.answers[rqid])) {
-          state.answers[rqid].splice(rindex, 1);
-          renderFileList(rqid);
-          queueSave();
-          updateProgress();
-        }
-        return;
-      }
 
       if (e.target.closest && e.target.closest('#addMenuItem')) {
         addMenuItem();
@@ -1978,11 +1850,6 @@
 
     function formatAnswer(q) {
       var val = state.answers[q.id];
-
-      if (q.type === 'file') {
-        if (!Array.isArray(val) || val.length === 0) return '[No files selected]';
-        return val.map(function (f) { return f.name + ' (' + formatSize(f.size) + ')'; }).join('\n');
-      }
 
       if (q.type === 'hours') {
         if (!val || typeof val !== 'object') return '[Not answered]';
